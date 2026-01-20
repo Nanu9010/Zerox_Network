@@ -5,7 +5,6 @@ from core.decorators import role_required
 from core.models import UserProfile
 from orders.models import AuditLog
 
-
 @role_required('ADMIN')
 def add_staff(request):
     """Create new staff/admin accounts"""
