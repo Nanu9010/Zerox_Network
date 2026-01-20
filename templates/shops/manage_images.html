@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Shop Images - {{ shop.name }}{% endblock %}
+
+{% block content %}
+<section style="background: var(--secondary); padding: 2rem 0;">
+    <div class="container">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+            <a href="{% url 'shops:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
+            <h1 style="font-size: 2rem; margin: 0;">📸 Shop Gallery</h1>
+        </div>
+        <p style="color: var(--text-secondary);">Upload photos to build trust with customers</p>
+    </div>
+</section>
+
+<section class="container" style="padding: 3rem 0;">
+    
+    <!-- Upload Section -->
+    <div class="card card-elevated" style="margin-bottom: 3rem;">
+        <h2 style="margin-bottom: 1.5rem;">Upload New Photo</h2>
+        
+        <div style="background: hsl(50, 100%, 97%); border: 1px solid hsl(50, 100%, 80%); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+            <p style="font-weight: 600; color: hsl(30, 80%, 30%); margin-bottom: 0.5rem;">⚠️ Image Rules (Strictly Enforced)</p>
+            <ul style="font-size: 0.875rem; color: hsl(30, 80%, 25%); margin-left: 1.25rem;">
+                <li>Max size: <strong>5MB</strong> per image</li>
+                <li>Min resolution: <strong>1280x720</strong> pixels</li>
+                <li>Format: JPG, JPEG, PNG only</li>
+                <li><strong>NO</strong> memes, blurred photos, or screenshots</li>
+                <li>All images require <strong>Admin Approval</strong> before going live</li>
+            </ul>
+        </div>
+        
+        <form method="POST" enctype="multipart/form-data" style="display: grid; gap: 1rem;">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label">Select Image</label>
+                {{ form.image }}
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Caption (Optional)</label>
+                {{ form.caption }}
+            </div>
+            
+            <button type="submit" class="btn btn-primary">📤 Upload Photo</button>
+        </form>
+    </div>
+    
+    <!-- Gallery Grid -->
+    <h2 style="margin-bottom: 1.5rem;">Your Photos</h2>
+    
+    {% if images %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem;">
+        {% for img in images %}
+        <div class="card" style="padding: 0; overflow: hidden; position: relative;">
+            <!-- Status Badge -->
+            <div style="position: absolute; top: 1rem; right: 1rem; z-index: 2;">
+                {% if img.is_primary %}
+                    <span class="badge badge-success">⭐ Primary</span>
+                {% endif %}
+                
+                {% if not img.is_approved %}
+                    <span class="badge badge-warning">⏳ Pending Approval</span>
+                {% else %}
+                    <span class="badge badge-success">✅ Live</span>
+                {% endif %}
+            </div>
+            
+            <!-- Image -->
+            <div style="height: 200px; overflow: hidden; background: #000;">
+                <img src="{{ img.image.url }}" alt="Shop Image" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.9;">
+            </div>
+            
+            <!-- Info & Actions -->
+            <div style="padding: 1rem;">
+                {% if img.caption %}
+                <p style="font-weight: 600; margin-bottom: 0.5rem;">{{ img.caption }}</p>
+                {% else %}
+                <p style="color: var(--text-muted); font-style: italic; margin-bottom: 0.5rem;">No caption</p>
+                {% endif %}
+                
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem;">
+                    Uploaded: {{ img.created_at|date:"M d, Y" }}
+                </p>
+                
+                <div style="display: flex; gap: 0.5rem;">
+                    {% if img.is_approved and not img.is_primary %}
+                        <a href="{% url 'shops:set_primary_image' img.id %}" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.5rem; flex: 1; text-align: center;">Example Main</a>
+                    {% endif %}
+                    
+                    <a href="{% url 'shops:delete_image' img.id %}" 
+                       class="btn btn-ghost" 
+                       style="font-size: 0.8rem; padding: 0.5rem; color: var(--error); border: 1px solid var(--error);"
+                       onclick="return confirm('Delete this image?')">
+                       🗑️ Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 4rem; background: var(--bg-light); border-radius: var(--radius-md); color: var(--text-muted);">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">📷</div>
+        <p>No images uploaded yet.</p>
+        <p>Upload your shop front photo to get started!</p>
+    </div>
+    {% endif %}
+
+</section>
+{% endblock %}

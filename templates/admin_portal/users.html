@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}User Management - Admin{% endblock %}
+
+{% block content %}
+<section style="background: var(--secondary); padding: 2rem 0;">
+    <div class="container">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
+            <h1 style="font-size: 2rem; margin: 0;">👥 User Management</h1>
+        </div>
+        <p style="color: var(--text-secondary);">Manage users and permissions</p>
+    </div>
+</section>
+
+<section class="container" style="padding: 3rem 0;">
+    
+    <!-- Top Actions -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2.5rem;">
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href="?role=all" class="btn {% if role_filter == 'all' %}btn-primary{% else %}btn-ghost{% endif %}" style="min-width: unset; flex: 1;">All</a>
+            <a href="?role=CUSTOMER" class="btn {% if role_filter == 'CUSTOMER' %}btn-primary{% else %}btn-ghost{% endif %}" style="min-width: unset; flex: 1;">👤 Customer</a>
+            <a href="?role=SHOP" class="btn {% if role_filter == 'SHOP' %}btn-primary{% else %}btn-ghost{% endif %}" style="min-width: unset; flex: 1;">🏪 Shop</a>
+            <a href="?role=ADMIN" class="btn {% if role_filter == 'ADMIN' %}btn-primary{% else %}btn-ghost{% endif %}" style="min-width: unset; flex: 1;">👑 Admin</a>
+            <a href="?role=STAFF" class="btn {% if role_filter == 'STAFF' %}btn-primary{% else %}btn-ghost{% endif %}" style="min-width: unset; flex: 1;">📋 Staff</a>
+        </div>
+        <a href="{% url 'admin_portal:add_staff' %}" class="btn btn-primary" style="width: 100%;">
+            ➕ Add Staff Member
+        </a>
+    </div>
+    
+    <!-- User Table -->
+    <div class="card">
+        <div class="table-responsive">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border-color);">
+                        <th style="padding: 1rem; text-align: left;">Name</th>
+                        <th style="padding: 1rem; text-align: left;">Email</th>
+                        <th style="padding: 1rem; text-align: left;">Role</th>
+                        <th style="padding: 1rem; text-align: left;">Status</th>
+                        <th style="padding: 1rem; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 1rem;">
+                            <strong>{{ user.username }}</strong>
+                        </td>
+                        <td style="padding: 1rem;">{{ user.email|default:"No email" }}</td>
+                        <td style="padding: 1rem;">
+                            {% if user.profile.role == 'CUSTOMER' %}
+                                <span class="badge" style="background: hsl(210, 100%, 95%); color: hsl(210, 100%, 40%);">👤 Customer</span>
+                            {% elif user.profile.role == 'SHOP' %}
+                                <span class="badge" style="background: hsl(145, 60%, 95%); color: var(--primary);">🏪 Shop</span>
+                            {% elif user.profile.role == 'ADMIN' %}
+                                <span class="badge" style="background: hsl(30, 100%, 95%); color: hsl(30, 100%, 40%);">👑 Admin</span>
+                            {% elif user.profile.role == 'STAFF' %}
+                                <span class="badge" style="background: hsl(280, 60%, 95%); color: hsl(280, 60%, 40%);">📋 Staff</span>
+                            {% else %}
+                                <span class="badge" style="background: hsl(0, 0%, 95%); color: hsl(0, 0%, 40%);">❓ No Role</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 1rem;">
+                            {% if user.profile.is_blocked %}
+                                <span class="badge badge-error">🚫 Blocked</span>
+                            {% else %}
+                                <span class="badge badge-success">✅ Active</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 1rem; text-align: right;">
+                            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                                <a href="{% url 'admin_portal:view_user' user.id %}" class="btn btn-ghost" style="padding: 0.5rem 0.75rem; font-size: 0.875rem; width: auto; min-width: auto; min-height: auto;">
+                                    👁️
+                                </a>
+                                <a href="{% url 'admin_portal:edit_user' user.id %}" class="btn btn-secondary" style="padding: 0.5rem 0.75rem; font-size: 0.875rem; width: auto; min-width: auto; min-height: auto;">
+                                    ✏️
+                                </a>
+                                {% if user.profile.role != 'ADMIN' %}
+                                    {% if user.profile.is_blocked %}
+                                        <form method="POST" action="{% url 'admin_portal:unblock_user' user.id %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-ghost" style="padding: 0.5rem 0.75rem; font-size: 0.875rem; background: hsl(145, 60%, 95%); color: var(--primary); width: auto; min-width: auto; min-height: auto;">
+                                                Unblock
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form method="POST" action="{% url 'admin_portal:block_user' user.id %}" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-ghost" style="padding: 0.5rem 0.75rem; font-size: 0.875rem; border-color: hsl(0, 80%, 50%); color: hsl(0, 80%, 50%); width: auto; min-width: auto; min-height: auto;">
+                                                Block
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                            No users found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+</section>
+{% endblock %}

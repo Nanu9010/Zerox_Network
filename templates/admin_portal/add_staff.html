@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Staff - Admin{% endblock %}
+
+{% block content %}
+<section style="background: var(--secondary); padding: 2rem 0;">
+    <div class="container">
+        <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">➕ Add Staff Member</h1>
+        <p style="color: var(--text-secondary);">Create a staff account with admin privileges</p>
+    </div>
+</section>
+
+<section class="container" style="padding: 3rem 0;">
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div class="card card-elevated">
+            
+            {% if messages %}
+                {% for message in messages %}
+                <div class="card {% if message.tags == 'success' %}badge-success{% elif message.tags == 'error' %}badge-error{% endif %}" style="margin-bottom: 1.5rem; padding: 1rem;">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="full_name" class="form-input" placeholder="e.g., John Doe" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-input" placeholder="Choose a username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-input" placeholder="staff@zerox.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" name="phone" class="form-input" placeholder="+91 1234567890" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-input" placeholder="Create a strong password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" name="password2" class="form-input" placeholder="Confirm password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Role & Permissions</label>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <label class="feature-card" style="cursor: pointer; padding: 1rem; border: 2px solid var(--primary); background: hsl(145, 60%, 97%);">
+                            <input type="radio" name="role" value="ADMIN" checked style="margin-right: 0.5rem;">
+                            <div>
+                                <strong>👑 Full Admin</strong>
+                                <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">Complete access to all admin functions</p>
+                            </div>
+                        </label>
+                        <label class="feature-card staff-role" style="cursor: pointer; padding: 1rem; border: 2px solid var(--border-color);">
+                            <input type="radio" name="role" value="STAFF" style="margin-right: 0.5rem;">
+                            <div>
+                                <strong>📋 Staff Member</strong>
+                                <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">Limited admin access (view only, basic approvals)</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; justify-content: center;">
+                        ✅ Create Staff Account
+                    </button>
+                    <a href="{% url 'admin_portal:users' %}?role=all" class="btn btn-secondary" style="width: 100%; height: 48px; justify-content: center; display: flex; align-items: center;">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+// Role card selection
+document.querySelectorAll('.staff-role').forEach(card => {
+    card.addEventListener('click', function() {
+        document.querySelectorAll('.feature-card').forEach(c => {
+            c.style.borderColor = 'var(--border-color)';
+            c.style.background = 'white';
+        });
+        this.style.borderColor = 'var(--primary)';
+        this.style.background = 'hsl(145, 60%, 97%)';
+    });
+});
+</script>
+{% endblock %}

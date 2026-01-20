@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up - Zerox{% endblock %}
+
+{% block content %}
+<section class="container" style="padding: 4rem 0; min-height: 70vh; display: flex; align-items: center; justify-content: center;">
+    <div style="max-width: 500px; width: 100%;">
+        <div class="card card-elevated">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="width: 64px; height: 64px; background: var(--primary); border-radius: var(--radius-lg); display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 2rem; margin-bottom: 1rem;">
+                    ✨
+                </div>
+                <h1 style="margin-bottom: 0.5rem;">Create Account</h1>
+                <p style="color: var(--text-secondary);">Join Zerox printing network</p>
+            </div>
+            
+            {% if messages %}
+                {% for message in messages %}
+                <div class="card {% if message.tags == 'success' %}badge-success{% elif message.tags == 'error' %}badge-error{% endif %}" style="margin-bottom: 1.5rem; padding: 1rem; border-left: 4px solid {% if message.tags == 'success' %}var(--success){% else %}var(--error){% endif %};">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label">Account Type</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <label class="feature-card" style="cursor: pointer; padding: 1rem; margin: 0; border: 2px solid var(--primary); background: hsl(145, 60%, 97%);">
+                            <input type="radio" name="role" value="CUSTOMER" checked style="display: none;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">👤</div>
+                                <div style="font-weight: 700; font-size: 0.875rem;">Customer</div>
+                            </div>
+                        </label>
+                        <label class="feature-card role-card" style="cursor: pointer; padding: 1rem; margin: 0;">
+                            <input type="radio" name="role" value="SHOP" style="display: none;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🏪</div>
+                                <div style="font-weight: 700; font-size: 0.875rem;">Shop Owner</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-input" placeholder="Choose a username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-input" placeholder="your@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" name="phone" class="form-input" placeholder="+91 1234567890" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-input" placeholder="Create a password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" name="password2" class="form-input" placeholder="Confirm your password" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-top: 1rem;">
+                    Create Account
+                </button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid hsl(0, 0%, 90%);">
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">
+                    Already have an account? 
+                    <a href="{% url 'core:login' %}" style="color: var(--primary); font-weight: 600; text-decoration: none;">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Role card selection
+document.querySelectorAll('.role-card').forEach(card => {
+    card.addEventListener('click', function() {
+        document.querySelectorAll('.role-card, .role-card').forEach(c => {
+            c.style.borderColor = 'hsl(0, 0%, 93%)';
+            c.style.background = 'white';
+        });
+        this.style.borderColor = 'var(--primary)';
+        this.style.background = 'hsl(145, 60%, 97%)';
+    });
+});
+</script>
+{% endblock %}

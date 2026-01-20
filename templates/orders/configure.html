@@ -1,0 +1,478 @@
+{% extends 'base.html' %}
+
+{% block title %}Configure Print - Zerox{% endblock %}
+
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+
+<style>
+    /* Custom Pill Styles */
+    .pill-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .pill-option {
+        flex: 1;
+        min-width: 80px;
+        position: relative;
+    }
+    
+    .pill-option input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+    
+    .pill-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1rem;
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: var(--radius-lg);
+        font-weight: 600;
+        color: var(--text-secondary);
+        transition: all 0.2s;
+        height: 100%;
+        text-align: center;
+        font-size: 0.9rem;
+    }
+    
+    .pill-option input:checked + .pill-label {
+        border-color: var(--primary);
+        background: #f0fdf4; /* Light green tint */
+        color: var(--primary);
+        box-shadow: 0 4px 6px -1px rgba(15, 157, 88, 0.1);
+    }
+    
+    /* File Strip Styles */
+    .file-strip {
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+        padding: 1rem;
+        padding-bottom: 1.5rem;
+        scrollbar-width: none; /* Hide scrollbar Firefox */
+        -ms-overflow-style: none; /* Hide scrollbar IE */
+    }
+    .file-strip::-webkit-scrollbar {
+        display: none; /* Hide scrollbar Chrome/Safari */
+    }
+    
+    .file-thumb {
+        min-width: 140px;
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: var(--radius-lg);
+        padding: 0.5rem;
+        opacity: 0.6;
+        transition: all 0.2s;
+        text-align: center;
+    }
+    
+    .file-thumb.active {
+        opacity: 1;
+        border-color: var(--primary);
+        transform: scale(1.05);
+        box-shadow: var(--shadow-md);
+    }
+    
+    /* Sticky Footer */
+    .sticky-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 1rem;
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    
+    .section-title {
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 0.75rem;
+    }
+</style>
+
+<div style="padding-bottom: 120px; background: var(--bg-gray); min-height: 100vh;">
+    
+    <form method="POST" id="configForm">
+        {% csrf_token %}
+        
+        <!-- STEP A: File Selector -->
+        <div style="background: white; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb;">
+            <div class="container">
+                <h3 style="padding-top: 1rem; margin-bottom: 0;">Documents</h3>
+            </div>
+            
+            <div class="file-strip" id="fileSlider">
+                {% for file in files %}
+                <div class="file-thumb {% if forloop.first %}active{% endif %}" onclick="selectFile({{ file.id }})" id="card_{{ file.id }}">
+                    <!-- Canvas for thumb -->
+                    <canvas id="thumb_{{ file.id }}" style="width: 100%; height: 100px; object-fit: contain; margin-bottom: 0.5rem; background: #fafafa;"></canvas>
+                    <div style="font-weight: 600; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ file.file_name }}</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted);">{{ file.pages_count }} pgs</div>
+                </div>
+                {% endfor %}
+                
+                <!-- Add Button -->
+                <div class="file-thumb" onclick="document.getElementById('addFileInput').click()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; border-style: dashed; opacity: 1;">
+                    <span style="font-size: 2rem; color: var(--primary);">+</span>
+                    <span style="font-size: 0.8rem; font-weight: 600; color: var(--primary);">Add File</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hidden file input -->
+        <input type="file" id="addFileInput" accept=".pdf,.jpg,.jpeg,.png" multiple style="display: none;" onchange="handleAddFiles(event)">
+
+        <!-- STEP B: Settings -->
+        <div class="container" style="padding-top: 1.5rem;">
+            
+            <!-- Global / Individual Toggle -->
+             <div class="pill-group" style="margin-bottom: 2rem;">
+                <label class="pill-option">
+                    <input type="radio" name="apply_to_all" value="on" checked onchange="toggleApplyMode()">
+                    <span class="pill-label">Apply to ALL</span>
+                </label>
+                <label class="pill-option">
+                    <input type="radio" name="apply_to_all" value="off" onchange="toggleApplyMode()">
+                    <span class="pill-label">This File Only</span>
+                </label>
+            </div>
+
+            <!-- Configuration Sections -->
+            <div class="card" style="border: none; box-shadow: none; padding: 0; background: transparent;">
+                
+                <!-- Pages Per Sheet -->
+                <p class="section-title">Pages per Sheet</p>
+                <div class="pill-group">
+                    {% for val in "1,2,4,6"|make_list %}
+                    <label class="pill-option">
+                        <input type="radio" name="pages_per_sheet" value="{{ val }}" {% if val == "1" %}checked{% endif %} onchange="updateSettings()">
+                        <span class="pill-label">{{ val }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <!-- Print Type -->
+                <p class="section-title">Print Type</p>
+                 <div class="pill-group">
+                    <label class="pill-option">
+                        <input type="radio" name="print_type" value="ALL" checked onchange="updateSettings()">
+                        <span class="pill-label">All Pages</span>
+                    </label>
+                    <label class="pill-option">
+                        <input type="radio" name="print_type" value="ODD" onchange="updateSettings()">
+                        <span class="pill-label">Odd</span>
+                    </label>
+                    <label class="pill-option">
+                        <input type="radio" name="print_type" value="EVEN" onchange="updateSettings()">
+                        <span class="pill-label">Even</span>
+                    </label>
+                </div>
+
+                <!-- Color -->
+                <div class="grid grid-2" style="gap: 1rem; margin-bottom: 0;">
+                    <div>
+                        <p class="section-title">Color</p>
+                        <div class="pill-group" style="margin-bottom: 0;"> <!-- Reset margin for grid context -->
+                            <label class="pill-option">
+                                <input type="radio" name="color_type" value="BW" checked onchange="updateSettings()">
+                                <span class="pill-label">B/W</span>
+                            </label>
+                            <label class="pill-option">
+                                <input type="radio" name="color_type" value="COLOR" onchange="updateSettings()">
+                                <span class="pill-label">Color</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div>
+                         <p class="section-title">Sides</p>
+                         <div class="pill-group" style="margin-bottom: 0;">
+                            <label class="pill-option">
+                                <input type="radio" name="print_side" value="SINGLE" checked onchange="updateSettings()">
+                                <span class="pill-label">Single</span>
+                            </label>
+                            <label class="pill-option">
+                                <input type="radio" name="print_side" value="DOUBLE" onchange="updateSettings()">
+                                <span class="pill-label">Double</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Paper Size -->
+                <div style="margin-top: 1.5rem;">
+                    <p class="section-title">Paper Size</p>
+                    <div class="pill-group">
+                        <label class="pill-option">
+                            <input type="radio" name="paper_size" value="A4" checked onchange="updateSettings()">
+                            <span class="pill-label">A4 (Standard)</span>
+                        </label>
+                        <label class="pill-option">
+                            <input type="radio" name="paper_size" value="A3" onchange="updateSettings()">
+                            <span class="pill-label">A3 (Large)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Copies -->
+                <div style="margin-top: 1.5rem;">
+                    <p class="section-title">Copies</p>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <button type="button" class="btn btn-secondary" style="width: 48px; border-radius: 50%; padding: 0;" onclick="adjustCopies(-1)">-</button>
+                        <input type="number" name="copies" value="1" min="1" class="form-input" style="text-align: center; width: 80px;" onchange="updateSettings()" readonly>
+                        <button type="button" class="btn btn-secondary" style="width: 48px; border-radius: 50%; padding: 0;" onclick="adjustCopies(1)">+</button>
+                    </div>
+                </div>
+                
+                <!-- Note -->
+                <div class="form-group" style="margin-top: 2rem;">
+                    <label class="form-label">Special Instructions</label>
+                    <textarea name="special_note" class="form-input" placeholder="e.g. Spiral Binding, Staple left corner..." rows="2" onchange="updateSettings()"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sticky Footer -->
+        <div class="sticky-footer">
+            <div>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0;">Estimated Total</p>
+                <div style="display: flex; align-items: baseline; gap: 0.5rem;">
+                    <h2 id="totalPriceDisplay" style="margin: 0; color: var(--text-primary);">₹0</h2>
+                    <span id="totalSheetsDisplay" style="font-size: 0.8rem; color: var(--text-secondary);">0 sheets</span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="padding: 0 2rem; min-width: 150px;">
+                PAY NOW
+            </button>
+        </div>
+
+        <!-- Hidden Inputs for Submission -->
+        <div id="hiddenInputs"></div>
+        
+    </form>
+</div>
+
+<script>
+// Data Store (Same logic as before, updated for new UI)
+const files = {
+    {% for file in files %}
+    {{ file.id }}: {
+        id: {{ file.id }},
+        name: "{{ file.file_name }}",
+        url: "{{ file.file.url }}",
+        pages: {{ file.pages_count }},
+        settings: {
+            pages_per_sheet: 1, print_type: 'ALL', paper_size: 'A4',
+            color_type: 'BW', print_side: 'SINGLE', copies: 1, special_note: ''
+        }
+    },
+    {% endfor %}
+};
+
+let currentFileId = {{ files.0.id }};
+let applyAll = true;
+const prices = {
+    A4_BW: {{ shop.a4_bw_price }},
+    A4_COLOR: {{ shop.a4_color_price }},
+    A3_BW: {{ shop.a3_bw_price }},
+    A3_COLOR: {{ shop.a3_color_price }}
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    generateThumbnails();
+    calculateTotals();
+});
+
+function adjustCopies(delta) {
+    const input = document.querySelector('input[name="copies"]');
+    let val = parseInt(input.value) + delta;
+    if (val < 1) val = 1;
+    input.value = val;
+    updateSettings();
+}
+
+function selectFile(id) {
+    currentFileId = id;
+    document.querySelectorAll('.file-thumb').forEach(el => el.classList.remove('active'));
+    document.getElementById(`card_${id}`).classList.add('active');
+    
+    if (!applyAll) {
+        loadSettingsToForm(files[id].settings);
+    }
+}
+
+function toggleApplyMode() {
+    applyAll = document.querySelector('input[name="apply_to_all"]:checked').value === 'on';
+    if (applyAll) updateSettings();
+    else loadSettingsToForm(files[currentFileId].settings);
+}
+
+function updateSettings() {
+    const form = document.getElementById('configForm');
+    
+    // Helper to get checked value
+    const getVal = (name) => {
+        const el = document.querySelector(`input[name="${name}"]:checked`);
+        return el ? el.value : null;
+    };
+
+    const newSettings = {
+        pages_per_sheet: parseInt(getVal('pages_per_sheet')),
+        print_type: getVal('print_type'),
+        paper_size: getVal('paper_size'),
+        color_type: getVal('color_type'),
+        print_side: getVal('print_side'),
+        copies: parseInt(form.copies.value),
+        special_note: form.special_note.value
+    };
+
+    if (applyAll) {
+        for (let id in files) files[id].settings = {...newSettings};
+    } else {
+        files[currentFileId].settings = {...newSettings};
+    }
+    
+    updateHiddenInputs();
+    calculateTotals();
+}
+
+function loadSettingsToForm(settings) {
+    const setVal = (name, val) => {
+        const el = document.querySelector(`input[name="${name}"][value="${val}"]`);
+        if (el) el.checked = true;
+    };
+    
+    setVal('pages_per_sheet', settings.pages_per_sheet);
+    setVal('print_type', settings.print_type);
+    setVal('paper_size', settings.paper_size);
+    setVal('color_type', settings.color_type);
+    setVal('print_side', settings.print_side);
+    
+    document.querySelector('input[name="copies"]').value = settings.copies;
+    document.querySelector('textarea[name="special_note"]').value = settings.special_note;
+}
+
+function updateHiddenInputs() {
+    const container = document.getElementById('hiddenInputs');
+    container.innerHTML = '';
+    if (!applyAll) {
+        for (let id in files) {
+            const s = files[id].settings;
+            for (let key in s) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = `file_${id}_${key}`;
+                input.value = s[key];
+                container.appendChild(input);
+            }
+        }
+    }
+}
+
+function calculateTotals() {
+    let totalSheets = 0;
+    let totalPrice = 0;
+    for (let id in files) {
+        const f = files[id];
+        const s = f.settings;
+        let adjPages = f.pages;
+        if (s.print_type === 'ODD' || s.print_type === 'EVEN') adjPages = Math.ceil(f.pages / 2);
+        let sheets = Math.ceil(adjPages / s.pages_per_sheet);
+        if (s.print_side === 'DOUBLE') sheets = Math.ceil(sheets / 2);
+        sheets = sheets * s.copies;
+        
+        let rateKey = `${s.paper_size}_${s.color_type}`;
+        let rate = prices[rateKey] || 0;
+        
+        totalSheets += sheets;
+        totalPrice += sheets * rate;
+    }
+    document.getElementById('totalSheetsDisplay').innerText = `${totalSheets} sheets`;
+    document.getElementById('totalPriceDisplay').innerText = `₹${totalPrice.toFixed(2)}`;
+}
+
+function generateThumbnails() {
+    for (let id in files) {
+        const url = files[id].url;
+        const canvas = document.getElementById(`thumb_${id}`);
+        if (!canvas) continue;
+        
+        if (url.match(/\.(jpg|jpeg|png)$/i)) {
+             // Image thumbnail (simplified)
+             const img = new Image();
+             img.onload = () => {
+                 canvas.width = img.width;
+                 canvas.height = img.height;
+                 canvas.getContext('2d').drawImage(img, 0, 0);
+             };
+             img.src = url;
+        } else {
+            // PDF thumbnail
+            pdfjsLib.getDocument(url).promise.then(pdf => {
+                pdf.getPage(1).then(page => {
+                    const viewport = page.getViewport({scale: 0.3});
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    page.render({
+                        canvasContext: canvas.getContext('2d'),
+                        viewport: viewport
+                    });
+                });
+            });
+        }
+    }
+}
+async function handleAddFiles(event) {
+    const newFiles = event.target.files;
+    if (!newFiles.length) return;
+
+    const formData = new FormData();
+    for (let i = 0; i < newFiles.length; i++) {
+        formData.append('files', newFiles[i]);
+    }
+
+    try {
+        const response = await fetch("{% url 'orders:add_files' order.id %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            // Reload to update UI with new files
+            window.location.reload();
+        } else {
+            alert('Error adding files: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to upload files. Please try again.');
+    } finally {
+        // Clear input
+        event.target.value = '';
+    }
+}
+</script>
+{% endblock %}

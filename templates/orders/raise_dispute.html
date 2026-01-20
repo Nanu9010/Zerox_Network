@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: auto; padding: 2rem;">
+  <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+      <a href="{% url 'orders:my_orders' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
+      <h2 style="margin: 0; font-weight: 600;">Raise a Dispute</h2>
+  </div>
+  <p class="text-center text-muted">Order #{{ order.id }} - {{ order.shop.name }}</p>
+  
+  <div class="alert alert-warning mt-3">
+    <small><strong>Note:</strong> You can only raise a dispute within 48 hours of pickup. Please provide clear evidence.</small>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="mt-4">
+    {% csrf_token %}
+    
+    <div class="form-group mb-3">
+        <label class="form-label">Issue Type</label>
+        <select name="issue_type" class="form-control" required>
+            <option value="" disabled selected>Select an issue...</option>
+            <option value="MISSING_FILES">Missing Files</option>
+            <option value="POOR_QUALITY">Poor Print Quality</option>
+            <option value="WRONG_PAPER">Wrong Paper/Settings</option>
+            <option value="OTHER">Other</option>
+        </select>
+    </div>
+
+    <div class="form-group mb-3">
+      <label class="form-label">Description</label>
+      <textarea name="description" class="form-control" rows="4" placeholder="Describe what went wrong..." required></textarea>
+    </div>
+
+    <div class="form-group mb-3">
+      <label class="form-label">Proof Photo (Required)</label>
+      <input type="file" name="proof_image" accept="image/*" required class="form-control" />
+      <small class="text-muted">Please upload a photo of the printed papers you received.</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block" style="width: 100%; font-weight: 600;">Submit Dispute</button>
+    <a href="{% url 'orders:my_orders' %}" class="btn btn-ghost mt-2" style="width: 100%; text-align: center; display: block;">Cancel</a>
+  </form>
+</div>
+{% endblock %}

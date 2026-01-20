@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Zerox - Find Print Shops Near You{% endblock %}</title>
+
+    <!-- Fonts: Manrope -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    
+    <!-- Navigation (Floating Pill style on Mobile/Desktop?) Keeping it simple top bar for now as per "Minimal" -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="/" class="navbar-brand">
+                <span class="navbar-brand-icon">Z</span>
+                Zerox
+            </a>
+            
+            <!-- Desktop Menu -->
+            <ul class="navbar-nav desktop-only">
+                <li><a href="/" class="navbar-link">Home</a></li>
+                <li><a href="/shop/list/" class="navbar-link">Find Shops</a></li>
+                <li><a href="/shop/register/" class="navbar-link">Partner</a></li>
+                {% if user.is_authenticated %}
+                     <li><a href="{% url 'core:dashboard' %}" class="navbar-link">Dashboard</a></li>
+                     <li><a href="{% url 'core:profile' %}" class="navbar-link">Profile</a></li>
+                {% else %}
+                    <li><a href="{% url 'core:login' %}" class="navbar-link">Login</a></li>
+                {% endif %}
+            </ul>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="menu-toggle" onclick="openMenu()">
+                <div style="width: 24px; height: 2px; background: var(--text-primary); margin-bottom: 6px;"></div>
+                <div style="width: 24px; height: 2px; background: var(--text-primary); margin-bottom: 6px;"></div>
+                <div style="width: 24px; height: 2px; background: var(--text-primary);"></div>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Mobile Overlay Menu (Qwikprint style) -->
+    <div id="mobileMenu" class="mobile-menu-overlay">
+        <div class="mobile-menu-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div class="navbar-brand">
+                    <span class="navbar-brand-icon">Z</span> Zerox
+                </div>
+                <button onclick="closeMenu()" style="background: none; border: 2px solid var(--warning); color: var(--text-primary); border-radius: 50%; width: 40px; height: 40px; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                    ✕
+                </button>
+            </div>
+            
+            <ul class="mobile-menu-list">
+                <li><a href="/" onclick="closeMenu()">Home</a></li>
+                <li><a href="/shop/list/" onclick="closeMenu()">Xerox Shops</a></li>
+                <li><a href="/shop/register/" onclick="closeMenu()">Franchise / Partner</a></li>
+                <li><a href="#" onclick="closeMenu()">How it Works?</a></li>
+                <li><a href="#" onclick="closeMenu()">Customer Service</a></li>
+                
+                {% if user.is_authenticated %}
+                    <li style="margin-top: 1rem; border-top: 1px solid var(--bg-subtle); padding-top: 1rem;">
+                        <a href="{% url 'core:dashboard' %}" onclick="closeMenu()">Dashboard</a>
+                    </li>
+                    <li><a href="/order/my-orders/" onclick="closeMenu()">My Orders</a></li>
+                    <li><a href="{% url 'core:profile' %}" onclick="closeMenu()">Profile</a></li>
+                    <li><a href="{% url 'core:logout' %}" style="color: var(--error);" onclick="closeMenu()">Logout</a></li>
+                {% else %}
+                    <li style="margin-top: 1rem;">
+                        <a href="{% url 'core:login' %}" class="btn btn-primary" onclick="closeMenu()">Login / Signup</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main style="min-height: 60vh;">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer (Qwikprint style) -->
+    <footer class="footer">
+        <div class="container text-center mb-4">
+            <div class="navbar-brand justify-content-center mb-2" style="justify-content: center;">
+                <span class="navbar-brand-icon">Z</span> Zerox
+            </div>
+            <p class="text-secondary" style="max-width: 400px; margin: 0 auto;">
+                India's First & Only Self-Service<br>Printing Vending Network
+            </p>
+        </div>
+
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Navigation Column -->
+                <div class="footer-col text-center-mobile">
+                    <h4 class="mb-3">Navigation</h4>
+                    <a href="/shop/list/" class="footer-link">Xerox Shops</a>
+                    <a href="#" class="footer-link">How it works</a>
+                    <a href="/shop/register/" class="footer-link">Franchise</a>
+                    <a href="#" class="footer-link">Customer Service</a>
+                </div>
+
+                <!-- Social Column -->
+                <div class="footer-col text-center-mobile">
+                    <h4 class="mb-3">Social</h4>
+                    <a href="#" class="footer-link">Twitter (X)</a>
+                    <a href="#" class="footer-link">Instagram</a>
+                    <a href="#" class="footer-link">Youtube</a>
+                    <a href="#" class="footer-link">Linkedin</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom mt-4 pt-4 text-center">
+                <div class="mb-3" style="display: flex; justify-content: center; gap: 2rem; color: var(--text-muted);">
+                    <a href="#" class="text-muted" style="text-decoration: none;">Terms & Conditions</a>
+                    <a href="#" class="text-muted" style="text-decoration: none;">Privacy Policy</a>
+                </div>
+                <p class="text-muted text-sm">
+                    &copy; 2026 Zerox Automate<br>
+                    Unit of Echto Ventures LLP
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script>
+    function openMenu() {
+        document.getElementById('mobileMenu').classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    function closeMenu() {
+        document.getElementById('mobileMenu').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Close on outside click
+    document.getElementById('mobileMenu').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeMenu();
+        }
+    });
+    </script>
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block content %}
+<section class="container" style="min-height: 90vh; display: flex; align-items: center; padding: 3rem 0;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; width: 100%;">
+        
+        <!-- Left Column: Text & CTA -->
+        <div>
+            <h1 class="mb-4" style="font-size: 3.5rem; line-height: 1.1; font-weight: 800;">
+                Upload. Print.<br>
+                <span style="color: var(--primary);">No Waiting.</span>
+            </h1>
+            
+            <p style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6;">
+                Scan a shop's QR code, upload your documents, and collect your prints in minutes. Simple, fast, and secure.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 400px;">
+                <!-- Scan QR -->
+                <a href="{% url 'shops:list' %}" class="btn btn-primary" style="padding: 1.25rem; font-size: 1.125rem;">
+                    📷 Scan Shop QR Code
+                </a>
+                
+                <!-- Find Shops -->
+                <a href="{% url 'shops:list' %}" class="btn btn-secondary" style="padding: 1.25rem; font-size: 1.125rem;">
+                    📍 Find Nearby Shops
+                </a>
+            </div>
+
+            <!-- How it Works -->
+            <div style="margin-top: 3rem;">
+                <p class="text-sm text-muted text-uppercase mb-3" style="font-weight: 700; letter-spacing: 1px;">How it works</p>
+                
+                <div style="display: flex; align-items: center; gap: 1rem; font-weight: 600; font-size: 1.125rem;">
+                    <span>📱 Scan</span>
+                    <span class="text-muted">→</span>
+                    <span>📄 Upload</span>
+                    <span class="text-muted">→</span>
+                    <span>🏃 Collect</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Hero Image -->
+        <div style="text-align: center;">
+            <img src="{% static 'img/hero-banner.jpg' %}" alt="Student Printing App" style="width: 100%; max-width: 600px; height: auto; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);">
+        </div>
+
+    </div>
+</section>
+
+<!-- Mobile Responsive: Stack vertically on small screens -->
+<style>
+@media (max-width: 768px) {
+    section .container > div {
+        grid-template-columns: 1fr !important;
+        gap: 2rem !important;
+    }
+    
+    section h1 {
+        font-size: 2.5rem !important;
+    }
+    
+    section p {
+        font-size: 1.125rem !important;
+    }
+}
+</style>
+{% endblock %}

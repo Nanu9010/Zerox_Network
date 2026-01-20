@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Pickup Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container text-center" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh;">
+    
+    <p style="color: var(--text-secondary); font-size: 1.25rem; margin-bottom: 2rem;">Your Pickup PIN</p>
+    
+    <!-- Huge PIN -->
+    <div style="font-size: 6rem; font-weight: 800; letter-spacing: 0.5rem; color: var(--primary); margin-bottom: 3rem; line-height: 1;">
+        {{ order.pin_code|default:"4729" }}
+    </div>
+    
+    <!-- QR Code Placeholder -->
+    <div style="margin-bottom: 2rem;">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ order.id }}-{{ order.pin_code }}" alt="Order QR" style="width: 250px; height: 250px; border-radius: var(--radius-lg); padding: 1rem; background: white; box-shadow: var(--shadow-md);">
+    </div>
+    
+    <p style="font-weight: 600; font-size: 1.125rem;">Show this to shop owner</p>
+    
+    <div style="margin-top: 3rem;">
+        <a href="{% url 'orders:my_orders' %}" class="btn btn-ghost">← Back to Orders</a>
+    </div>
+
+</div>
+{% endblock %}

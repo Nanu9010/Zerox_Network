@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Shops - Admin Portal{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-4">
+    <div style="display: flex; flex-direction: column; md-flex-direction: row; align-items: flex-start; md-align-items: center; justify-content: space-between; margin-bottom: 2rem; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
+            <h1 class="mb-0" style="font-size: 1.5rem;">Manage Shops</h1>
+        </div>
+        <div class="badge badge-neutral">Total: {{ shops.count }}</div>
+    </div>
+
+    <!-- Search -->
+    <div class="card p-3 mb-4">
+        <form method="GET" style="display: flex; flex-direction: column; md-flex-direction: row; gap: 1rem;">
+            <input type="text" name="search" class="form-input" placeholder="Search by name or owner email..." value="{{ search_query }}">
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 2;">Search</button>
+                {% if search_query %}
+                    <a href="{% url 'admin_portal:manage_shops' %}" class="btn btn-ghost" style="flex: 1; min-width: auto;">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Shops List -->
+    <div class="grid">
+        {% for shop in shops %}
+        <div class="card" style="border-left: 4px solid {% if shop.is_suspended %}var(--error){% elif shop.is_verified %}var(--success){% else %}var(--warning){% endif %};">
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div>
+                    <h3 class="mb-1" style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        {{ shop.name }}
+                        {% if shop.is_suspended %}<span class="badge badge-error">SUSPENDED</span>{% endif %}
+                    </h3>
+                    <p class="text-secondary text-sm mb-1">
+                        📍 {{ shop.location }}<br>
+                        📞 {{ shop.phone }}
+                    </p>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                        <span class="badge badge-neutral">Earnings: ₹{{ shop.earnings_total }}</span>
+                        <span class="badge badge-neutral">Orders: {{ shop.total_orders }}</span>
+                        <span class="badge badge-primary" style="font-weight: 600;">Commission: {{ shop.commission_rate }}%</span>
+                        <span class="badge {% if shop.is_open %}badge-success{% else %}badge-neutral{% endif %}">
+                            {% if shop.is_open %}Open{% else %}Closed{% endif %}
+                        </span>
+                    </div>
+                </div>
+                
+                <div style="padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                    <p class="text-sm text-secondary mb-3">Owner: {{ shop.owner.email }}</p>
+                    <div style="display: flex; gap: 1rem;">
+                        {% if not shop.is_suspended %}
+                            <form method="POST" action="{% url 'admin_portal:toggle_shop_status' shop.id %}" onsubmit="return confirm('Are you sure you want to suspend this shop?');" style="flex: 1;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="suspend">
+                                <button type="submit" class="btn btn-ghost" style="color: var(--error); width: 100%; height: 44px;">Suspend</button>
+                            </form>
+                        {% else %}
+                            <form method="POST" action="{% url 'admin_portal:toggle_shop_status' shop.id %}" style="flex: 1;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="activate">
+                                <button type="submit" class="btn btn-ghost" style="color: var(--success); width: 100%; height: 44px;">Activate</button>
+                            </form>
+                        {% endif %}
+                        
+                        <a href="{% url 'shops:detail' shop.id %}" class="btn btn-secondary" style="flex: 1; height: 44px; display: flex; align-items: center; justify-content: center;" target="_blank">View</a>
+                        
+                        <button onclick="openCommissionModal('{{ shop.id }}', '{{ shop.name }}', '{{ shop.commission_rate }}')" class="btn btn-ghost" style="flex: 1; height: 44px; color: var(--primary);">Set Commission</button>
+                    </div>
+                </div>
+            </div>
+            
+            {% if shop.suspension_reason %}
+            <div class="alert alert-error mt-2 mb-0 p-2 text-sm">
+                <strong>Reason:</strong> {{ shop.suspension_reason }}
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="text-center py-4">
+            <p class="text-muted">No shops found matching your search.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Commission Modal -->
+<div id="commissionModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="card" style="max-width: 400px; width: 90%; margin: 2rem;">
+        <h3 class="mb-3">Set Commission Rate</h3>
+        <p class="text-secondary text-sm mb-3">Shop: <strong id="modalShopName"></strong></p>
+        
+        <form method="POST" action="{% url 'admin_portal:set_commission' %}">
+            {% csrf_token %}
+            <input type="hidden" name="shop_id" id="modalShopId">
+            
+            <div class="form-group mb-3">
+                <label class="form-label">Commission Rate (%)</label>
+                <input type="number" name="commission_rate" id="modalCommissionRate" class="form-input" min="0" max="100" step="0.01" required>
+                <p class="text-sm text-muted mt-1">Platform's share of each order (e.g., 15 for 15%)</p>
+            </div>
+            
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Save</button>
+                <button type="button" onclick="closeCommissionModal()" class="btn btn-ghost" style="flex: 1;">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openCommissionModal(shopId, shopName, currentRate) {
+    document.getElementById('modalShopId').value = shopId;
+    document.getElementById('modalShopName').textContent = shopName;
+    document.getElementById('modalCommissionRate').value = currentRate;
+    document.getElementById('commissionModal').style.display = 'flex';
+}
+
+function closeCommissionModal() {
+    document.getElementById('commissionModal').style.display = 'none';
+}
+
+// Close modal on outside click
+document.getElementById('commissionModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeCommissionModal();
+    }
+});
+</script>
+{% endblock %}

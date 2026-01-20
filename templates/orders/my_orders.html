@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - Zerox{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-4">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+        <a href="{% url 'core:home' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
+        <h1 class="mb-0">My Orders</h1>
+    </div>
+
+    <!-- Orders Feed -->
+    <div class="grid">
+        {% for order in orders %}
+        <div class="card" style="border-left: 5px solid {% if order.status == 'READY' %}var(--success){% elif order.status == 'PENDING' %}var(--warning){% else %}#e5e7eb{% endif %};">
+            
+            <!-- Header: Order ID & Status -->
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="margin-bottom: 0;">Order #{{ order.id }}</h3>
+                    <p class="text-sm text-secondary mb-0">{{ order.shop.name }}</p>
+                    <small class="text-muted">{{ order.created_at|date:"M d, Y • h:i A" }}</small>
+                </div>
+                <span class="badge" style="
+                    {% if order.status == 'READY' %}background: #dcfce7; color: #166534;
+                    {% elif order.status == 'PENDING' %}background: #fef9c3; color: #854d0e;
+                    {% elif order.status == 'PRINTING' %}background: #dbeafe; color: #1e40af;
+                    {% elif order.status == 'COMPLETED' %}background: var(--bg-subtle); color: var(--text-secondary);
+                    {% else %}background: #f3f4f6; color: #374151;{% endif %}
+                ">
+                    {{ order.status }}
+                </span>
+            </div>
+
+            <!-- Files List -->
+            <div class="mb-4" style="background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-md);">
+                {% for file in order.files.all %}
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <span style="font-size: 1.25rem;">📄</span>
+                    <div style="overflow: hidden;">
+                         <p class="mb-0 text-primary" style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ file.file_name }}</p>
+                         <p class="mb-0 text-sm text-muted">{{ file.pages_count }} pages • {{ file.settings.print_type }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center mb-0">No files uploaded.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Footer: Total & Actions -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid rgba(0,0,0,0.05);">
+                <div>
+                    <p class="text-xs text-muted text-uppercase mb-0">Total Paid</p>
+                    <p class="text-primary mb-0" style="font-weight: 800; font-size: 1.1rem;">₹{{ order.total_price }}</p>
+                </div>
+                
+                <div style="display: flex; gap: 0.75rem;">
+                    {% if order.status == 'READY' %}
+                    <a href="{% url 'orders:pickup_info' order.id %}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem; min-height: 40px;">
+                        View PIN
+                    </a>
+                    {% endif %}
+                    
+                    <a href="{% url 'orders:checkout' order.id %}" class="btn btn-ghost" style="padding: 0.5rem 1rem; font-size: 0.9rem; min-height: 40px;">
+                        Details
+                    </a>
+                    
+                    {% if order.status == 'COMPLETED' and order.can_raise_dispute %}
+                    <a href="{% url 'orders:raise_dispute' order.id %}" class="btn btn-ghost" style="padding: 0.5rem 1rem; font-size: 0.9rem; color: var(--error); min-height: 40px;">
+                        Raise Dispute
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-4">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+            <p class="text-muted">You haven't placed any orders yet.</p>
+            <a href="{% url 'shops:list' %}" class="btn btn-primary mt-3">Find a Shop</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

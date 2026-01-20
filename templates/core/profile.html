@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Zerox{% endblock %}
+
+{% block content %}
+<section style="background: var(--secondary); padding: 2rem 0;">
+    <div class="container">
+        <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">My Profile</h1>
+        <p style="color: var(--text-secondary);">Manage your account settings</p>
+    </div>
+</section>
+
+<section class="container" style="padding: 3rem 0;">
+    <div style="max-width: 700px; margin: 0 auto;">
+        <div class="card card-elevated">
+            <div style="display: flex; align-items: center; gap: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid hsl(0, 0%, 90%);">
+                <div style="width: 80px; height: 80px; background: var(--primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem;">
+                    {% if user.profile.role == 'SHOP' %}🏪{% elif user.profile.role == 'ADMIN' %}👑{% else %}👤{% endif %}
+                </div>
+                <div>
+                    <h2 style="margin: 0 0 0.5rem 0;">{{ user.username }}</h2>
+                    <span class="badge badge-success">{{ user.profile.get_role_display }}</span>
+                </div>
+            </div>
+            
+            <div style="padding-top: 1.5rem;">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-size: 0.875rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">Email Address</label>
+                        <input type="email" name="email" value="{{ user.email }}" class="form-input" required>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-size: 0.875rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">Phone Number</label>
+                        <input type="text" name="phone" value="{{ user.profile.phone }}" class="form-input" required>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem;">Member Since</p>
+                        <p style="font-weight: 600;">{{ user.date_joined|date:"M d, Y" }}</p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid hsl(0, 0%, 90%);">
+                        <button type="submit" class="btn btn-primary" style="flex: 2;">
+                            💾 Save Changes
+                        </button>
+                        <a href="{% url 'core:logout' %}" class="btn btn-ghost" style="flex: 1;">
+                            🚪 Logout
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

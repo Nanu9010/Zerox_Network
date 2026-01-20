@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: auto; padding: 2rem;">
+  <h2 class="text-center" style="font-weight: 600;">Mark Order Ready</h2>
+  <form method="post" enctype="multipart/form-data" class="mt-4">
+    {% csrf_token %}
+    <div class="form-group mb-3">
+      <label for="proof_image" class="form-label" style="font-weight: 500;">Proof Photo</label>
+      <input type="file" name="proof_image" id="proof_image" accept="image/*" required class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary btn-block" style="width: 100%; font-weight: 600;">Upload & Mark Ready</button>
+  </form>
+</div>
+{% endblock %}

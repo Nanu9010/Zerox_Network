@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}Shop Dashboard - Zerox{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-4">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h1>{{ shop.name }}</h1>
+            <p class="text-secondary">Wait time: {{ shop.wait_time }} mins</p>
+        </div>
+        <div class="badge {% if shop.is_open %}badge-success{% else %}badge-error{% endif %}">
+            {% if shop.is_open %}OPEN{% else %}CLOSED{% endif %}
+        </div>
+    </div>
+
+    <!-- Financial Overview -->
+    <div class="card mb-4" style="background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-subtle) 100%);">
+        <h3 class="mb-3">💰 Financial Overview</h3>
+        <div class="grid grid-2">
+            <div class="text-center p-2" style="background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                <p class="text-sm text-secondary text-uppercase mb-1">Total Gross</p>
+                <h3 class="mb-0">₹{{ financials.gross|floatformat:2 }}</h3>
+            </div>
+            <div class="text-center p-2" style="background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                <p class="text-sm text-secondary text-uppercase mb-1">Commission Cut</p>
+                <h3 class="mb-0 text-error">-₹{{ financials.commission|floatformat:2 }}</h3>
+            </div>
+            <div class="text-center p-2" style="background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                <p class="text-sm text-secondary text-uppercase mb-1">Net Earnings</p>
+                <h3 class="mb-0 text-success">₹{{ financials.earned|floatformat:2 }}</h3>
+            </div>
+            <div class="text-center p-2" style="background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
+                <p class="text-sm text-secondary text-uppercase mb-1">Pending Payout</p>
+                <h3 class="mb-0 text-warning">₹{{ financials.pending|floatformat:2 }}</h3>
+            </div>
+        </div>
+        <div class="mt-3 text-center">
+            <small class="text-muted">Total Paid Out: <strong>₹{{ financials.paid|floatformat:2 }}</strong></small>
+        </div>
+    </div>
+
+    <!-- Main Actions -->
+    <div class="grid grid-2 mb-4">
+        <a href="#orders-section" class="btn btn-primary">
+            📄 View Orders
+        </a>
+        <a href="{% url 'shops:manage_images' %}" class="btn btn-secondary">
+            📷 Photos
+        </a>
+        <a href="{% url 'shops:settings' %}" class="btn btn-secondary">
+            ⚙️ Settings
+        </a>
+    </div>
+    
+    <!-- QR Code Section -->
+    <div class="card mb-4" style="background: linear-gradient(135deg, hsl(145, 60%, 98%) 0%, hsl(145, 60%, 95%) 100%);">
+        <h3 class="mb-3">📱 Your Shop QR Code</h3>
+        <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; align-items: center;">
+            <!-- QR Code Display -->
+            <div style="background: white; padding: 1.5rem; border-radius: var(--radius-md); box-shadow: var(--shadow-md); text-align: center;">
+                <div style="background: white; padding: 1rem; border: 3px solid var(--primary); border-radius: var(--radius-md); display: inline-block;">
+                    <div style="font-size: 4rem; color: var(--primary);">📷</div>
+                    <p style="font-size: 0.75rem; font-weight: 700; color: var(--primary); margin-top: 0.5rem; margin-bottom: 0;">{{ shop.qr_code }}</p>
+                </div>
+            </div>
+            
+            <!-- Download Options -->
+            <div>
+                <p class="text-secondary mb-3">Display this QR code in your shop so customers can scan and upload files instantly!</p>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <a href="{% url 'shops:download_qr_png' shop.id %}" class="btn btn-primary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <span>⬇️</span>
+                        <span>Download QR Code (PNG)</span>
+                    </a>
+                    <a href="{% url 'shops:download_qr_poster' shop.id %}" class="btn btn-secondary" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <span>📄</span>
+                        <span>Download Full Poster (PDF)</span>
+                    </a>
+                </div>
+                <p class="text-sm text-muted mt-3 mb-0">💡 Tip: Print the poster and paste it at your counter for maximum visibility!</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- PIN Verification Section -->
+    <div class="card mb-4">
+        <h3>Verify Pickup PIN</h3>
+        <div class="alert alert-warning mb-2">
+            Ask customer for their 4-digit PIN to release the order.
+        </div>
+        <form method="POST" action="{% url 'orders:verify_pin' %}" class="mt-2">
+            {% csrf_token %}
+            <div style="display: flex; gap: 0.5rem;">
+                <input type="text" name="pin" class="form-input" placeholder="Enter PIN (e.g. 4729)" required style="font-size: 1.25rem; letter-spacing: 2px; text-align: center; font-weight: 700;">
+                <button type="submit" class="btn btn-primary" style="width: auto; min-width: 100px;">Verify</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Incoming Orders List -->
+    <h3 id="orders-section" class="mb-2">Incoming Orders</h3>
+    
+    <div class="grid">
+        {% for order in orders %}
+            {% if order.status != 'COMPLETED' and order.status != 'CANCELLED' and order.status != 'REJECTED' %}
+        <div class="card" style="border-left: 5px solid var(--primary);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                <span style="font-weight: 700; font-size: 1.1rem;">#{{ order.id }}</span>
+                 <span class="badge badge-warning">{{ order.status }}</span>
+            </div>
+            
+            <div class="mb-2">
+                {% for file in order.files.all %}
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; background: var(--bg-subtle); padding: 0.5rem; border-radius: var(--radius-sm);">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.2rem;">📄</span>
+                        <div>
+                            <strong class="text-primary">{{ file.file_name }}</strong><br>
+                            <span class="text-muted text-sm">{{ file.paper_size }} | {{ file.get_color_type_display }} | {{ file.get_print_side_display }} | <strong>{{ file.copies }} Copies</strong></span>
+                        </div>
+                    </div>
+                    {% if order.status == 'PRINTING' or order.status == 'READY' or order.status == 'COMPLETED' %}
+                    <a href="{{ file.file.url }}" download class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; height: auto;">
+                        ⬇️ Download
+                    </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="grid grid-2" style="gap: 0.75rem;">
+                {% if order.status == 'PENDING' or order.status == 'PAID' or order.status == 'ACCEPTED' %}
+                <form method="POST" action="{% url 'shops:accept_order' order.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Accept / Print</button>
+                </form>
+                {% endif %}
+                
+                {% if order.status == 'PRINTING' %}
+                <a href="{% url 'shops:mark_ready' order.id %}" class="btn btn-primary" style="background: var(--success); border-color: var(--success);">
+                    ✅ Mark Ready
+                </a>
+                {% endif %}
+                
+                <a href="{% url 'shops:reject_order' order.id %}" class="btn btn-ghost" style="color: var(--error); border: 1px solid var(--error);">
+                     ❌ Reject
+                </a>
+            </div>
+            
+            <!-- PIN Verification (only for READY orders) -->
+            {% if order.status == 'READY' %}
+            <div style="margin-top: 1rem; padding: 1rem; background: hsl(145, 60%, 95%); border-radius: var(--radius-md); border: 2px solid var(--primary);">
+                <p style="font-weight: 600; color: var(--primary); margin-bottom: 0.5rem; font-size: 0.9rem;">🔐 Customer Pickup - Verify PIN</p>
+                <form method="POST" action="{% url 'orders:verify_pin' %}" style="display: flex; gap: 0.5rem;">
+                    {% csrf_token %}
+                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                    <input type="text" name="pin" class="form-input" placeholder="Enter 4-digit PIN" required maxlength="4" pattern="[0-9]{4}" style="font-size: 1.1rem; letter-spacing: 2px; text-align: center; font-weight: 700; flex: 1;">
+                    <button type="submit" class="btn btn-primary" style="min-width: 100px;">Complete ✓</button>
+                </form>
+                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; margin-bottom: 0;">Generated PIN: <strong style="color: var(--primary); font-size: 1.2rem; letter-spacing: 1px;">{{ order.pin_code }}</strong></p>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% empty %}
+         <div class="text-center py-4">
+             <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+             <p class="text-muted">No active orders right now.</p>
+         </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

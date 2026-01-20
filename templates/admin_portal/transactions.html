@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Transactions - Admin Portal{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-4">
+    <div style="display: flex; flex-direction: column; md-flex-direction: row; align-items: flex-start; md-align-items: center; justify-content: space-between; margin-bottom: 2rem; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
+            <h1 class="mb-0" style="font-size: 1.5rem;">Transactions</h1>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-2 mb-4">
+        <div class="card bg-surface">
+            <h3 class="mb-1 text-primary">₹{{ total_volume|floatformat:2 }}</h3>
+            <p class="text-secondary text-sm mb-0">Total Gross Volume</p>
+        </div>
+        <div class="card bg-surface">
+            <h3 class="mb-1 text-success">₹{{ total_commission|floatformat:2 }}</h3>
+            <p class="text-secondary text-sm mb-0">Platform Revenue (15%)</p>
+        </div>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="card p-0" style="overflow: hidden;">
+        <div class="table-responsive" style="margin-bottom: 0;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: var(--bg-subtle); text-align: left;">
+                        <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Date</th>
+                        <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Order ID</th>
+                        <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Shop</th>
+                        <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Customer</th>
+                        <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Amount</th>
+                        <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Commission</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
+                        <td style="padding: 1rem; color: var(--text-secondary);">
+                            {{ order.completed_at|date:"M d, Y H:i" }}
+                        </td>
+                        <td style="padding: 1rem; font-weight: 600;">
+                            #{{ order.id|stringformat:".4s" }}
+                        </td>
+                        <td style="padding: 1rem;">
+                            {{ order.shop.name }}
+                        </td>
+                        <td style="padding: 1rem;">
+                            {{ order.customer.username|default:order.customer_name }}
+                        </td>
+                        <td style="padding: 1rem; font-weight: 600;">
+                            ₹{{ order.total_price }}
+                        </td>
+                        <td style="padding: 1rem; color: var(--success); font-weight: 600;">
+                            ₹{{ order.commission_amount }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                            No transactions found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

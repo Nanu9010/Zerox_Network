@@ -1,0 +1,4 @@
+Django>=4.2,<5.0
+PyPDF2>=3.0.0
+pillow>=10.0.0
+# Add any other packages you discover in the codebase (e.g., django-crispy-forms)

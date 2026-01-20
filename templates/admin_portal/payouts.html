@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Shop Payouts - Admin{% endblock %}
+
+{% block content %}
+<section style="background: var(--bg-surface); padding: 2rem 0;">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">💸 Shop Payouts</h1>
+                <p style="color: var(--text-secondary);">Manage pending transfers to shops</p>
+            </div>
+            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost">Back to Dashboard</a>
+        </div>
+    </div>
+</section>
+
+<section class="container" style="padding: 2rem 0;">
+    <div class="card mb-4" style="background: linear-gradient(135deg, hsl(210, 20%, 98%) 0%, hsl(210, 20%, 95%) 100%);">
+        <h3 class="mb-2">Payout Summary</h3>
+        <div class="grid grid-3">
+            <div>
+                <p class="text-sm text-secondary mb-0">Total Platform Revenue</p>
+                <h2 class="text-primary mb-0">₹{{ summary.total_revenue|floatformat:2 }}</h2>
+            </div>
+            <div>
+                <p class="text-sm text-secondary mb-0">Total Paid Out</p>
+                <h2 class="text-success mb-0">₹{{ summary.total_paid|floatformat:2 }}</h2>
+            </div>
+            <div>
+                <p class="text-sm text-secondary mb-0">Total Pending Payouts</p>
+                <h2 class="text-warning mb-0">₹{{ summary.total_pending|floatformat:2 }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-elevated">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Shop</th>
+                        <th>Owner</th>
+                        <th>Gross Sales</th>
+                        <th>Net Earnings</th>
+                        <th>Already Paid</th>
+                        <th>Pending Balance</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for shop in shops %}
+                    <tr>
+                        <td>
+                            <strong>{{ shop.name }}</strong><br>
+                            <span class="text-muted text-sm">{{ shop.location }}</span>
+                        </td>
+                        <td>
+                            {{ shop.owner.username }}<br>
+                            <small>{{ shop.phone }}</small>
+                        </td>
+                        <td>₹{{ shop.gross|floatformat:2 }}</td>
+                        <td class="text-success">₹{{ shop.net_earnings|floatformat:2 }}</td>
+                        <td>₹{{ shop.paid_total|floatformat:2 }}</td>
+                        <td>
+                            {% if shop.pending_balance > 0 %}
+                                <strong class="text-error" style="font-size: 1.1rem;">₹{{ shop.pending_balance|floatformat:2 }}</strong>
+                            {% else %}
+                                <span class="text-success">Settled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if shop.pending_balance > 0 %}
+                            <form method="POST" action="{% url 'admin_portal:process_payout' shop.id %}" onsubmit="return confirm('Confirm that you have transferred ₹{{ shop.pending_balance }} to {{ shop.name }}?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="amount" value="{{ shop.pending_balance }}">
+                                <button type="submit" class="btn btn-secondary text-sm">
+                                    Mark Paid
+                                </button>
+                            </form>
+                            {% else %}
+                            <button class="btn btn-ghost text-sm" disabled>Paid</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">No shops found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

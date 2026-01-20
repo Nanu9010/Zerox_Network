@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ shop.name }} - Zerox{% endblock %}
+
+{% block content %}
+<div style="background: white;">
+    <!-- Big Shop Image (Slider-like) -->
+    <div style="height: 250px; background: #000; position: relative; overflow: hidden;">
+        <img id="mainImage" src="{{ shop.get_primary_image }}" style="width: 100%; height: 100%; object-fit: cover;">
+        
+        <!-- Image count badge if multiple -->
+        {% if shop.get_images.count > 1 %}
+        <div style="position: absolute; bottom: 1rem; right: 1rem; background: rgba(0,0,0,0.6); color: white; padding: 4px 12px; border-radius: 999px; font-size: 0.75rem;">
+            📸 {{ shop.get_images.count }} Photos
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Shop Info -->
+    <div class="container" style="padding-top: 1.5rem; padding-bottom: 2rem;">
+        <h1 style="font-size: 1.75rem; line-height: 1.2; margin-bottom: 0.5rem;">{{ shop.name }}</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 1rem;">📍 {{ shop.location }}</p>
+        
+        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; font-weight: 600; font-size: 0.95rem;">
+            <span style="color: var(--primary);">₹{{ shop.a4_bw_price }} B/W</span>
+            <span style="color: #e5e7eb;">|</span>
+            <span style="color: var(--primary);">₹{{ shop.a4_color_price }} Color</span>
+        </div>
+
+        <!-- Primary Action: Upload -->
+        <div class="card card-elevated" style="margin-bottom: 2rem; border-color: var(--primary);">
+            <form method="POST" action="{% url 'orders:upload' shop.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <!-- Inputs first (Required) -->
+                {% if not user.is_authenticated %}
+                <div class="form-group">
+                    <label class="form-label">Your Name</label>
+                    <input type="text" name="customer_name" class="form-input" placeholder="Enter name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" name="phone" class="form-input" placeholder="Phone number" required>
+                </div>
+                {% else %}
+                    <input type="hidden" name="customer_name" value="{{ user.get_full_name|default:user.username }}">
+                    <input type="hidden" name="phone" value="{{ user.profile.phone }}">
+                {% endif %}
+
+                <!-- Big Upload Button -->
+                <div style="margin-top: 1rem;">
+                    <input type="file" name="files" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" multiple required style="display: none;" onchange="handleFileSelect(this)">
+                    
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('fileInput').click()" style="width: 100%; font-size: 1.125rem; padding: 1rem;">
+                        📄 Upload Documents
+                    </button>
+                    
+                    <div id="filePreview" style="margin-top: 1rem; display: none;">
+                        <p style="color: var(--success); font-weight: 600; margin-bottom: 0.5rem;" id="fileCountText"></p>
+                        <button type="submit" class="btn btn-secondary" style="width: 100%;">
+                            Continue to Settings →
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sections -->
+        <div style="display: grid; gap: 2rem;">
+            <!-- Price List -->
+            <section>
+                <h3 style="color: var(--text-secondary); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">Full Price List</h3>
+                <div class="grid-2" style="gap: 1rem;">
+                    <div style="padding: 1rem; background: var(--bg-light); border-radius: var(--radius-md);">
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">A4 B/W</p>
+                        <p style="font-weight: 700; font-size: 1.25rem;">₹{{ shop.a4_bw_price }}</p>
+                    </div>
+                    <div style="padding: 1rem; background: var(--bg-light); border-radius: var(--radius-md);">
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">A4 Color</p>
+                        <p style="font-weight: 700; font-size: 1.25rem;">₹{{ shop.a4_color_price }}</p>
+                    </div>
+                     <div style="padding: 1rem; background: var(--bg-light); border-radius: var(--radius-md);">
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">A3 B/W</p>
+                        <p style="font-weight: 700; font-size: 1.25rem;">₹{{ shop.a3_bw_price }}</p>
+                    </div>
+                    <div style="padding: 1rem; background: var(--bg-light); border-radius: var(--radius-md);">
+                        <p style="color: var(--text-muted); font-size: 0.8rem;">A3 Color</p>
+                        <p style="font-weight: 700; font-size: 1.25rem;">₹{{ shop.a3_color_price }}</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Photos -->
+            {% if shop.get_images.count > 1 %}
+            <section>
+                 <h3 style="color: var(--text-secondary); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">Photos</h3>
+                 <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem;">
+                    {% for img in shop.get_images %}
+                    <img src="{{ img.image.url }}" style="height: 100px; width: 100px; object-fit: cover; border-radius: 8px; flex-shrink: 0;" onclick="document.getElementById('mainImage').src=this.src">
+                    {% endfor %}
+                 </div>
+            </section>
+            {% endif %}
+            
+            <!-- Map (Placeholder) -->
+            <section>
+                <h3 style="color: var(--text-secondary); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">Location</h3>
+                <div style="background: #eee; height: 150px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                    Google Maps Integration
+                </div>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem;">{{ shop.location }}</p>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script>
+function handleFileSelect(input) {
+    if (input.files.length > 0) {
+        document.getElementById('filePreview').style.display = 'block';
+        document.getElementById('fileCountText').innerText = `✅ ${input.files.length} document(s) selected`;
+    }
+}
+</script>
+{% endblock %}

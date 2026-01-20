@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Portal - Zerox{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-4">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div>
+            <h1 class="mb-1">Admin Portal</h1>
+            <p class="text-secondary">Manage shops and approvals</p>
+        </div>
+        <div class="badge {% if show_revenue %}badge-success{% else %}badge-neutral{% endif %}">
+            Logged in as {{ user.profile.get_role_display }}
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="grid grid-2 grid-4 mb-4">
+        {% if show_revenue %}
+        <div class="card">
+            <h3 class="mb-1 text-success">₹{{ stats.revenue|floatformat:2 }}</h3>
+            <p class="text-secondary text-sm mb-0">Platform Commission</p>
+        </div>
+        {% endif %}
+        <div class="card">
+            <h3 class="mb-1">{{ stats.orders }}</h3>
+            <p class="text-secondary text-sm mb-0">Completed Orders</p>
+        </div>
+        <div class="card">
+            <h3 class="mb-1">{{ stats.active_shops }}</h3>
+            <p class="text-secondary text-sm mb-0">Active Shops</p>
+        </div>
+        <div class="card">
+            <h3 class="mb-1">{{ stats.shops }}</h3>
+            <p class="text-secondary text-sm mb-0">Total Registered</p>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="mb-4" style="display: flex; justify-content: flex-end; gap: 1rem; flex-wrap: wrap;">
+        {% if show_revenue %}
+        <a href="{% url 'admin_portal:analytics' %}" class="btn btn-ghost">
+            📊 Analytics
+        </a>
+        {% endif %}
+        <a href="{% url 'admin_portal:review_images' %}" class="btn btn-ghost">
+            📸 Photos
+        </a>
+        <a href="{% url 'admin_portal:users' %}" class="btn btn-ghost">
+            👥 Users
+        </a>
+        <a href="{% url 'admin_portal:disputes' %}" class="btn btn-ghost">
+            ⚖️ Disputes
+        </a>
+        <a href="{% url 'admin_portal:refunds_list' %}" class="btn btn-ghost">
+            💸 Refunds
+        </a>
+        {% if show_revenue %}
+        <a href="{% url 'admin_portal:transactions' %}" class="btn btn-ghost">
+            💰 Transactions
+        </a>
+        <a href="{% url 'admin_portal:payouts' %}" class="btn btn-ghost">
+            💸 Payouts
+        </a>
+        {% endif %}
+        <a href="{% url 'admin_portal:manage_shops' %}" class="btn btn-secondary">
+            🏪 Manage Shops
+        </a>
+    </div>
+
+    <!-- Section: Pending Shops -->
+    <h3 class="mb-2">⚠️ Pending Shops</h3>
+    <div class="grid mb-4">
+        {% for shop in pending_shops %}
+        <div class="card">
+            <div style="display: flex; flex-direction: column; md-flex-direction: row; justify-content: space-between; align-items: start; margin-bottom: 1rem; gap: 1rem;">
+                <div>
+                    <h3 class="mb-1">{{ shop.name }}</h3>
+                    <p class="text-muted text-sm mb-1">
+                        📍 {{ shop.location }}<br>
+                        📞 {{ shop.phone }}<br>
+                        👤 {{ shop.owner.username }} ({{ shop.owner.email }})
+                    </p>
+                    <p class="mb-0 text-sm">Created: {{ shop.created_at|date:"M d, Y" }}</p>
+                </div>
+                <span class="badge badge-warning">Verification Pending</span>
+            </div>
+
+            <!-- Shop Actions -->
+            <div style="background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-md); margin-top: 1rem;">
+                <p class="text-sm font-weight-bold mb-2">Actions</p>
+                <div class="grid grid-2" style="gap: 1rem;">
+                    <form method="POST" action="{% url 'admin_portal:approve_shop' shop.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="approve">
+                        <button type="submit" class="btn btn-primary" style="background: var(--success); height: 40px; width: 100%;">
+                            ✅ Approve
+                        </button>
+                    </form>
+                    
+                    <form method="POST" action="{% url 'admin_portal:approve_shop' shop.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="reject">
+                        <button type="submit" class="btn btn-ghost" style="color: var(--error); border: 1px solid var(--error); height: 40px; width: 100%;">
+                            ❌ Reject
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="card text-center py-4">
+            <p class="text-muted mb-0">No pending shop approvals.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Section: Pending Images -->
+    <h3 class="mb-2">📷 Pending Shop Images</h3>
+    <div class="grid">
+        {% for img in pending_images %}
+        <div class="card">
+            <div class="mb-2">
+                <span class="badge badge-neutral mb-2">{{ img.shop.name }}</span>
+                {% if img.is_primary %}<span class="badge badge-success">Primary</span>{% endif %}
+            </div>
+            
+            <div style="height: 200px; background: var(--bg-subtle); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 1rem;">
+                <img src="{{ img.image.url }}" style="width: 100%; height: 100%; object-fit: cover;" alt="Shop Image">
+            </div>
+            
+            <p class="text-sm text-secondary mb-2">Caption: "{{ img.caption }}"</p>
+
+            <div class="grid grid-2" style="gap: 1rem;">
+                <form method="POST" action="{% url 'admin_portal:approve_image' img.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="approve">
+                    <button type="submit" class="btn btn-primary" style="background: var(--success); height: 40px;">
+                        Approve
+                    </button>
+                </form>
+                
+                <form method="POST" action="{% url 'admin_portal:approve_image' img.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="reject">
+                    <button type="submit" class="btn btn-ghost" style="color: var(--error); height: 40px;">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+        <div class="card text-center py-4">
+            <p class="text-muted mb-0">No pending images.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

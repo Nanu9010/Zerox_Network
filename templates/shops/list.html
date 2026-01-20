@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Find Print Shops{% endblock %}
+
+{% block content %}
+<section class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+    <!-- Search Bar -->
+    <div class="mb-4">
+        <form method="GET">
+            <div style="position: relative;">
+                <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">🔍</span>
+                <input type="text" 
+                       name="search" 
+                       class="form-input" 
+                       placeholder="Search name or location..." 
+                       value="{{ search_query }}"
+                       style="padding-left: 3rem; border-radius: 999px;">
+            </div>
+        </form>
+    </div>
+    
+    <!-- Shop List -->
+    <div class="grid">
+        {% for shop in shops %}
+        <div class="card p-0" style="padding: 0; overflow: hidden; border: 1px solid rgba(0,0,0,0.05);">
+            <!-- Shop Image -->
+            <div style="height: 180px; position: relative; background: var(--bg-subtle);">
+                <img src="{{ shop.get_primary_image }}" alt="{{ shop.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                <span class="badge {% if shop.is_open %}badge-success{% else %}badge-error{% endif %}" style="position: absolute; top: 1rem; right: 1rem; box-shadow: var(--shadow-sm);">
+                    {% if shop.is_open %}Open{% else %}Closed{% endif %}
+                </span>
+            </div>
+            
+            <div style="padding: 1.25rem;">
+                <!-- Title & Location -->
+                <h3>{{ shop.name }}</h3>
+                
+                <div class="text-secondary mb-2 text-sm" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span>⭐ {{ shop.rating|default:"5.0" }}</span>
+                    <span>•</span>
+                    <span>1.2 km away</span>
+                </div>
+                
+                <!-- Pricing Pivot -->
+                <p class="text-primary" style="font-weight: 800; font-size: 1.125rem;">
+                    ₹{{ shop.a4_bw_price }}<span class="text-secondary" style="font-weight: 400; font-size: 0.9rem;">/page (B/W)</span>
+                </p>
+                
+                <!-- Action -->
+                <a href="{% url 'shops:detail' shop.id %}" class="btn btn-primary">
+                    Upload & Print
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-4">
+            <p class="text-muted">No shops found matching your search.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

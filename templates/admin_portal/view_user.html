@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}User Details - Admin{% endblock %}
+
+{% block content %}
+<section style="background: var(--secondary); padding: 2rem 0;">
+    <div class="container">
+    <div style="display: flex; flex-direction: column; md-flex-direction: row; justify-content: space-between; align-items: flex-start; md-align-items: center; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">👤 {{ view_user.username }}</h1>
+            <p style="color: var(--text-secondary);">User Details & Activity</p>
+        </div>
+        <a href="{% url 'admin_portal:edit_user' view_user.id %}" class="btn btn-primary" style="width: 100%; md-width: auto; justify-content: center;">
+            ✏️ Edit User
+        </a>
+    </div>
+    </div>
+</section>
+
+<section class="container" style="padding: 3rem 0;">
+    <div class="grid grid-2" style="gap: 2rem;">
+        
+        <!-- User Info -->
+        <div class="card card-elevated">
+            <h3 style="margin-bottom: 1.5rem;">User Information</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--bg-light); border-radius: var(--radius-md);">
+                    <span style="color: var(--text-muted);">Username</span>
+                    <strong>{{ view_user.username }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--bg-light); border-radius: var(--radius-md);">
+                    <span style="color: var(--text-muted);">Email</span>
+                    <strong>{{ view_user.email|default:"Not set" }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--bg-light); border-radius: var(--radius-md);">
+                    <span style="color: var(--text-muted);">Full Name</span>
+                    <strong>{{ view_user.first_name|default:"Not set" }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--bg-light); border-radius: var(--radius-md);">
+                    <span style="color: var(--text-muted);">Phone</span>
+                    <strong>{{ view_user.profile.phone|default:"Not set" }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--bg-light); border-radius: var(--radius-md);">
+                    <span style="color: var(--text-muted);">Role</span>
+                    {% if view_user.profile.role == 'CUSTOMER' %}
+                        <span class="badge" style="background: hsl(210, 100%, 95%); color: hsl(210, 100%, 40%);">👤 Customer</span>
+                    {% elif view_user.profile.role == 'SHOP' %}
+                        <span class="badge" style="background: hsl(145, 60%, 95%); color: var(--primary);">🏪 Shop</span>
+                    {% elif view_user.profile.role == 'ADMIN' %}
+                        <span class="badge" style="background: hsl(30, 100%, 95%); color: hsl(30, 100%, 40%);">👑 Admin</span>
+                    {% elif view_user.profile.role == 'STAFF' %}
+                        <span class="badge" style="background: hsl(280, 60%, 95%); color: hsl(280, 60%, 40%);">📋 Staff</span>
+                    {% endif %}
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--bg-light); border-radius: var(--radius-md);">
+                    <span style="color: var(--text-muted);">Status</span>
+                    {% if view_user.profile.is_blocked %}
+                        <span class="badge badge-error">🚫 Blocked</span>
+                    {% else %}
+                        <span class="badge badge-success">✅ Active</span>
+                    {% endif %}
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--bg-light); border-radius: var(--radius-md);">
+                    <span style="color: var(--text-muted);">Joined</span>
+                    <strong>{{ view_user.date_joined|date:"M d, Y" }}</strong>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Activity -->
+        <div class="card card-elevated">
+            <h3 style="margin-bottom: 1.5rem;">Activity & Orders</h3>
+            
+            {% if orders %}
+                <div style="max-height: 400px; overflow-y: auto;">
+                    {% for order in orders %}
+                    <div style="padding: 1rem; border-bottom: 1px solid var(--border-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>Order #{{ order.id }}</strong>
+                                <p style="font-size: 0.875rem; color: var(--text-muted);">{{ order.shop.name }}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <span style="font-weight: 700; color: var(--primary);">₹{{ order.total_price }}</span>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">{{ order.status }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p style="text-align: center; color: var(--text-muted); padding: 2rem;">No orders found</p>
+            {% endif %}
+        </div>
+        
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="card" style="margin-top: 2rem;">
+        <h4 style="margin-bottom: 1.5rem;">Quick Actions</h4>
+        <div style="display: flex; flex-direction: column; md-flex-direction: row; gap: 1rem;">
+            <a href="{% url 'admin_portal:edit_user' view_user.id %}" class="btn btn-primary" style="justify-content: center;">✏️ Edit User</a>
+            {% if view_user.profile.is_blocked %}
+                <form method="POST" action="{% url 'admin_portal:unblock_user' view_user.id %}" style="display: flex; flex: 1;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-secondary" style="width: 100%; justify-content: center;">Unblock User</button>
+                </form>
+            {% else %}
+                <form method="POST" action="{% url 'admin_portal:block_user' view_user.id %}" style="display: flex; flex: 1;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-ghost" style="width: 100%; border-color: hsl(0, 80%, 50%); color: hsl(0, 80%, 50%); justify-content: center;">Block User</button>
+                </form>
+            {% endif %}
+            <a href="{% url 'admin_portal:users' %}" class="btn btn-ghost" style="justify-content: center;">← Back to Users</a>
+        </div>
+    </div>
+    
+</section>
+{% endblock %}

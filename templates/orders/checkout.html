@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - Order #{{ order.id }}{% endblock %}
+
+{% block extra_css %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+{% endblock %}
+
+{% block content %}
+<section style="background: var(--secondary); padding: 2rem 0;">
+    <div class="container">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+            <a href="{% url 'orders:configure' order.id %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
+            <h1 style="font-size: 2rem; margin: 0;">Checkout</h1>
+        </div>
+        <p style="color: var(--text-secondary);">Review your order and complete payment</p>
+    </div>
+</section>
+
+<section class="container" style="padding: 3rem 0;">
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div class="card card-elevated">
+            <h2 style="margin-bottom: 1.5rem;">Order Summary</h2>
+            
+            <!-- Shop Info -->
+            <div style="padding: 1.25rem; background: var(--bg-light); border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                    <div style="width: 48px; height: 48px; background: var(--primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                        🏪
+                    </div>
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.125rem;">{{ order.shop.name }}</h3>
+                        <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0;">{{ order.shop.location }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Files List -->
+            <div style="padding-bottom: 1.5rem; border-bottom: 1px solid hsl(0, 0%, 90%);">
+                {% for file in order.files.all %}
+                <div style="background: var(--bg-surface); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; border-bottom: 1px dashed var(--border-color); padding-bottom: 0.5rem;">
+                        <span style="font-weight: 600;">{{ file.file_name }}</span>
+                        <span class="badge badge-neutral">{{ file.pages_count }} pgs</span>
+                    </div>
+                    
+                    <div class="grid grid-2 text-sm text-secondary" style="gap: 0.5rem;">
+                         <div>
+                             <span>{{ file.pages_per_sheet }} up | {{ file.get_print_type_display }}</span>
+                         </div>
+                         <div class="text-right">
+                             <span>{{ file.paper_size }} | {{ file.get_color_type_display }}</span>
+                         </div>
+                         <div>
+                             <span>{{ file.get_print_side_display }}</span>
+                         </div>
+                         <div class="text-right">
+                             <strong>{{ file.copies }} Copy(s)</strong>
+                         </div>
+                    </div>
+                    {% if file.special_note %}
+                    <div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--primary);">
+                        Note: {{ file.special_note }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pricing -->
+            <div style="padding: 1.5rem 0;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
+                    <span style="color: var(--text-secondary);">Total Sheets</span>
+                    <span>{{ order.final_sheets }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; background: hsl(145, 60%, 95%); border-radius: var(--radius-md); margin-top: 1rem;">
+                    <span style="font-size: 1.125rem; font-weight: 700;">Total Amount</span>
+                    <span style="font-size: 1.75rem; font-weight: 800; color: var(--primary);">₹{{ order.total_price }}</span>
+                </div>
+            </div>
+            
+            <!-- Payment Button -->
+            <button id="payButton" class="btn btn-primary" style="width: 100%; padding: 1.125rem; font-size: 1.125rem;">
+                🔒 Pay ₹{{ order.total_price }} with Razorpay
+            </button>
+            
+            <p class="text-center text-muted" style="margin-top: 1.25rem; font-size: 0.875rem;">
+                🔒 Secure payment powered by Razorpay
+            </p>
+        </div>
+    </div>
+</section>
+
+<script>
+document.getElementById('payButton').onclick = function(e) {
+    e.preventDefault();
+    
+    var options = {
+        "key": "{{ razorpay_key_id }}",
+        "amount": "{{ razorpay_amount }}", // Amount in paise (calculated in view)
+        "currency": "INR",
+        "name": "Zerox Network",
+        "description": "Print Order #{{ order.id }}",
+        "image": "/static/img/logo.png",
+        "order_id": "",
+        "handler": function (response){
+            // Payment success
+            fetch('{% url "orders:payment_success" order.id %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_signature: response.razorpay_signature
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '{% url "orders:my_orders" %}?payment=success';
+                } else {
+                    alert('Payment verification failed!');
+                }
+            });
+        },
+        "prefill": {
+            "name": "{{ order.customer_name }}",
+            "contact": "{{ order.customer_phone }}"
+        },
+        "theme": {
+            "color": "#00B140"
+        }
+    };
+    
+    var rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response){
+        alert('Payment failed: ' + response.error.description);
+        window.location.href = '{% url "orders:checkout" order.id %}?payment=failed';
+    });
+    rzp1.open();
+}
+</script>
+{% endblock %}
