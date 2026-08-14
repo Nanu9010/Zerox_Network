@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}My Dashboard - Zerox{% endblock %}
+
+{% block content %}
+<section style="background: var(--secondary); padding: 2rem 0;">
+    <div class="container">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">My Dashboard</h1>
+                <p style="color: var(--text-secondary);">Welcome back, {{ user.username }}!</p>
+            </div>
+            <div style="display: flex; gap: 0.75rem;">
+                {% if user_shops %}
+                <a href="{% url 'shops:dashboard' %}" class="btn btn-primary" style="padding: 0.6rem 1.25rem; width: auto; min-width: auto;">
+                    🏪 Shop Dashboard
+                </a>
+                {% endif %}
+                <a href="{% url 'orders:my_orders' %}" class="btn btn-secondary" style="padding: 0.6rem 1.25rem; width: auto; min-width: auto;">
+                    📦 All Orders
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container" style="padding: 2rem 0;">
+    
+    {% if messages %}
+        {% for message in messages %}
+        <div class="card {% if message.tags == 'success' %}badge-success{% elif message.tags == 'error' %}badge-error{% endif %}" style="margin-bottom: 1.5rem; padding: 1rem; border-left: 4px solid {% if message.tags == 'success' %}var(--success){% else %}var(--error){% endif %};">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Stats Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div class="card" style="text-align: center; padding: 1.25rem;">
+            <div style="font-size: 2rem; margin-bottom: 0.25rem;">📦</div>
+            <div style="font-size: 1.75rem; font-weight: 800; color: var(--primary);">{{ total_orders }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Total Orders</div>
+        </div>
+        <div class="card" style="text-align: center; padding: 1.25rem;">
+            <div style="font-size: 2rem; margin-bottom: 0.25rem;">⏳</div>
+            <div style="font-size: 1.75rem; font-weight: 800; color: hsl(40, 100%, 50%);">{{ active_orders }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Active</div>
+        </div>
+        <div class="card" style="text-align: center; padding: 1.25rem;">
+            <div style="font-size: 2rem; margin-bottom: 0.25rem;">✅</div>
+            <div style="font-size: 1.75rem; font-weight: 800; color: var(--success);">{{ completed_orders }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Completed</div>
+        </div>
+        <div class="card" style="text-align: center; padding: 1.25rem;">
+            <div style="font-size: 2rem; margin-bottom: 0.25rem;">🏪</div>
+            <div style="font-size: 1.75rem; font-weight: 800; color: hsl(220, 60%, 50%);">{{ user_shops.count }}</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">My Shops</div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; align-items: start;">
+        
+        <!-- Left: My Orders -->
+        <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                <h2 style="margin: 0; font-size: 1.25rem;">📋 My Recent Orders</h2>
+                <a href="{% url 'orders:my_orders' %}" style="font-size: 0.875rem; color: var(--primary); text-decoration: none;">View All →</a>
+            </div>
+            
+            {% if orders %}
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                {% for order in orders %}
+                <div class="card" style="padding: 1rem; border-left: 4px solid 
+                    {% if order.status == 'READY' %}#00B140
+                    {% elif order.status == 'PRINTING' %}#3b82f6
+                    {% elif order.status == 'ACCEPTED' %}#8b5cf6
+                    {% elif order.status == 'PAID' %}#eab308
+                    {% elif order.status == 'COMPLETED' %}#64748b
+                    {% else %}#ef4444{% endif %};">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <strong>Order #{{ order.id }}</strong>
+                                <span class="badge" style="font-size: 0.7rem; padding: 0.15rem 0.5rem;
+                                    {% if order.status == 'READY' %}background: #dcfce7; color: #15803d;
+                                    {% elif order.status == 'PRINTING' %}background: #dbeafe; color: #1d4ed8;
+                                    {% elif order.status == 'ACCEPTED' %}background: #f3e8ff; color: #6b21a8;
+                                    {% elif order.status == 'PAID' %}background: #fef9c3; color: #854d0e;
+                                    {% elif order.status == 'COMPLETED' %}background: #f1f5f9; color: #475569;
+                                    {% else %}background: #fee2e2; color: #b91c1c;{% endif %}
+                                ">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">
+                                🏪 {{ order.shop.name }} • {{ order.created_at|date:"M d, h:i A" }}
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 700; color: var(--primary);">₹{{ order.total_price }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card" style="text-align: center; padding: 2.5rem;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">📦</div>
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">No orders yet</p>
+                <a href="{% url 'shops:list' %}" class="btn btn-primary" style="width: auto; margin: 0 auto;">Find a Print Shop</a>
+            </div>
+            {% endif %}
+
+            <!-- My Shops Section -->
+            {% if user_shops %}
+            <div style="margin-top: 2rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                    <h2 style="margin: 0; font-size: 1.25rem;">🏪 My Shops</h2>
+                    <a href="{% url 'shops:dashboard' %}" style="font-size: 0.875rem; color: var(--primary); text-decoration: none;">Manage →</a>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    {% for shop in user_shops %}
+                    <div class="card" style="padding: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                        <div>
+                            <strong>{{ shop.name }}</strong>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">📍 {{ shop.location }}</div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            {% if shop.is_approved %}
+                                <span class="badge badge-success" style="font-size: 0.7rem;">Approved</span>
+                            {% else %}
+                                <span class="badge" style="background: hsl(40, 100%, 95%); color: hsl(40, 100%, 40%); font-size: 0.7rem;">Pending</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right: Notifications -->
+        <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                <h2 style="margin: 0; font-size: 1.25rem;">
+                    🔔 Notifications
+                    {% if unread_count %}
+                    <span style="background: hsl(0, 80%, 50%); color: white; font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 999px; vertical-align: middle;">{{ unread_count }}</span>
+                    {% endif %}
+                </h2>
+                {% if unread_count %}
+                <form method="POST" action="{% url 'core:mark_all_notifications' %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" style="background: none; border: none; color: var(--primary); font-size: 0.8rem; cursor: pointer; padding: 0;">Mark all read</button>
+                </form>
+                {% endif %}
+            </div>
+            
+            {% if notifications %}
+            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                {% for notif in notifications %}
+                <form method="POST" action="{% url 'core:mark_notification_read' notif.id %}">
+                    {% csrf_token %}
+                    <button type="submit" style="width: 100%; text-align: left; background: {% if notif.is_read %}white{% else %}hsl(210, 100%, 98%){% endif %}; border: 1px solid {% if notif.is_read %}var(--border-color){% else %}hsl(210, 100%, 85%){% endif %}; border-radius: var(--radius-md); padding: 0.75rem; cursor: pointer; transition: all 0.2s;">
+                        <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+                            <span style="font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem;">
+                                {% if notif.notification_type == 'ORDER_UPDATE' %}📦
+                                {% elif notif.notification_type == 'SHOP_ALERT' %}🏪
+                                {% elif notif.notification_type == 'PROMOTION' %}🎉
+                                {% else %}ℹ️{% endif %}
+                            </span>
+                            <div style="overflow: hidden;">
+                                <div style="font-weight: {% if notif.is_read %}600{% else %}800{% endif %}; font-size: 0.875rem; color: var(--text-primary); margin-bottom: 0.15rem;">
+                                    {{ notif.title }}
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    {{ notif.message|truncatewords:15 }}
+                                </div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.25rem;">
+                                    {{ notif.created_at|timesince }} ago
+                                </div>
+                            </div>
+                            {% if not notif.is_read %}
+                            <div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%; flex-shrink: 0; margin-top: 0.35rem;"></div>
+                            {% endif %}
+                        </div>
+                    </button>
+                </form>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔔</div>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin: 0;">No notifications yet</p>
+            </div>
+            {% endif %}
+        </div>
+        
+    </div>
+</section>
+
+<style>
+@media (max-width: 768px) {
+    section.container > div[style*="grid-template-columns: 2fr 1fr"] {
+        grid-template-columns: 1fr !important;
+    }
+}
+</style>
+{% endblock %}

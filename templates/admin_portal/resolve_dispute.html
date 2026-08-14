@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Resolve Dispute - Admin{% endblock %}
+
+{% block content %}
+<section style="background: var(--secondary); padding: 2rem 0;">
+    <div class="container">
+        <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">⚖️ Resolve Dispute</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 0.25rem;">Dispute #{{ dispute.id }}</p>
+        <p style="color: var(--text-secondary); font-size: 0.875rem;">Review evidence and make a decision</p>
+    </div>
+</section>
+
+<section class="container" style="padding: 3rem 0;">
+    <div style="max-width: 800px; margin: 0 auto;">
+        
+        <div class="card card-elevated" style="margin-bottom: 2rem;">
+            <h3>Order Details</h3>
+            <p><strong>Order ID:</strong> #{{ dispute.order.id }}</p>
+            <p><strong>Shop:</strong> {{ dispute.order.shop.name }}</p>
+            <p><strong>Amount:</strong> ₹{{ dispute.order.total_price }}</p>
+            
+            <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-light); border-radius: var(--radius-sm);">
+                <p style="font-weight: 600; margin-bottom: 0.5rem;">Print Configuration</p>
+                {% for file in dispute.order.files.all %}
+                <div style="{% if not forloop.last %}margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px dashed var(--border-color);{% endif %}">
+                    <p style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem;">📄 {{ file.file_name }}</p>
+                    <div style="display: flex; flex-direction: column; md-flex-direction: row; gap: 0.5rem; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary);">
+                        <div>
+                            <span>{{ file.pages_per_sheet }} up | {{ file.get_print_type_display }}</span><br>
+                            <span>{{ file.paper_size }} | {% if file.color_type == 'COLOR' %}Color{% else %}B/W{% endif %}</span>
+                        </div>
+                        <div style="md-text-align: right;">
+                            <span>{{ file.get_print_side_display }}</span><br>
+                            <span><strong>{{ file.copies }} Copies</strong></span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="card" style="margin-bottom: 2rem; background: hsl(0, 60%, 97%);">
+            <h3>Customer Complaint</h3>
+            <p><strong>Issue:</strong> {{ dispute.get_issue_type_display }}</p>
+            <p>{{ dispute.description }}</p>
+        </div>
+        
+        {% if dispute.shop_response %}
+        <div class="card" style="margin-bottom: 2rem; background: hsl(210, 60%, 97%);">
+            <h3>Shop Response</h3>
+            <p>{{ dispute.shop_response }}</p>
+        </div>
+        {% endif %}
+        
+        <div class="card card-elevated">
+            <h3 style="margin-bottom: 1.5rem;">Admin Decision</h3>
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                {% if user.profile.role == 'ADMIN' %}
+                <div class="form-group">
+                    <label class="form-label">Decision</label>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <label class="feature-card" style="cursor: pointer; padding: 1rem; border: 2px solid var(--border-color);">
+                            <input type="radio" name="decision" value="approve_full" required style="margin-right: 0.5rem;">
+                            <strong>✅ Approve Full Refund</strong> - ₹{{ dispute.order.total_price }}
+                        </label>
+                        <label class="feature-card" style="cursor: pointer; padding: 1rem; border: 2px solid var(--border-color);">
+                            <input type="radio" name="decision" value="approve_partial" style="margin-right: 0.5rem;">
+                            <div>
+                                <strong>⚖️ Approve Partial Refund</strong>
+                                <input type="number" name="refund_amount" class="form-input" placeholder="Enter amount" step="0.01" min="0" max="{{ dispute.order.total_price }}" style="margin-top: 0.5rem;">
+                            </div>
+                        </label>
+                        <label class="feature-card" style="cursor: pointer; padding: 1rem; border: 2px solid var(--border-color);">
+                            <input type="radio" name="decision" value="reject" style="margin-right: 0.5rem;">
+                            <strong>❌ Reject Refund</strong> - No refund issued
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Admin Notes</label>
+                    <textarea name="admin_notes" class="form-input" rows="4" placeholder="Explain your decision..."></textarea>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; justify-content: center;">Submit Decision</button>
+                    <a href="{% url 'admin_portal:disputes' %}" class="btn btn-ghost" style="width: 100%; height: 48px; justify-content: center; display: flex; align-items: center;">Cancel</a>
+                </div>
+                
+                {% else %}
+                <!-- STAFF VIEW -->
+                <div class="alert alert-warning mb-4">
+                    <strong>Role Notice:</strong> As Staff, you can review proofs and leave a recommendation. Only Admins can finalize refunds.
+                </div>
+                
+                <input type="hidden" name="decision" value="recommend">
+                
+                <div class="form-group">
+                    <label class="form-label">Recommendation & Investigation Notes</label>
+                    <textarea name="admin_notes" class="form-input" rows="6" placeholder="What did you find? Should we refund? Explain here..." required></textarea>
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <button type="submit" class="btn btn-secondary" style="width: 100%; height: 48px; justify-content: center;">💾 Save Recommendation</button>
+                    <a href="{% url 'admin_portal:disputes' %}" class="btn btn-ghost" style="width: 100%; height: 48px; justify-content: center; display: flex; align-items: center;">Back</a>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+        
+    </div>
+</section>
+{% endblock %}

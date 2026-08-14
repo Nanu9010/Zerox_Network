@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Payout History - Admin Portal{% endblock %}
+
+{% block content %}
+<section style="background: var(--secondary); padding: 2rem 0;">
+    <div class="container">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
+            <h1 style="font-size: 2rem; margin: 0;">Payout History</h1>
+        </div>
+        <p style="color: var(--text-secondary);">Track all payouts to shop owners</p>
+    </div>
+</section>
+
+<section class="container" style="padding: 3rem 0;">
+    <!-- Summary Cards -->
+    <div class="grid grid-3" style="margin-bottom: 2rem;">
+        <div class="card card-elevated" style="text-align: center;">
+            <div style="color: var(--text-muted); font-size: 0.875rem;">Total Paid</div>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--success);">₹{{ total_paid }}</div>
+        </div>
+        <div class="card card-elevated" style="text-align: center;">
+            <div style="color: var(--text-muted); font-size: 0.875rem;">Pending</div>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--warning);">₹{{ pending_payouts }}</div>
+        </div>
+        <div class="card card-elevated" style="text-align: center;">
+            <div style="color: var(--text-muted); font-size: 0.875rem;">Failed</div>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--error);">₹{{ total_failed }}</div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 2rem;">
+        <a href="?status=all" class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-ghost{% endif %}">
+            All
+        </a>
+        <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-ghost{% endif %}">
+            Pending
+        </a>
+        <a href="?status=processing" class="btn {% if status_filter == 'processing' %}btn-primary{% else %}btn-ghost{% endif %}">
+            Processing
+        </a>
+        <a href="?status=completed" class="btn {% if status_filter == 'completed' %}btn-primary{% else %}btn-ghost{% endif %}">
+            Completed
+        </a>
+        <a href="?status=failed" class="btn {% if status_filter == 'failed' %}btn-primary{% else %}btn-ghost{% endif %}">
+            Failed
+        </a>
+    </div>
+
+    <!-- Payouts Table -->
+    <div class="card card-elevated">
+        {% if payouts %}
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border-color);">
+                        <th style="padding: 1rem; text-align: left;">ID</th>
+                        <th style="padding: 1rem; text-align: left;">Shop</th>
+                        <th style="padding: 1rem; text-align: right;">Amount</th>
+                        <th style="padding: 1rem; text-align: center;">Mode</th>
+                        <th style="padding: 1rem; text-align: center;">Status</th>
+                        <th style="padding: 1rem; text-align: left;">Date</th>
+                        <th style="padding: 1rem; text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payout in payouts %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 1rem;">#{{ payout.id }}</td>
+                        <td style="padding: 1rem;">
+                            <div style="font-weight: 600;">{{ payout.shop.name }}</div>
+                            <div style="color: var(--text-muted); font-size: 0.875rem;">{{ payout.shop.owner.email }}</div>
+                        </td>
+                        <td style="padding: 1rem; text-align: right; font-weight: 600;">
+                            ₹{{ payout.amount }}
+                        </td>
+                        <td style="padding: 1rem; text-align: center;">
+                            <span class="badge badge-neutral">{{ payout.mode }}</span>
+                        </td>
+                        <td style="padding: 1rem; text-align: center;">
+                            <span class="badge {% if payout.status == 'COMPLETED' %}badge-success{% elif payout.status == 'FAILED' %}badge-error{% elif payout.status == 'PROCESSING' %}badge-warning{% else %}badge-neutral{% endif %}">
+                                {{ payout.status }}
+                            </span>
+                        </td>
+                        <td style="padding: 1rem; color: var(--text-muted);">
+                            {{ payout.payout_date }}
+                        </td>
+                        <td style="padding: 1rem; text-align: center;">
+                            {% if payout.status == 'FAILED' %}
+                            <form method="POST" action="{% url 'admin_portal:retry_payout' payout.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-ghost" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
+                                    🔄 Retry
+                                </button>
+                            </form>
+                            {% endif %}
+                            {% if payout.razorpay_payout_id %}
+                            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
+                                {{ payout.razorpay_payout_id }}
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div style="padding: 3rem; text-align: center; color: var(--text-muted);">
+            No payouts found matching the filter.
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

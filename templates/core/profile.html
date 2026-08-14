@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Zerox{% endblock %}
+
+{% block content %}
+<section style="background: var(--secondary); padding: 2rem 0;">
+    <div class="container">
+        <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">My Profile</h1>
+        <p style="color: var(--text-secondary);">Manage your account settings</p>
+    </div>
+</section>
+
+<section class="container" style="padding: 3rem 0;">
+    <div style="max-width: 700px; margin: 0 auto;">
+        
+        {% if messages %}
+            {% for message in messages %}
+            <div class="card {% if message.tags == 'success' %}badge-success{% elif message.tags == 'error' %}badge-error{% endif %}" style="margin-bottom: 1.5rem; padding: 1rem; border-left: 4px solid {% if message.tags == 'success' %}var(--success){% else %}var(--error){% endif %};">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Profile Card -->
+        <div class="card card-elevated" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid hsl(0, 0%, 90%);">
+                <div style="width: 80px; height: 80px; background: var(--primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem;">
+                    {% if user.profile.role == 'SHOP' %}🏪{% elif user.profile.role == 'ADMIN' %}👑{% else %}👤{% endif %}
+                </div>
+                <div>
+                    <h2 style="margin: 0 0 0.5rem 0;">{{ user.username }}</h2>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <span class="badge badge-success">{{ user.profile.get_role_display }}</span>
+                        {% if user.profile.is_shop_owner %}
+                        <span class="badge" style="background: hsl(220, 60%, 95%); color: hsl(220, 60%, 40%);">+ Shop Owner</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div style="padding-top: 1.5rem;">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="profile">
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-size: 0.875rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">Email Address</label>
+                        <input type="email" name="email" value="{{ user.email }}" class="form-input" required>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-size: 0.875rem; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">Phone Number</label>
+                        <input type="text" name="phone" value="{{ user.profile.phone }}" class="form-input" required>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem;">Member Since</p>
+                        <p style="font-weight: 600;">{{ user.date_joined|date:"M d, Y" }}</p>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid hsl(0, 0%, 90%);">
+                        <button type="submit" class="btn btn-primary" style="flex: 2;">
+                            💾 Save Changes
+                        </button>
+                        <a href="{% url 'core:logout' %}" class="btn btn-ghost" style="flex: 1;">
+                            🚪 Logout
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- My Shops Section -->
+        {% if user.profile.is_shop_owner or user.profile.role == 'SHOP' %}
+        <div class="card card-elevated" style="margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                <h3 style="margin: 0;">🏪 My Shops</h3>
+                <button onclick="document.getElementById('addShopForm').style.display = document.getElementById('addShopForm').style.display === 'none' ? 'block' : 'none'" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.875rem; width: auto; min-width: auto;">
+                    ➕ Add Shop
+                </button>
+            </div>
+            
+            {% if user_shops %}
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for shop in user_shops %}
+                <div style="padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <div style="font-weight: 700;">{{ shop.name }}</div>
+                        <div style="font-size: 0.875rem; color: var(--text-muted);">📍 {{ shop.location }}</div>
+                        <div style="font-size: 0.875rem; color: var(--text-muted);">📞 {{ shop.phone }}</div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        {% if shop.is_approved %}
+                            <span class="badge badge-success">Approved</span>
+                        {% else %}
+                            <span class="badge" style="background: hsl(40, 100%, 95%); color: hsl(40, 100%, 40%);">Pending</span>
+                        {% endif %}
+                        <a href="{% url 'shops:dashboard' %}" class="btn btn-ghost" style="padding: 0.4rem 0.75rem; font-size: 0.8rem; width: auto; min-width: auto;">Dashboard →</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="color: var(--text-muted); text-align: center; padding: 1.5rem;">No shops registered yet.</p>
+            {% endif %}
+            
+            <!-- Add Shop Form (hidden by default) -->
+            <div id="addShopForm" style="display: none; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px dashed var(--border-color);">
+                <h4 style="margin-bottom: 1rem;">Register New Shop</h4>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="shop">
+                    
+                    <div class="form-group">
+                        <label class="form-label">Shop Name</label>
+                        <input type="text" name="shop_name" class="form-input" placeholder="e.g., Quick Print Hub" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Location / Address</label>
+                        <input type="text" name="shop_location" class="form-input" placeholder="e.g., MG Road, Bangalore" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Shop Phone</label>
+                        <input type="tel" name="shop_phone" class="form-input" placeholder="e.g., 9876543210" required>
+                    </div>
+                    
+                    <input type="hidden" name="shop_lat" id="profileShopLat">
+                    <input type="hidden" name="shop_lon" id="profileShopLon">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                        <div class="form-group">
+                            <label class="form-label">A4 B&W (₹)</label>
+                            <input type="number" step="0.01" name="a4_bw_price" class="form-input" value="1.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">A4 Color (₹)</label>
+                            <input type="number" step="0.01" name="a4_color_price" class="form-input" value="5.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">A3 B&W (₹)</label>
+                            <input type="number" step="0.01" name="a3_bw_price" class="form-input" value="2.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">A3 Color (₹)</label>
+                            <input type="number" step="0.01" name="a3_color_price" class="form-input" value="10.00">
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button type="submit" class="btn btn-primary" style="flex: 1;">
+                            ✅ Register Shop
+                        </button>
+                        <button type="button" onclick="document.getElementById('addShopForm').style.display='none'" class="btn btn-ghost" style="flex: 1;">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+        
+    </div>
+</section>
+{% endblock %}

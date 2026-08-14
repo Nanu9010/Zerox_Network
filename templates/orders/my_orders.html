@@ -1,0 +1,432 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders & Order Tracker - Zerox{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Order Tracking Stepper */
+    .tracker-stepper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        margin: 1.5rem 0;
+        padding: 0 0.5rem;
+    }
+    .tracker-stepper::before {
+        content: '';
+        position: absolute;
+        top: 18px;
+        left: 25px;
+        right: 25px;
+        height: 4px;
+        background: #e2e8f0;
+        z-index: 1;
+    }
+    .tracker-progress-line {
+        position: absolute;
+        top: 18px;
+        left: 25px;
+        height: 4px;
+        background: var(--primary, #00B140);
+        z-index: 1;
+        transition: width 0.4s ease;
+    }
+    .tracker-step {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.35rem;
+        width: 70px;
+        text-align: center;
+    }
+    .tracker-node {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid #cbd5e1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #64748b;
+        transition: all 0.3s ease;
+    }
+    .tracker-step.completed .tracker-node {
+        background: var(--primary, #00B140);
+        border-color: var(--primary, #00B140);
+        color: #fff;
+        box-shadow: 0 0 0 3px rgba(0, 177, 64, 0.2);
+    }
+    .tracker-step.active .tracker-node {
+        background: #fff;
+        border-color: var(--primary, #00B140);
+        color: var(--primary, #00B140);
+        box-shadow: 0 0 0 4px rgba(0, 177, 64, 0.25);
+        animation: pulse-node 1.8s infinite;
+    }
+    @keyframes pulse-node {
+        0% { box-shadow: 0 0 0 0 rgba(0, 177, 64, 0.4); }
+        70% { box-shadow: 0 0 0 8px rgba(0, 177, 64, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(0, 177, 64, 0); }
+    }
+    .tracker-label {
+        font-size: 0.725rem;
+        font-weight: 600;
+        color: #64748b;
+    }
+    .tracker-step.completed .tracker-label,
+    .tracker-step.active .tracker-label {
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    /* Modal Preview */
+    .preview-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.75);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem;
+        backdrop-filter: blur(4px);
+    }
+    .preview-modal-content {
+        background: #fff;
+        border-radius: var(--radius-md, 12px);
+        width: 100%;
+        max-width: 850px;
+        height: 85vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    }
+    .preview-modal-header {
+        padding: 1rem 1.25rem;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .preview-modal-body {
+        flex: 1;
+        background: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: auto;
+    }
+    .preview-modal-body iframe,
+    .preview-modal-body img {
+        width: 100%;
+        height: 100%;
+        border: none;
+        object-fit: contain;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    
+    <!-- Top Header & Search Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="{% url 'core:home' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
+            <div>
+                <h1 class="mb-0" style="font-size: 1.85rem;">My Orders & Live Tracker</h1>
+                <p class="text-sm text-secondary mb-0">Track printing progress & view ordered documents</p>
+            </div>
+        </div>
+
+        <!-- Phone Lookup Form for Guest Users -->
+        <form method="GET" action="{% url 'orders:my_orders' %}" style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="tel" name="phone" value="{{ phone_query }}" placeholder="Enter phone number..." class="form-input" style="padding: 0.5rem 0.85rem; font-size: 0.9rem; width: 200px;">
+            <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem; min-height: auto;">
+                🔍 Track
+            </button>
+        </form>
+    </div>
+
+    <!-- Success Flash Notification (After Payment) -->
+    {% if request.GET.payment == 'success' %}
+    <div style="background: #dcfce7; border: 1px solid #86efac; border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem; color: #14532d;">
+        <div style="font-size: 2rem;">🎉</div>
+        <div>
+            <h4 style="margin: 0 0 0.25rem 0; color: #15803d;">Payment Successful! Your order has been placed.</h4>
+            <p style="margin: 0; font-size: 0.9rem; color: #166534;">The print shop has been notified. You can track live status and view your ordered files below.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Orders List -->
+    <div class="grid" style="gap: 1.75rem;">
+        {% for order in orders %}
+        <div class="card card-elevated" style="border-left: 6px solid 
+            {% if order.status == 'READY' %}#00B140
+            {% elif order.status == 'PRINTING' %}#3b82f6
+            {% elif order.status == 'ACCEPTED' %}#8b5cf6
+            {% elif order.status == 'PAID' %}#eab308
+            {% elif order.status == 'COMPLETED' %}#64748b
+            {% else %}#ef4444{% endif %}; border-radius: var(--radius-md); padding: 1.5rem;">
+            
+            <!-- Order Header Info -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+                        <h3 style="margin: 0; font-size: 1.35rem;">Order #{{ order.id }}</h3>
+                        <span class="badge" style="font-size: 0.8rem; font-weight: 700; padding: 0.35rem 0.75rem; border-radius: 20px;
+                            {% if order.status == 'READY' %}background: #dcfce7; color: #15803d;
+                            {% elif order.status == 'PRINTING' %}background: #dbeafe; color: #1d4ed8;
+                            {% elif order.status == 'ACCEPTED' %}background: #f3e8ff; color: #6b21a8;
+                            {% elif order.status == 'PAID' %}background: #fef9c3; color: #854d0e;
+                            {% elif order.status == 'COMPLETED' %}background: #f1f5f9; color: #475569;
+                            {% else %}background: #fee2e2; color: #b91c1c;{% endif %}
+                        ">
+                            {% if order.status == 'PAID' %}Paid & Pending Acceptance
+                            {% elif order.status == 'ACCEPTED' %}Accepted by Shop
+                            {% elif order.status == 'PRINTING' %}Printing in Progress
+                            {% elif order.status == 'READY' %}Ready for Pickup!
+                            {% elif order.status == 'COMPLETED' %}Completed & Picked Up
+                            {% elif order.status == 'REJECTED' %}Rejected by Shop
+                            {% else %}{{ order.status }}{% endif %}
+                        </span>
+                    </div>
+                    
+                    <p style="margin: 0; font-weight: 600; color: var(--text-primary);">🏪 {{ order.shop.name }}</p>
+                    <p style="margin: 0.15rem 0 0 0; font-size: 0.85rem; color: var(--text-muted);">
+                        📍 {{ order.shop.location }} • Placed: {{ order.created_at|date:"M d, Y • h:i A" }}
+                    </p>
+                </div>
+
+                <div style="text-align: right;">
+                    <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block;">Total Paid</span>
+                    <span style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">₹{{ order.total_price }}</span>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary); display: block;">({{ order.final_sheets }} sheet{% if order.final_sheets > 1 %}s{% endif %})</span>
+                </div>
+            </div>
+
+            <!-- LIVE ORDER TRACKER STEPPER -->
+            {% if order.status != 'CANCELLED' and order.status != 'REJECTED' %}
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 1.25rem 1rem; margin-bottom: 1.5rem;">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #334155; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                    ⏱️ Live Printing Progress:
+                </div>
+                
+                <div class="tracker-stepper">
+                    <!-- Progress line calculation -->
+                    <div class="tracker-progress-line" style="
+                        {% if order.status == 'PAID' %}width: 0%;
+                        {% elif order.status == 'ACCEPTED' %}width: 33%;
+                        {% elif order.status == 'PRINTING' %}width: 66%;
+                        {% elif order.status == 'READY' or order.status == 'COMPLETED' %}width: 100%;
+                        {% endif %}
+                    "></div>
+
+                    <!-- Step 1: Paid -->
+                    <div class="tracker-step {% if order.status in 'PAID,ACCEPTED,PRINTING,READY,COMPLETED' %}completed{% endif %}">
+                        <div class="tracker-node">✓</div>
+                        <span class="tracker-label">Order Paid</span>
+                    </div>
+
+                    <!-- Step 2: Accepted -->
+                    <div class="tracker-step {% if order.status in 'ACCEPTED,PRINTING,READY,COMPLETED' %}completed{% elif order.status == 'PAID' %}active{% endif %}">
+                        <div class="tracker-node">🏪</div>
+                        <span class="tracker-label">Shop Accepted</span>
+                    </div>
+
+                    <!-- Step 3: Printing -->
+                    <div class="tracker-step {% if order.status in 'PRINTING,READY,COMPLETED' %}completed{% elif order.status == 'ACCEPTED' %}active{% endif %}">
+                        <div class="tracker-node">🖨️</div>
+                        <span class="tracker-label">Printing</span>
+                    </div>
+
+                    <!-- Step 4: Ready -->
+                    <div class="tracker-step {% if order.status in 'READY,COMPLETED' %}completed{% elif order.status == 'PRINTING' %}active{% endif %}">
+                        <div class="tracker-node">🎉</div>
+                        <span class="tracker-label">Ready</span>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- Rejected / Cancelled alert -->
+            <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.5rem; color: #991b1b; font-size: 0.9rem;">
+                ⚠️ <strong>Order Status: {{ order.get_status_display }}</strong>
+                {% if order.rejection_reason %}
+                <div style="margin-top: 0.35rem; color: #7f1d1d;">Reason: {{ order.rejection_reason }}</div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- READY FOR PICKUP PIN BANNER -->
+            {% if order.status == 'READY' or order.status == 'COMPLETED' %}
+            <div style="background: #f0fdf4; border: 2px dashed #00B140; border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <span style="background: #00B140; color: white; font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.5rem; border-radius: 4px; text-transform: uppercase;">Pickup Ready</span>
+                    <h4 style="margin: 0.35rem 0 0 0; font-size: 1.1rem; color: #166534;">Show this PIN at {{ order.shop.name }} to collect your printouts:</h4>
+                </div>
+                <div style="text-align: center; background: #fff; border: 2px solid #00B140; padding: 0.5rem 1.25rem; border-radius: var(--radius-md);">
+                    <span style="font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: 700;">YOUR PICKUP PIN</span>
+                    <span style="font-size: 2rem; font-weight: 900; letter-spacing: 4px; color: var(--primary);">{{ order.pin_code }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- ORDERED FILES SECTION & FILE VIEWER -->
+            <div style="margin-bottom: 1.25rem;">
+                <h4 style="margin-bottom: 0.75rem; font-size: 1rem; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                    📁 Ordered Files ({{ order.files.count }} file{% if order.files.count > 1 %}s{% endif %})
+                </h4>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    {% for file in order.files.all %}
+                    <div style="background: var(--bg-surface, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: var(--radius-md); padding: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                        
+                        <!-- File Icon & Details -->
+                        <div style="display: flex; align-items: center; gap: 1rem; min-width: 240px; flex: 1;">
+                            <div style="width: 44px; height: 44px; background: #e0f2fe; color: #0284c7; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0;">
+                                {% if '.pdf' in file.file_name|lower %}📄{% else %}🖼️{% endif %}
+                            </div>
+                            <div style="overflow: hidden;">
+                                <p style="margin: 0 0 0.2rem 0; font-weight: 700; font-size: 0.95rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;" title="{{ file.file_name }}">
+                                    {{ file.file_name }}
+                                </p>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center;">
+                                    <span class="badge badge-neutral" style="font-size: 0.725rem; font-weight: 600;">{{ file.pages_count }} page{% if file.pages_count > 1 %}s{% endif %}</span>
+                                    <span class="badge badge-neutral" style="font-size: 0.725rem; font-weight: 600;">{{ file.paper_size }}</span>
+                                    <span class="badge badge-neutral" style="font-size: 0.725rem; font-weight: 600;">{{ file.get_color_type_display }}</span>
+                                    <span class="badge badge-neutral" style="font-size: 0.725rem; font-weight: 600;">{{ file.get_print_side_display }}</span>
+                                    <span class="badge badge-neutral" style="font-size: 0.725rem; font-weight: 600;">{{ file.copies }} copy{% if file.copies > 1 %}s{% endif %}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FILE ACTION BUTTONS (VIEW & DOWNLOAD) -->
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
+                            <!-- 1. Open/View in New Tab -->
+                            <a href="{{ file.file.url }}" target="_blank" class="btn btn-ghost" style="padding: 0.45rem 0.85rem; font-size: 0.825rem; border: 1px solid #cbd5e1;" title="Open file in new tab">
+                                👁️ View File
+                            </a>
+
+                            <!-- 2. Preview Modal Button -->
+                            <button type="button" class="btn btn-ghost" style="padding: 0.45rem 0.85rem; font-size: 0.825rem; border: 1px solid #cbd5e1;" onclick="openFilePreview('{{ file.file.url }}', '{{ file.file_name|escapejs }}')">
+                                🔍 Preview
+                            </button>
+
+                            <!-- 3. Direct Download -->
+                            <a href="{{ file.file.url }}" download="{{ file.file_name }}" class="btn btn-ghost" style="padding: 0.45rem 0.85rem; font-size: 0.825rem; border: 1px solid #cbd5e1; color: var(--primary);" title="Download file">
+                                📥 Download
+                            </a>
+                        </div>
+
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center py-2 mb-0">No file attachments recorded.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid #e2e8f0; flex-wrap: wrap; gap: 0.75rem;">
+                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                    Contact Shop: <strong>{{ order.shop.phone }}</strong>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem;">
+                    {% if order.status == 'READY' or order.status == 'COMPLETED' %}
+                    <a href="{% url 'orders:pickup_info' order.id %}" class="btn btn-primary" style="padding: 0.45rem 1rem; font-size: 0.875rem;">
+                        🔑 View Pickup PIN Screen
+                    </a>
+                    {% endif %}
+
+                    {% if order.status == 'COMPLETED' and order.can_raise_dispute %}
+                    <a href="{% url 'orders:raise_dispute' order.id %}" class="btn btn-ghost" style="padding: 0.45rem 1rem; font-size: 0.875rem; color: var(--error);">
+                        Raise Dispute
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+        {% empty %}
+        <div class="card text-center py-5" style="border-radius: var(--radius-md);">
+            <div style="font-size: 3.5rem; margin-bottom: 1rem;">📦</div>
+            <h3>No Orders Found</h3>
+            <p class="text-muted" style="max-width: 450px; margin: 0 auto 1.5rem auto;">
+                {% if phone_query %}
+                No print orders associated with phone number <strong>{{ phone_query }}</strong>.
+                {% else %}
+                You haven't placed any print orders yet. Find a print shop near you to get started!
+                {% endif %}
+            </p>
+            <a href="{% url 'shops:list' %}" class="btn btn-primary" style="width: auto; margin: 0 auto;">Find a Print Shop</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- FILE PREVIEW MODAL -->
+<div id="filePreviewModal" class="preview-modal" onclick="closeFilePreview(event)">
+    <div class="preview-modal-content" onclick="event.stopPropagation()">
+        <div class="preview-modal-header">
+            <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden;">
+                <span>📄</span>
+                <strong id="previewFileName" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 500px;">Document Preview</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <a id="previewExternalLink" href="#" target="_blank" class="btn btn-ghost" style="padding: 0.35rem 0.75rem; font-size: 0.8rem; border: 1px solid #cbd5e1;">
+                    ↗ Open in New Tab
+                </a>
+                <button type="button" class="btn btn-ghost" style="padding: 0.25rem 0.65rem; font-size: 1.25rem; line-height: 1;" onclick="closeFilePreview()">
+                    ✕
+                </button>
+            </div>
+        </div>
+        <div class="preview-modal-body" id="previewModalBody">
+            <!-- Content dynamically populated by JS -->
+        </div>
+    </div>
+</div>
+
+<script>
+function openFilePreview(fileUrl, fileName) {
+    const modal = document.getElementById('filePreviewModal');
+    const body = document.getElementById('previewModalBody');
+    const title = document.getElementById('previewFileName');
+    const extLink = document.getElementById('previewExternalLink');
+
+    title.textContent = fileName;
+    extLink.href = fileUrl;
+
+    const ext = fileName.split('.').pop().toLowerCase();
+    
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
+        body.innerHTML = `<img src="${fileUrl}" alt="${fileName}" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
+    } else {
+        body.innerHTML = `<iframe src="${fileUrl}" width="100%" height="100%"></iframe>`;
+    }
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeFilePreview(e) {
+    const modal = document.getElementById('filePreviewModal');
+    const body = document.getElementById('previewModalBody');
+    modal.style.display = 'none';
+    body.innerHTML = '';
+    document.body.style.overflow = 'auto';
+}
+</script>
+{% endblock %}

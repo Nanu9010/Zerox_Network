@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Shop Approvals - Admin{% endblock %}
+
+{% block content %}
+<section style="background: var(--secondary); padding: 2rem 0;">
+    <div class="container">
+        <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">🏪 Shop Management</h1>
+        <p style="color: var(--text-secondary);">Approve, reject, or suspend shops</p>
+    </div>
+</section>
+
+<section class="container" style="padding: 3rem 0;">
+    
+    <!-- Filter Tabs -->
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap;">
+        <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto; padding: 0.5rem 1rem;">
+            ⏳ Pending ({{ shops|length }})
+        </a>
+        <a href="?status=approved" class="btn {% if status_filter == 'approved' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto; padding: 0.5rem 1rem;">
+            ✅ Approved
+        </a>
+        <a href="?status=all" class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto; padding: 0.5rem 1rem;">
+            📋 All Shops
+        </a>
+    </div>
+    
+    <!-- Shop List -->
+    {% if shops %}
+        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            {% for shop in shops %}
+            <div class="card card-elevated">
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                    
+                    <!-- Shop Info -->
+                    <div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                            <h3 style="margin: 0; font-size: 1.25rem;">{{ shop.name }}</h3>
+                            {% if shop.is_approved %}
+                                <span class="badge badge-success">✅ Approved</span>
+                            {% else %}
+                                <span class="badge badge-warning">⏳ Pending</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr; md-grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                            <div>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Location</p>
+                                <p style="font-weight: 600; font-size: 0.875rem;">📍 {{ shop.location }}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Phone</p>
+                                <p style="font-weight: 600; font-size: 0.875rem;">📞 {{ shop.phone }}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Owner</p>
+                                <p style="font-weight: 600; font-size: 0.875rem;">👤 {{ shop.owner.username }}</p>
+                            </div>
+                            <div>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">QR Code</p>
+                                <p style="font-weight: 600; font-family: monospace; font-size: 0.875rem;">{{ shop.qr_code }}</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Price List -->
+                        <div style="padding: 1.25rem; background: var(--bg-light); border-radius: var(--radius-md);">
+                            <p style="font-weight: 700; margin-bottom: 0.75rem; font-size: 0.9rem; color: var(--primary);">💰 Price List</p>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem;">
+                                <div>A4 B/W: <strong>₹{{ shop.a4_bw_price }}</strong></div>
+                                <div>A4 Color: <strong>₹{{ shop.a4_color_price }}</strong></div>
+                                <div>A3 B/W: <strong>₹{{ shop.a3_bw_price }}</strong></div>
+                                <div>A3 Color: <strong>₹{{ shop.a3_color_price }}</strong></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                        {% if not shop.is_approved %}
+                            <div style="display: flex; gap: 1rem;">
+                                <form method="POST" action="{% url 'admin_portal:approve_shop' shop.id %}" style="margin: 0; flex: 1;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; justify-content: center;">
+                                        ✅ Approve
+                                    </button>
+                                </form>
+                                <a href="{% url 'admin_portal:reject_shop' shop.id %}" class="btn btn-ghost" style="flex: 1; height: 48px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);">
+                                    ❌ Reject
+                                </a>
+                            </div>
+                        {% else %}
+                            <a href="{% url 'admin_portal:suspend_shop' shop.id %}" class="btn btn-ghost" style="width: 100%; height: 48px; display: flex; align-items: center; justify-content: center; border-color: hsl(0, 80%, 50%); color: hsl(0, 80%, 50%);">
+                                🚫 Suspend Shop
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card text-center" style="padding: 4rem 2rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+            <h3>No shops found</h3>
+            <p class="text-muted">
+                {% if status_filter == 'pending' %}
+                    All shops have been reviewed!
+                {% else %}
+                    Try a different filter
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
+    
+</section>
+{% endblock %}

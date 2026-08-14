@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Profile & Control Dashboard - Zerox{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-hero {
+        background: linear-gradient(135deg, #111827 0%, #1F2937 100%);
+        color: #FFFFFF;
+        border-radius: var(--radius-lg);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+    }
+    .admin-hero::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, rgba(0,0,0,0) 70%);
+        pointer-events: none;
+    }
+    .hero-profile-container {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+    .admin-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.25rem;
+        color: white;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+    }
+    .stat-card-gradient {
+        background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+        color: white;
+    }
+    .stat-card-gradient h3, .stat-card-gradient p {
+        color: white !important;
+    }
+    .dashboard-nav-grid {
+        display: flex;
+        gap: 0.75rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        margin-bottom: 2rem;
+        scrollbar-width: thin;
+    }
+    .nav-pill-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.2rem;
+        background: var(--bg-surface);
+        border: 1px solid var(--bg-subtle);
+        border-radius: var(--radius-full);
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        white-space: nowrap;
+        transition: all var(--transition-base);
+        box-shadow: var(--shadow-sm);
+    }
+    .nav-pill-btn:hover {
+        background: var(--primary-light);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    .activity-feed-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .activity-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.85rem 1.25rem;
+        background: var(--bg-surface);
+        border-radius: var(--radius-md);
+        border-left: 4px solid var(--primary);
+        box-shadow: var(--shadow-sm);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+
+    <!-- Admin Profile Hero Header -->
+    <div class="admin-hero">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+            <div class="hero-profile-container">
+                <div class="admin-avatar">
+                    {% if user.is_superuser %}👑{% else %}🛡️{% endif %}
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem;">
+                        <h2 style="color: white; margin: 0; font-size: 1.75rem;">{{ user.username }}</h2>
+                        <span class="badge {% if show_revenue %}badge-success{% else %}badge-warning{% endif %}">
+                            {{ user.profile.get_role_display|default:"System Admin" }}
+                        </span>
+                    </div>
+                    <p style="color: #9CA3AF; margin: 0; font-size: 0.95rem;">
+                        📧 {{ user.email|default:"admin@zerox.network" }} &nbsp;|&nbsp; 🗓️ Joined {{ user.date_joined|date:"M d, Y" }}
+                    </p>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="text-align: right; background: rgba(255,255,255,0.08); padding: 0.75rem 1.25rem; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.12);">
+                    <div style="font-size: 0.75rem; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.05em;">System Status</div>
+                    <div style="font-weight: 700; color: #34D399; font-size: 0.95rem;">🟢 Network Operational</div>
+                </div>
+                <a href="{% url 'core:profile' %}" class="btn btn-ghost" style="color: white; border: 1px solid rgba(255,255,255,0.2); border-radius: var(--radius-md);">
+                    ⚙️ Profile Settings
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Hub -->
+    <div class="dashboard-nav-grid">
+        {% if show_revenue %}
+        <a href="{% url 'admin_portal:analytics' %}" class="nav-pill-btn">
+            📊 Platform Analytics
+        </a>
+        {% endif %}
+        <a href="{% url 'admin_portal:manage_shops' %}" class="nav-pill-btn">
+            🏪 Shop Directory ({{ stats.shops }})
+        </a>
+        <a href="{% url 'admin_portal:users' %}" class="nav-pill-btn">
+            👥 User Management ({{ stats.users }})
+        </a>
+        <a href="{% url 'admin_portal:review_images' %}" class="nav-pill-btn">
+            📸 Photos Moderation
+        </a>
+        <a href="{% url 'admin_portal:disputes' %}" class="nav-pill-btn">
+            ⚖️ Disputes {% if stats.pending_disputes %}<span class="badge badge-warning">{{ stats.pending_disputes }}</span>{% endif %}
+        </a>
+        <a href="{% url 'admin_portal:refunds_list' %}" class="nav-pill-btn">
+            💸 Refunds {% if stats.pending_refunds %}<span class="badge badge-error">{{ stats.pending_refunds }}</span>{% endif %}
+        </a>
+        {% if show_revenue %}
+        <a href="{% url 'admin_portal:transactions' %}" class="nav-pill-btn">
+            💰 Transactions
+        </a>
+        <a href="{% url 'admin_portal:payouts' %}" class="nav-pill-btn">
+            🏦 Shop Payouts
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Platform Stats Grid -->
+    <div class="grid grid-2 grid-4 mb-4" style="gap: 1.25rem;">
+        {% if show_revenue %}
+        <div class="card stat-card-gradient">
+            <h3 class="mb-1" style="font-size: 1.85rem;">₹{{ stats.revenue|floatformat:2 }}</h3>
+            <p class="text-sm mb-0">Platform Earnings (Commission)</p>
+        </div>
+        {% endif %}
+        <div class="card">
+            <h3 class="mb-1" style="font-size: 1.85rem; color: var(--primary);">{{ stats.active_shops }}</h3>
+            <p class="text-secondary text-sm mb-0">Active Approved Shops</p>
+        </div>
+        <div class="card">
+            <h3 class="mb-1" style="font-size: 1.85rem;">{{ stats.orders }}</h3>
+            <p class="text-secondary text-sm mb-0">Completed Orders</p>
+        </div>
+        <div class="card">
+            <h3 class="mb-1" style="font-size: 1.85rem;">{{ stats.users }}</h3>
+            <p class="text-secondary text-sm mb-0">Registered Users</p>
+        </div>
+    </div>
+
+    <!-- Pending Shop Approvals Queue -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 class="m-0" style="display: flex; align-items: center; gap: 0.5rem;">
+            ⚠️ Pending Shop Approvals 
+            <span class="badge badge-warning">{{ pending_shops.count }}</span>
+        </h3>
+        <a href="{% url 'admin_portal:shop_approvals' %}" class="text-sm font-weight-bold text-primary">View All Queue &rarr;</a>
+    </div>
+
+    <div class="grid mb-4" style="gap: 1.25rem;">
+        {% for shop in pending_shops %}
+        <div class="card" style="border-left: 4px solid var(--warning);">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h3 class="mb-1">{{ shop.name }}</h3>
+                    <p class="text-secondary text-sm mb-1">
+                        📍 <strong>Location:</strong> {{ shop.location }}<br>
+                        📞 <strong>Phone:</strong> {{ shop.phone }}<br>
+                        👤 <strong>Owner:</strong> {{ shop.owner.username }} ({{ shop.owner.email }})
+                    </p>
+                    <p class="text-muted text-xs mb-0">Registered: {{ shop.created_at|date:"M d, Y - H:i" }}</p>
+                </div>
+                <span class="badge badge-warning">Action Required</span>
+            </div>
+
+            <div style="background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-md); margin-top: 1rem;">
+                <div class="grid grid-2" style="gap: 1rem;">
+                    <form method="POST" action="{% url 'admin_portal:approve_shop' shop.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="approve">
+                        <button type="submit" class="btn btn-primary" style="background: var(--success); height: 42px; width: 100%;">
+                            ✅ Approve Shop
+                        </button>
+                    </form>
+                    
+                    <form method="POST" action="{% url 'admin_portal:approve_shop' shop.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="reject">
+                        <button type="submit" class="btn btn-ghost" style="color: var(--error); border: 1px solid var(--error); height: 42px; width: 100%;">
+                            ❌ Reject
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="card text-center py-4">
+            <p class="text-muted mb-0">✨ All shop applications have been reviewed. No pending shop approvals!</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pending Images Queue -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h3 class="m-0" style="display: flex; align-items: center; gap: 0.5rem;">
+            📷 Pending Media Moderation
+            <span class="badge badge-neutral">{{ pending_images.count }}</span>
+        </h3>
+        <a href="{% url 'admin_portal:review_images' %}" class="text-sm font-weight-bold text-primary">Review Images &rarr;</a>
+    </div>
+
+    <div class="grid grid-2 grid-4 mb-4" style="gap: 1.25rem;">
+        {% for img in pending_images %}
+        <div class="card">
+            <div class="mb-2" style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="badge badge-neutral text-xs">{{ img.shop.name|truncatechars:18 }}</span>
+                {% if img.is_primary %}<span class="badge badge-success text-xs">Primary</span>{% endif %}
+            </div>
+            
+            <div style="height: 160px; background: var(--bg-subtle); border-radius: var(--radius-md); overflow: hidden; margin-bottom: 0.75rem;">
+                <img src="{{ img.image.url }}" style="width: 100%; height: 100%; object-fit: cover;" alt="Shop Image">
+            </div>
+            
+            <p class="text-xs text-secondary mb-2" style="min-height: 2.4em;">
+                Caption: "{{ img.caption|default:"No caption"|truncatechars:35 }}"
+            </p>
+
+            <div class="grid grid-2" style="gap: 0.5rem;">
+                <form method="POST" action="{% url 'admin_portal:approve_image' img.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="approve">
+                    <button type="submit" class="btn btn-primary" style="background: var(--success); height: 36px; font-size: 0.85rem;">
+                        Approve
+                    </button>
+                </form>
+                
+                <form method="POST" action="{% url 'admin_portal:approve_image' img.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="reject">
+                    <button type="submit" class="btn btn-ghost" style="color: var(--error); border: 1px solid var(--error); height: 36px; font-size: 0.85rem;">
+                        Reject
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+        <div class="card text-center py-4" style="grid-column: 1 / -1;">
+            <p class="text-muted mb-0">🖼️ No uploaded photos awaiting moderation.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Live Audit Trail / Activity Feed -->
+    {% if recent_activity %}
+    <div style="margin-top: 2rem;">
+        <h3 class="mb-3">📜 Platform Audit Activity</h3>
+        <div class="activity-feed-list">
+            {% for log in recent_activity %}
+            <div class="activity-item">
+                <div>
+                    <span class="font-weight-bold" style="color: var(--text-primary);">{{ log.action }}</span>
+                    <span class="text-muted text-sm">&bull; {{ log.details|default:log.model_name }}</span>
+                </div>
+                <div class="text-xs text-muted">
+                    👤 {{ log.user.username|default:"System" }} | 🕒 {{ log.created_at|date:"M d, H:i" }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

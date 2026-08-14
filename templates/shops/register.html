@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+
+{% block title %}Register Your Shop - Zerox Network{% endblock %}
+
+{% block extra_css %}
+<!-- Leaflet CSS for Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<style>
+    #shopMap { 
+        height: 300px; 
+        border-radius: var(--radius-md); 
+        margin-top: 0.5rem;
+    }
+    .location-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+    }
+    .location-status.success { color: var(--success); }
+    .location-status.error { color: var(--error); }
+    .location-status.info { color: var(--text-secondary); }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="container" style="padding: 3rem 0;">
+    <div style="max-width: 700px; margin: 0 auto;">
+        <h1 class="text-center">Become a Zerox Partner 🚀</h1>
+        <p class="text-center text-muted mb-xl">Join our network and reach more customers</p>
+        
+        {% if messages %}
+            {% for message in messages %}
+            <div class="card {% if message.tags == 'success' %}bg-success{% elif message.tags == 'error' %}bg-error{% endif %}" style="margin-bottom: 1rem; padding: 1rem;">
+                {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="POST" class="card card-elevated" id="registerForm">
+            {% csrf_token %}
+            
+            <h3>Shop Information</h3>
+            
+            <div class="form-group">
+                <label class="form-label">Shop Name</label>
+                <input type="text" name="shop_name" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Location / Address</label>
+                <input type="text" name="location" id="shopLocation" class="form-input" required 
+                       placeholder="e.g. MG Road, Bangalore">
+                <small style="color: var(--text-muted);">Start typing to search, or click on map to set location</small>
+            </div>
+            
+            <!-- Map for location selection -->
+            <div class="form-group">
+                <label class="form-label">📍 Pin Your Location on Map</label>
+                <div id="shopMap"></div>
+                <div id="locationStatus" class="location-status info">
+                    Click on map to set your shop location, or use "Detect My Location" button
+                </div>
+            </div>
+            
+            <!-- Hidden fields for coordinates -->
+            <input type="hidden" name="latitude" id="shopLat">
+            <input type="hidden" name="longitude" id="shopLon">
+            
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" name="phone" class="form-input" required placeholder="e.g. 9876543210">
+            </div>
+            
+            <h3 class="mt-xl">Price List (per page in ₹)</h3>
+            
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label class="form-label">A4 Black & White</label>
+                    <input type="number" step="0.01" name="a4_bw_price" class="form-input" value="1.00" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">A4 Color</label>
+                    <input type="number" step="0.01" name="a4_color_price" class="form-input" value="5.00" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">A3 Black & White</label>
+                    <input type="number" step="0.01" name="a3_bw_price" class="form-input" value="2.00" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">A3 Color</label>
+                    <input type="number" step="0.01" name="a3_color_price" class="form-input" value="10.00" required>
+                </div>
+            </div>
+            
+            {% if not user.is_authenticated %}
+            <h3 class="mt-xl">Create Account</h3>
+            
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-input" required>
+            </div>
+            {% endif %}
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">
+                Register Shop
+            </button>
+        </form>
+        
+        <p class="text-center text-muted mt-lg">
+            {% if user.is_authenticated %}
+                <a href="{% url 'shops:dashboard' %}" style="color: var(--primary);">← Back to Dashboard</a>
+            {% else %}
+                Already have an account? <a href="{% url 'core:login' %}" style="color: var(--primary);">Login here</a>
+            {% endif %}
+        </p>
+    </div>
+</section>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+// Initialize map
+const map = L.map('shopMap').setView([20.5937, 78.9629], 5);
+let marker = null;
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+// Click on map to set location
+map.on('click', function(e) {
+    setMarker(e.latlng.lat, e.latlng.lng);
+    
+    // Reverse geocode to get address
+    fetch(`/shop/api/geocode/?address=${e.latlng.lat},${e.latlng.lng}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('shopLocation').value = data.display_name;
+            }
+        });
+});
+
+function setMarker(lat, lon) {
+    if (marker) {
+        map.removeLayer(marker);
+    }
+    marker = L.marker([lat, lon]).addTo(map);
+    map.setView([lat, lon], 15);
+    
+    document.getElementById('shopLat').value = lat;
+    document.getElementById('shopLon').value = lon;
+    
+    const status = document.getElementById('locationStatus');
+    status.className = 'location-status success';
+    status.innerHTML = `✓ Location set: ${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+}
+
+// Detect user's current location
+function detectMyLocation() {
+    const status = document.getElementById('locationStatus');
+    status.className = 'location-status info';
+    status.innerHTML = '⏳ Detecting your location...';
+    
+    if (!navigator.geolocation) {
+        status.className = 'location-status error';
+        status.innerHTML = '❌ Geolocation not supported';
+        return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            setMarker(position.coords.latitude, position.coords.longitude);
+            
+            // Reverse geocode
+            fetch(`/shop/api/geocode/?address=${position.coords.latitude},${position.coords.longitude}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('shopLocation').value = data.display_name;
+                    }
+                });
+        },
+        function(error) {
+            status.className = 'location-status error';
+            status.innerHTML = '❌ Could not detect location. Please click on map.';
+        }
+    );
+}
+
+// Geocode address when user types
+let geocodeTimeout;
+document.getElementById('shopLocation').addEventListener('input', function() {
+    clearTimeout(geocodeTimeout);
+    const address = this.value.trim();
+    
+    if (address.length < 3) return;
+    
+    geocodeTimeout = setTimeout(() => {
+        fetch(`/shop/api/geocode/?address=${encodeURIComponent(address)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    setMarker(data.lat, data.lon);
+                    document.getElementById('shopLocation').value = data.display_name;
+                }
+            });
+    }, 500);
+});
+</script>
+{% endblock %}

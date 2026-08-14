@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Reject Order - Shop Dashboard{% endblock %}
+
+{% block content %}
+<section class="container" style="padding: 3rem 0;">
+    <div style="max-width: 600px; margin: 0 auto;">
+        <div class="card">
+            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <a href="{% url 'shops:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
+                <h2 style="margin: 0;">Reject Order #{{ order.id }}</h2>
+            </div>
+            <p class="text-muted">Please provide a reason for rejecting this order. The customer will be refunded automatically.</p>
+            
+            <form method="POST" style="margin-top: 1.5rem;">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label class="form-label">Rejection Reason</label>
+                    <select name="reason" class="form-select" required>
+                        <option value="">Select a reason...</option>
+                        <option value="Printer broken">Printer broken</option>
+                        <option value="No paper">No paper available</option>
+                        <option value="Low ink/toner">Low ink/toner</option>
+                        <option value="Too busy">Too busy - cannot complete on time</option>
+                        <option value="Shop closing">Shop closing early</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-accent" style="flex: 1;">Confirm Rejection</button>
+                    <a href="{% url 'shops:dashboard' %}" class="btn btn-ghost" style="flex: 1;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

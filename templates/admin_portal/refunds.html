@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Refunds - Admin{% endblock %}
+
+{% block content %}
+<section style="background: var(--secondary); padding: 2rem 0;">
+    <div class="container">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
+            <h1 style="font-size: 2rem; margin: 0;">💰 Refund Processing</h1>
+        </div>
+        <p style="color: var(--text-secondary);">Process refunds and track completions</p>
+    </div>
+</section>
+
+<section class="container" style="padding: 3rem 0;">
+    
+    <!-- Filter Tabs -->
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap;">
+        <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto;">
+            ⏳ Pending
+        </a>
+        <a href="?status=completed" class="btn {% if status_filter == 'completed' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto;">
+            ✅ Completed
+        </a>
+        <a href="?status=all" class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto;">
+            📋 All
+        </a>
+    </div>
+    
+    <!-- Refunds Table -->
+    <div class="card p-0" style="overflow: hidden;">
+        <div class="table-responsive" style="margin-bottom: 0;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border-color); background: var(--bg-subtle);">
+                        <th style="padding: 1rem; text-align: left;">Order</th>
+                        <th style="padding: 1rem; text-align: left;">Amount</th>
+                        <th style="padding: 1rem; text-align: left;">Reason</th>
+                        <th style="padding: 1rem; text-align: left;">Status</th>
+                        <th style="padding: 1rem; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for refund in refunds %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 1rem;">
+                            <strong>#{{ refund.order.id }}</strong>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">{{ refund.order.shop.name }}</p>
+                        </td>
+                        <td style="padding: 1rem;">
+                            <span style="font-size: 1.15rem; font-weight: 800; color: var(--primary);">₹{{ refund.amount }}</span>
+                        </td>
+                        <td style="padding: 1rem;">
+                            <span class="badge" style="font-size: 0.75rem;">{{ refund.get_reason_display }}</span>
+                        </td>
+                        <td style="padding: 1rem;">
+                            {% if refund.status == 'PENDING' %}
+                                <span class="badge badge-warning">⏳ Pending</span>
+                            {% elif refund.status == 'COMPLETED' %}
+                                <span class="badge badge-success">✅ Done</span>
+                            {% else %}
+                                <span class="badge">{{ refund.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 1rem; text-align: right;">
+                            {% if refund.status == 'PENDING' %}
+                                <form method="POST" action="{% url 'admin_portal:process_refund' refund.id %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary" style="padding: 0.5rem 0.75rem; font-size: 0.75rem; width: auto; min-width: auto; min-height: auto;">
+                                        Process
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">✓</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                            No refunds found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+</section>
+{% endblock %}
