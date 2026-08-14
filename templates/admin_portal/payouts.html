@@ -3,94 +3,136 @@
 {% block title %}Shop Payouts - Admin{% endblock %}
 
 {% block content %}
-<section style="background: var(--bg-surface); padding: 2rem 0;">
+<section style="background: var(--bg-surface); padding: 2rem 0; border-bottom: 1px solid var(--line);">
     <div class="container">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 1.75rem; color: var(--ink); margin-bottom: 0.25rem;">Shop Payouts</h1>
-                <p style="font-family: var(--font-body); color: var(--mid);">Manage pending transfers to shops</p>
+                <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 2rem; color: var(--ink); margin: 0 0 0.25rem;">Shop Payouts</h1>
+                <p style="color: var(--mid); margin: 0;">Manage pending transfers to shops</p>
             </div>
-            <a href="{% url 'admin_portal:dashboard' %}" style="font-family: var(--font-body); display: inline-block; padding: 0.5rem 1rem; background: var(--bone); color: var(--ink); border: 1px solid var(--line); border-radius: 0; text-decoration: none; font-size: 0.875rem; transition: all 0.15s ease;">Back to Dashboard</a>
+            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="padding: 0.5rem 1rem; font-size: 13px;">Back to Dashboard</a>
         </div>
     </div>
 </section>
 
-<section class="container" style="padding: 2rem 0;">
-    <div style="background: var(--bg-surface); border: 1px solid var(--line); border-radius: 0; padding: 1.5rem; margin-bottom: 2rem;">
-        <h3 style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); margin-bottom: 1rem;">Payout Summary</h3>
-        <div class="grid grid-3">
-            <div>
-                <p style="font-family: var(--font-body); font-size: 0.875rem; color: var(--mid); margin-bottom: 0.25rem;">Total Platform Revenue</p>
-                <h2 style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 1.5rem;">₹{{ summary.total_revenue|floatformat:2 }}</h2>
-            </div>
-            <div>
-                <p style="font-family: var(--font-body); font-size: 0.875rem; color: var(--mid); margin-bottom: 0.25rem;">Total Paid Out</p>
-                <h2 style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 1.5rem;">₹{{ summary.total_paid|floatformat:2 }}</h2>
-            </div>
-            <div>
-                <p style="font-family: var(--font-body); font-size: 0.875rem; color: var(--mid); margin-bottom: 0.25rem;">Total Pending Payouts</p>
-                <h2 style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 1.5rem;">₹{{ summary.total_pending|floatformat:2 }}</h2>
-            </div>
+<section class="container" style="padding: 2rem 0 4rem;">
+
+    <!-- Summary Cards -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+        <div style="padding: 1.25rem; border: 1px solid var(--line); background: var(--bone);">
+            <div style="font-size: 13px; color: var(--mid); margin-bottom: 0.25rem;">Total Platform Revenue</div>
+            <div style="font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; color: var(--ink);">₹{{ summary.total_revenue|floatformat:2 }}</div>
+        </div>
+        <div style="padding: 1.25rem; border: 1px solid var(--line); background: var(--bone);">
+            <div style="font-size: 13px; color: var(--mid); margin-bottom: 0.25rem;">Total Paid Out</div>
+            <div style="font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; color: var(--ink);">₹{{ summary.total_paid|floatformat:2 }}</div>
+        </div>
+        <div style="padding: 1.25rem; border: 1px solid var(--line); background: var(--bone);">
+            <div style="font-size: 13px; color: var(--mid); margin-bottom: 0.25rem;">Total Pending Payouts</div>
+            <div style="font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; color: var(--ink);">₹{{ summary.total_pending|floatformat:2 }}</div>
         </div>
     </div>
 
-    <div style="background: var(--bg-surface); border: 1px solid var(--line); border-radius: 0; padding: 1.5rem;">
-        <div class="table-responsive">
-            <table class="table">
+    <!-- Data Table -->
+    <div class="data-table-wrap">
+        <div class="data-table-toolbar">
+            <input type="text" class="data-table-filter" placeholder="Filter shops..." oninput="filterPayouts(this)">
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="data-table" id="payoutsTable">
                 <thead>
                     <tr>
-                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Shop</th>
-                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Owner</th>
-                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Gross Sales</th>
-                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Net Earnings</th>
-                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Already Paid</th>
-                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Pending Balance</th>
-                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Action</th>
+                        <th class="th-center"><input type="checkbox" onclick="toggleAllPayouts(this)"></th>
+                        <th onclick="sortPayoutsTable(1)">Shop <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th onclick="sortPayoutsTable(2)">Owner <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th class="th-right" onclick="sortPayoutsTable(3)">Gross Sales <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th class="th-right" onclick="sortPayoutsTable(4)">Net Earnings <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th class="th-right" onclick="sortPayoutsTable(5)">Already Paid <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th class="th-right" onclick="sortPayoutsTable(6)">Pending <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th class="th-right" style="width: 100px;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for shop in shops %}
                     <tr>
-                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); color: var(--ink);">
-                            <strong>{{ shop.name }}</strong><br>
-                            <span style="font-size: 0.875rem; color: var(--mid);">{{ shop.location }}</span>
+                        <td class="td-check"><input type="checkbox"></td>
+                        <td>
+                            <strong>{{ shop.name }}</strong>
+                            <div style="font-size: 12px; color: var(--mid);">{{ shop.location }}</div>
                         </td>
-                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); color: var(--ink);">
-                            {{ shop.owner.username }}<br>
-                            <small style="color: var(--mid);">{{ shop.phone }}</small>
+                        <td>
+                            {{ shop.owner.username }}
+                            <div style="font-size: 12px; color: var(--mid);">{{ shop.phone }}</div>
                         </td>
-                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); color: var(--ink);">₹{{ shop.gross|floatformat:2 }}</td>
-                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); color: var(--ink);">₹{{ shop.net_earnings|floatformat:2 }}</td>
-                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); color: var(--ink);">₹{{ shop.paid_total|floatformat:2 }}</td>
-                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line);">
+                        <td class="th-right">₹{{ shop.gross|floatformat:2 }}</td>
+                        <td class="th-right">₹{{ shop.net_earnings|floatformat:2 }}</td>
+                        <td class="th-right">₹{{ shop.paid_total|floatformat:2 }}</td>
+                        <td class="th-right">
                             {% if shop.pending_balance > 0 %}
-                                <strong style="font-size: 1.1rem; color: var(--error);">₹{{ shop.pending_balance|floatformat:2 }}</strong>
+                                <span style="font-weight: 700; color: var(--error);">₹{{ shop.pending_balance|floatformat:2 }}</span>
                             {% else %}
-                                <span style="color: var(--ink);">Settled</span>
+                                <span class="status-badge status-badge--success">Settled</span>
                             {% endif %}
                         </td>
-                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line);">
+                        <td class="td-actions">
                             {% if shop.pending_balance > 0 %}
-                            <form method="POST" action="{% url 'admin_portal:process_payout' shop.id %}" onsubmit="return confirm('Confirm that you have transferred ₹{{ shop.pending_balance }} to {{ shop.name }}?');">
+                            <form method="POST" action="{% url 'admin_portal:process_payout' shop.id %}" onsubmit="return confirm('Confirm that you have transferred ₹{{ shop.pending_balance }} to {{ shop.name }}?');" style="display: inline;">
                                 {% csrf_token %}
                                 <input type="hidden" name="amount" value="{{ shop.pending_balance }}">
-                                <button type="submit" style="font-family: var(--font-body); display: inline-block; padding: 0.375rem 0.75rem; background: var(--ink); color: var(--bone); border: 1px solid var(--ink); border-radius: 0; font-size: 0.875rem; cursor: pointer; transition: all 0.15s ease;">
-                                    Mark Paid
-                                </button>
+                                <button type="submit" style="padding: 0.35rem 0.7rem; font-size: 12px; font-weight: 600; background: var(--ink); color: var(--bone); border: 1px solid var(--ink); cursor: pointer; transition: all 0.15s ease;">Mark Paid</button>
                             </form>
                             {% else %}
-                            <button style="font-family: var(--font-body); display: inline-block; padding: 0.375rem 0.75rem; background: var(--bone); color: var(--mid); border: 1px solid var(--line); border-radius: 0; font-size: 0.875rem; cursor: not-allowed;" disabled>Paid</button>
+                            <button style="padding: 0.35rem 0.7rem; font-size: 12px; font-weight: 600; background: var(--bone); color: var(--mid); border: 1px solid var(--line); cursor: not-allowed;" disabled>Paid</button>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" style="font-family: var(--font-body); text-align: center; padding: 2rem; color: var(--mid);">No shops found.</td>
+                        <td colspan="8" style="padding: 3rem; text-align: center; color: var(--mid);">No shops found</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+
+        <div class="data-table-footer">
+            <span>{{ shops|length }} row(s) total</span>
+            <div class="pagination">
+                <button class="pagination-btn" disabled>‹</button>
+                <button class="pagination-btn" disabled>›</button>
+            </div>
+        </div>
     </div>
+
 </section>
+
+<script>
+function filterPayouts(input) {
+    var val = input.value.toLowerCase();
+    document.querySelectorAll('#payoutsTable tbody tr').forEach(function(row) {
+        row.style.display = row.textContent.toLowerCase().includes(val) ? '' : 'none';
+    });
+}
+
+function toggleAllPayouts(master) {
+    document.querySelectorAll('#payoutsTable tbody input[type="checkbox"]').forEach(function(cb) {
+        cb.checked = master.checked;
+    });
+}
+
+var poSortDir = {};
+function sortPayoutsTable(col) {
+    var table = document.getElementById('payoutsTable');
+    var tbody = table.querySelector('tbody');
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+    poSortDir[col] = !poSortDir[col];
+    rows.sort(function(a, b) {
+        var aText = a.children[col].textContent.trim().toLowerCase();
+        var bText = b.children[col].textContent.trim().toLowerCase();
+        return poSortDir[col] ? aText.localeCompare(bText) : bText.localeCompare(aText);
+    });
+    rows.forEach(function(row) { tbody.appendChild(row); });
+}
+</script>
 {% endblock %}

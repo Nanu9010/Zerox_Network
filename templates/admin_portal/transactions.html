@@ -3,219 +3,115 @@
 {% block title %}Transactions - Admin Portal{% endblock %}
 
 {% block content %}
-<style>
-:root {
-  --bone: #EFEDE8;
-  --ink: #101010;
-  --mid: #8A8781;
-  --bg-surface: #F4F3EF;
-  --line: #E2E0DA;
-  --error: #C43D3D;
-  --font-heading: 'Archivo', sans-serif;
-  --font-body: 'Archivo', sans-serif;
-}
-.tx-header {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 2rem;
-  gap: 1rem;
-}
-@media (min-width: 768px) {
-  .tx-header { flex-direction: row; align-items: center; }
-}
-.tx-header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.tx-title {
-  font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: 1.5rem;
-  color: var(--ink);
-  margin: 0;
-  line-height: 1;
-}
-.tx-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--line);
-  border-radius: 0px;
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
-  transition: border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.tx-card:hover {
-  border-color: var(--ink);
-}
-.tx-card-value {
-  font-family: var(--font-heading);
-  font-weight: 800;
-  font-size: 1.25rem;
-  color: var(--ink);
-  margin-bottom: 0.5rem;
-  line-height: 1;
-}
-.tx-card-label {
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  color: var(--mid);
-  margin: 0;
-}
-.tx-table-wrap {
-  background: var(--bone);
-  border: 1px solid var(--line);
-  border-radius: 0px;
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-}
-.tx-table-scroll {
-  width: 100%;
-  overflow-x: auto;
-}
-.tx-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.tx-table th {
-  padding: 1rem;
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.75rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--mid);
-  background: var(--bg-surface);
-  text-align: left;
-  border-bottom: 1px solid var(--line);
-  white-space: nowrap;
-}
-.tx-table td {
-  padding: 1rem;
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  color: var(--ink);
-  border-bottom: 1px solid var(--line);
-  vertical-align: middle;
-}
-.tx-table tbody tr:last-child td {
-  border-bottom: none;
-}
-.tx-table tbody tr:hover {
-  background: var(--bg-surface);
-}
-.tx-id {
-  font-weight: 600;
-}
-.tx-amount {
-  font-weight: 600;
-}
-.tx-commission {
-  font-weight: 600;
-  color: var(--ink);
-}
-.tx-empty {
-  padding: 3rem;
-  text-align: center;
-  color: var(--mid);
-}
-.tx-back {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.625rem 1rem;
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  background: transparent;
-  color: var(--mid);
-  border: none;
-  border-radius: 0px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-  min-height: 44px;
-  width: auto;
-  min-width: auto;
-}
-.tx-back:hover {
-  background: rgba(16, 16, 16, 0.05);
-  color: var(--ink);
-  transform: translateY(-1px);
-}
-.tx-date {
-  color: var(--mid);
-  white-space: nowrap;
-}
-</style>
+<section style="background: var(--bg-surface); padding: 2rem 0; border-bottom: 1px solid var(--line);">
+    <div class="container">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="padding: 0.5rem 0.75rem; font-size: 1.25rem;">←</a>
+            <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 2rem; margin: 0;">Transactions</h1>
+        </div>
+    </div>
+</section>
 
-<div class="container mt-4 mb-4">
-    <div class="tx-header">
-        <div class="tx-header-left">
-            <a href="{% url 'admin_portal:dashboard' %}" class="tx-back" style="width: auto; min-width: auto;">&larr;</a>
-            <h1 class="tx-title mb-0">Transactions</h1>
+<section class="container" style="padding: 2rem 0 4rem;">
+
+    <!-- Metrics -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+        <div style="padding: 1.25rem; border: 1px solid var(--line); background: var(--bone);">
+            <div style="font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; color: var(--ink); margin-bottom: 0.25rem;">₹{{ total_volume|floatformat:2 }}</div>
+            <div style="font-size: 13px; color: var(--mid);">Total Gross Volume</div>
+        </div>
+        <div style="padding: 1.25rem; border: 1px solid var(--line); background: var(--bone);">
+            <div style="font-family: var(--font-heading); font-weight: 800; font-size: 1.5rem; color: var(--ink); margin-bottom: 0.25rem;">₹{{ total_commission|floatformat:2 }}</div>
+            <div style="font-size: 13px; color: var(--mid);">Platform Revenue (15%)</div>
         </div>
     </div>
 
-    <div class="grid grid-2 mb-4">
-        <div class="tx-card">
-            <div class="tx-card-value">₹{{ total_volume|floatformat:2 }}</div>
-            <p class="tx-card-label mb-0">Total Gross Volume</p>
+    <!-- Data Table -->
+    <div class="data-table-wrap">
+        <div class="data-table-toolbar">
+            <input type="text" class="data-table-filter" placeholder="Filter transactions..." oninput="filterTx(this)">
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="data-table-columns-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/></svg>
+                    Columns
+                </button>
+            </div>
         </div>
-        <div class="tx-card">
-            <div class="tx-card-value">₹{{ total_commission|floatformat:2 }}</div>
-            <p class="tx-card-label mb-0">Platform Revenue (15%)</p>
-        </div>
-    </div>
 
-    <div class="tx-table-wrap">
-        <div class="tx-table-scroll">
-            <table class="tx-table">
+        <div style="overflow-x: auto;">
+            <table class="data-table" id="txTable">
                 <thead>
                     <tr>
-                        <th>Date</th>
-                        <th>Order ID</th>
-                        <th>Shop</th>
-                        <th>Customer</th>
-                        <th>Amount</th>
-                        <th>Commission</th>
+                        <th class="th-center"><input type="checkbox" onclick="toggleAllTx(this)"></th>
+                        <th onclick="sortTxTable(1)">Date <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th onclick="sortTxTable(2)">Order ID <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th onclick="sortTxTable(3)">Shop <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th onclick="sortTxTable(4)">Customer <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th class="th-right" onclick="sortTxTable(5)">Amount <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th class="th-right" onclick="sortTxTable(6)">Commission <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th class="th-right" style="width: 48px;"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for order in orders %}
                     <tr>
-                        <td class="tx-date">
-                            {{ order.completed_at|date:"M d, Y H:i" }}
-                        </td>
-                        <td class="tx-id">
-                            #{{ order.id|stringformat:".4s" }}
-                        </td>
-                        <td>
-                            {{ order.shop.name }}
-                        </td>
-                        <td>
-                            {{ order.customer.username|default:order.customer_name }}
-                        </td>
-                        <td class="tx-amount">
-                            ₹{{ order.total_price }}
-                        </td>
-                        <td class="tx-commission">
-                            ₹{{ order.commission_amount }}
+                        <td class="td-check"><input type="checkbox"></td>
+                        <td style="white-space: nowrap; color: var(--mid);">{{ order.completed_at|date:"M d, Y H:i" }}</td>
+                        <td><strong>#{{ order.id|stringformat:".4s" }}</strong></td>
+                        <td>{{ order.shop.name }}</td>
+                        <td>{{ order.customer.username|default:order.customer_name }}</td>
+                        <td class="th-right" style="font-weight: 600;">₹{{ order.total_price }}</td>
+                        <td class="th-right" style="font-weight: 600;">₹{{ order.commission_amount }}</td>
+                        <td class="td-actions">
+                            <button class="row-action-btn" title="More actions">⋯</button>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="tx-empty">
-                            No transactions found.
-                        </td>
+                        <td colspan="8" style="padding: 3rem; text-align: center; color: var(--mid);">No transactions found</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+
+        <div class="data-table-footer">
+            <span>{{ orders|length }} row(s) total</span>
+            <div class="pagination">
+                <button class="pagination-btn" disabled>‹</button>
+                <button class="pagination-btn" disabled>›</button>
+            </div>
+        </div>
     </div>
-</div>
+
+</section>
+
+<script>
+function filterTx(input) {
+    var val = input.value.toLowerCase();
+    document.querySelectorAll('#txTable tbody tr').forEach(function(row) {
+        row.style.display = row.textContent.toLowerCase().includes(val) ? '' : 'none';
+    });
+}
+
+function toggleAllTx(master) {
+    document.querySelectorAll('#txTable tbody input[type="checkbox"]').forEach(function(cb) {
+        cb.checked = master.checked;
+    });
+}
+
+var txSortDir = {};
+function sortTxTable(col) {
+    var table = document.getElementById('txTable');
+    var tbody = table.querySelector('tbody');
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+    txSortDir[col] = !txSortDir[col];
+    rows.sort(function(a, b) {
+        var aText = a.children[col].textContent.trim().toLowerCase();
+        var bText = b.children[col].textContent.trim().toLowerCase();
+        return txSortDir[col] ? aText.localeCompare(bText) : bText.localeCompare(aText);
+    });
+    rows.forEach(function(row) { tbody.appendChild(row); });
+}
+</script>
 {% endblock %}

@@ -3,130 +3,90 @@
 {% block title %}User Management - Admin{% endblock %}
 
 {% block content %}
-<style>
-:root {
---bone: #EFEDE8; --ink: #101010; --mid: #8A8781; --bg-surface: #F4F3EF; --line: #E2E0DA; --error: #C43D3D; --font-heading: 'Archivo', sans-serif; --font-body: 'Archivo', sans-serif;
-}
-* { box-sizing: border-box; }
-body { font-family: var(--font-body); color: var(--ink); background: var(--bone); }
-.section-header { background: var(--bg-surface); padding: 2rem 0; border-bottom: 1px solid var(--line); }
-.section-header h1 { font-family: var(--font-heading); font-weight: 800; font-size: 2rem; margin: 0; color: var(--ink); }
-.section-header p { color: var(--mid); margin: 0.5rem 0 0; }
-.btn { font-family: var(--font-body); border: none; cursor: pointer; border-radius: 0; padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 600; text-decoration: none; display: inline-block; text-align: center; transition: transform 0.15s ease, box-shadow 0.15s ease; }
-.btn:hover { transform: translateY(-1px); }
-.btn:active { transform: translateY(0); }
-.btn-primary { background: var(--ink); color: var(--bone); border: 1px solid var(--ink); }
-.btn-primary:hover { background: #202020; }
-.btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
-.btn-ghost:hover { background: var(--bg-surface); }
-.btn-secondary { background: var(--bg-surface); color: var(--ink); border: 1px solid var(--line); }
-.btn-secondary:hover { background: var(--line); }
-.filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.filter-bar .btn { flex: 1; min-width: unset; }
-.add-btn { width: 100%; text-align: center; }
-.card { border: 1px solid var(--line); background: var(--bone); border-radius: 0; }
-.table-responsive { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-thead tr { border-bottom: 2px solid var(--line); }
-th, td { padding: 1rem; text-align: left; font-family: var(--font-body); }
-th { font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
-tbody tr { border-bottom: 1px solid var(--line); }
-tbody tr:hover { background: var(--bg-surface); }
-.badge { display: inline-block; padding: 0.25rem 0.65rem; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--line); border-radius: 0; font-family: var(--font-body); }
-.badge-error { background: var(--error); color: var(--bone); border-color: var(--error); }
-.badge-success { background: var(--ink); color: var(--bone); border-color: var(--ink); }
-.badge-blue { background: transparent; color: #2B6CB0; border-color: #2B6CB0; }
-.badge-green { background: transparent; color: #2F855A; border-color: #2F855A; }
-.badge-orange { background: transparent; color: #C05621; border-color: #C05621; }
-.badge-purple { background: transparent; color: #6B46C1; border-color: #6B46C1; }
-.badge-gray { background: transparent; color: var(--mid); border-color: var(--mid); }
-.btn-unblock { background: transparent; color: #2F855A; border: 1px solid #2F855A; }
-.btn-unblock:hover { background: #2F855A; color: var(--bone); }
-.btn-block { background: transparent; color: var(--error); border: 1px solid var(--error); }
-.btn-block:hover { background: var(--error); color: var(--bone); }
-.action-btn { padding: 0.5rem 0.75rem; font-size: 0.875rem; width: auto; min-width: auto; min-height: auto; }
-.back-btn { width: auto; min-width: auto; font-size: 1.25rem; padding: 0.5rem 0.75rem; }
-.empty-row td { padding: 3rem; text-align: center; color: var(--mid); }
-</style>
-
-<section class="section-header">
+<section style="background: var(--bg-surface); padding: 2rem 0; border-bottom: 1px solid var(--line);">
     <div class="container">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost back-btn">←</a>
-            <h1>User Management</h1>
+            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="padding: 0.5rem 0.75rem; font-size: 1.25rem;">←</a>
+            <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 2rem; margin: 0;">User Management</h1>
         </div>
-        <p>Manage users and permissions</p>
+        <p style="color: var(--mid); margin: 0.5rem 0 0;">Manage users and permissions</p>
     </div>
 </section>
 
-<section class="container" style="padding: 3rem 0;">
+<section class="container" style="padding: 2rem 0 4rem;">
 
-    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2.5rem;">
-        <div class="filter-bar">
-            <a href="?role=all" class="btn {% if role_filter == 'all' %}btn-primary{% else %}btn-ghost{% endif %}">All</a>
-            <a href="?role=CUSTOMER" class="btn {% if role_filter == 'CUSTOMER' %}btn-primary{% else %}btn-ghost{% endif %}">Customer</a>
-            <a href="?role=SHOP" class="btn {% if role_filter == 'SHOP' %}btn-primary{% else %}btn-ghost{% endif %}">Shop</a>
-            <a href="?role=ADMIN" class="btn {% if role_filter == 'ADMIN' %}btn-primary{% else %}btn-ghost{% endif %}">Admin</a>
-            <a href="?role=STAFF" class="btn {% if role_filter == 'STAFF' %}btn-primary{% else %}btn-ghost{% endif %}">Staff</a>
-        </div>
-        <a href="{% url 'admin_portal:add_user' %}?role={{ role_filter }}" class="btn btn-primary add-btn">
-            + Add {% if role_filter == 'CUSTOMER' %}Customer{% elif role_filter == 'SHOP' %}Shop Owner{% elif role_filter == 'STAFF' %}Staff{% elif role_filter == 'ADMIN' %}Admin{% else %}User{% endif %}
-        </a>
+    <!-- Filter Tabs -->
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+        <a href="?role=all" style="padding: 0.5rem 1rem; font-size: 13px; font-weight: 600; border: 1px solid {% if role_filter == 'all' %}var(--ink){% else %}var(--line){% endif %}; background: {% if role_filter == 'all' %}var(--ink){% else %}var(--bone){% endif %}; color: {% if role_filter == 'all' %}var(--bone){% else %}var(--ink){% endif %}; text-decoration: none; transition: all 0.15s ease;">All</a>
+        <a href="?role=CUSTOMER" style="padding: 0.5rem 1rem; font-size: 13px; font-weight: 600; border: 1px solid {% if role_filter == 'CUSTOMER' %}var(--ink){% else %}var(--line){% endif %}; background: {% if role_filter == 'CUSTOMER' %}var(--ink){% else %}var(--bone){% endif %}; color: {% if role_filter == 'CUSTOMER' %}var(--bone){% else %}var(--ink){% endif %}; text-decoration: none; transition: all 0.15s ease;">Customer</a>
+        <a href="?role=SHOP" style="padding: 0.5rem 1rem; font-size: 13px; font-weight: 600; border: 1px solid {% if role_filter == 'SHOP' %}var(--ink){% else %}var(--line){% endif %}; background: {% if role_filter == 'SHOP' %}var(--ink){% else %}var(--bone){% endif %}; color: {% if role_filter == 'SHOP' %}var(--bone){% else %}var(--ink){% endif %}; text-decoration: none; transition: all 0.15s ease;">Shop</a>
+        <a href="?role=ADMIN" style="padding: 0.5rem 1rem; font-size: 13px; font-weight: 600; border: 1px solid {% if role_filter == 'ADMIN' %}var(--ink){% else %}var(--line){% endif %}; background: {% if role_filter == 'ADMIN' %}var(--ink){% else %}var(--bone){% endif %}; color: {% if role_filter == 'ADMIN' %}var(--bone){% else %}var(--ink){% endif %}; text-decoration: none; transition: all 0.15s ease;">Admin</a>
+        <a href="?role=STAFF" style="padding: 0.5rem 1rem; font-size: 13px; font-weight: 600; border: 1px solid {% if role_filter == 'STAFF' %}var(--ink){% else %}var(--line){% endif %}; background: {% if role_filter == 'STAFF' %}var(--ink){% else %}var(--bone){% endif %}; color: {% if role_filter == 'STAFF' %}var(--bone){% else %}var(--ink){% endif %}; text-decoration: none; transition: all 0.15s ease;">Staff</a>
     </div>
 
-    <div class="card">
-        <div class="table-responsive">
-            <table>
+    <!-- Data Table -->
+    <div class="data-table-wrap">
+        <!-- Toolbar -->
+        <div class="data-table-toolbar">
+            <input type="text" class="data-table-filter" placeholder="Filter customers..." oninput="filterTable(this)">
+            <a href="{% url 'admin_portal:add_user' %}?role={{ role_filter }}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 13px;">
+                + Add {% if role_filter == 'CUSTOMER' %}Customer{% elif role_filter == 'SHOP' %}Shop Owner{% elif role_filter == 'STAFF' %}Staff{% elif role_filter == 'ADMIN' %}Admin{% else %}User{% endif %}
+            </a>
+        </div>
+
+        <!-- Table -->
+        <div style="overflow-x: auto;">
+            <table class="data-table" id="usersTable">
                 <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
+                        <th class="th-center"><input type="checkbox" onclick="toggleAll(this)"></th>
+                        <th onclick="sortTable(1)">Name <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th onclick="sortTable(2)">Email <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
+                        <th onclick="sortTable(3)">Role <span class="th-sort"><span class="th-sort-arrow">↑</span><span class="th-sort-arrow">↓</span></span></th>
                         <th>Status</th>
-                        <th style="text-align: right;">Actions</th>
+                        <th class="th-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for user in users %}
                     <tr>
-                        <td>
-                            <strong>{{ user.username }}</strong>
-                        </td>
-                        <td>{{ user.email|default:"No email" }}</td>
+                        <td class="td-check"><input type="checkbox"></td>
+                        <td><strong>{{ user.username }}</strong></td>
+                        <td>{{ user.email|default:"—" }}</td>
                         <td>
                             {% if user.profile.role == 'CUSTOMER' %}
-                                <span class="badge badge-blue">Customer</span>
+                                <span class="status-badge status-badge--neutral">Customer</span>
                             {% elif user.profile.role == 'SHOP' %}
-                                <span class="badge badge-green">Shop</span>
+                                <span class="status-badge status-badge--success">Shop</span>
                             {% elif user.profile.role == 'ADMIN' %}
-                                <span class="badge badge-orange">Admin</span>
+                                <span class="status-badge status-badge--warning">Admin</span>
                             {% elif user.profile.role == 'STAFF' %}
-                                <span class="badge badge-purple">Staff</span>
+                                <span class="status-badge" style="background: #f3e8ff; color: #6b21a8;">Staff</span>
                             {% else %}
-                                <span class="badge badge-gray">No Role</span>
+                                <span class="status-badge status-badge--neutral">—</span>
                             {% endif %}
                         </td>
                         <td>
                             {% if user.profile.is_blocked %}
-                                <span class="badge badge-error">Blocked</span>
+                                <span class="status-badge status-badge--error">Blocked</span>
                             {% else %}
-                                <span class="badge badge-success">Active</span>
+                                <span class="status-badge status-badge--success">Active</span>
                             {% endif %}
                         </td>
-                        <td style="text-align: right;">
-                            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-                                <a href="{% url 'admin_portal:view_user' user.id %}" class="btn btn-ghost action-btn">View</a>
-                                <a href="{% url 'admin_portal:edit_user' user.id %}" class="btn btn-secondary action-btn">Edit</a>
+                        <td class="td-actions">
+                            <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
+                                <a href="{% url 'admin_portal:view_user' user.id %}" style="padding: 0.35rem 0.7rem; font-size: 12px; font-weight: 600; border: 1px solid var(--line); background: var(--bone); color: var(--ink); text-decoration: none; transition: all 0.15s ease;">View</a>
+                                <a href="{% url 'admin_portal:edit_user' user.id %}" style="padding: 0.35rem 0.7rem; font-size: 12px; font-weight: 600; border: 1px solid var(--line); background: var(--bone); color: var(--ink); text-decoration: none; transition: all 0.15s ease;">Edit</a>
                                 {% if user.profile.role != 'ADMIN' %}
                                     {% if user.profile.is_blocked %}
                                         <form method="POST" action="{% url 'admin_portal:unblock_user' user.id %}" style="display: inline;">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-unblock action-btn">Unblock</button>
+                                            <button type="submit" style="padding: 0.35rem 0.7rem; font-size: 12px; font-weight: 600; border: 1px solid #2F855A; background: transparent; color: #2F855A; cursor: pointer; transition: all 0.15s ease;" onmouseenter="this.style.background='#2F855A';this.style.color='var(--bone)'" onmouseleave="this.style.background='transparent';this.style.color='#2F855A'">Unblock</button>
                                         </form>
                                     {% else %}
                                         <form method="POST" action="{% url 'admin_portal:block_user' user.id %}" style="display: inline;">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-block action-btn">Block</button>
+                                            <button type="submit" style="padding: 0.35rem 0.7rem; font-size: 12px; font-weight: 600; border: 1px solid var(--error); background: transparent; color: var(--error); cursor: pointer; transition: all 0.15s ease;" onmouseenter="this.style.background='var(--error)';this.style.color='var(--bone)'" onmouseleave="this.style.background='transparent';this.style.color='var(--error)'">Block</button>
                                         </form>
                                     {% endif %}
                                 {% endif %}
@@ -135,13 +95,49 @@ tbody tr:hover { background: var(--bg-surface); }
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="empty-row">No users found</td>
+                        <td colspan="6" style="padding: 3rem; text-align: center; color: var(--mid);">No users found</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+
+        <!-- Footer -->
+        <div class="data-table-footer">
+            <span>{{ users|length }} row(s) total</span>
+        </div>
     </div>
 
 </section>
+
+<script>
+function filterTable(input) {
+    var val = input.value.toLowerCase();
+    var rows = document.querySelectorAll('#usersTable tbody tr');
+    rows.forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        row.style.display = text.includes(val) ? '' : 'none';
+    });
+}
+
+function toggleAll(master) {
+    document.querySelectorAll('#usersTable tbody input[type="checkbox"]').forEach(function(cb) {
+        cb.checked = master.checked;
+    });
+}
+
+var sortDir = {};
+function sortTable(col) {
+    var table = document.getElementById('usersTable');
+    var tbody = table.querySelector('tbody');
+    var rows = Array.from(tbody.querySelectorAll('tr'));
+    sortDir[col] = !sortDir[col];
+    rows.sort(function(a, b) {
+        var aText = a.children[col].textContent.trim().toLowerCase();
+        var bText = b.children[col].textContent.trim().toLowerCase();
+        return sortDir[col] ? aText.localeCompare(bText) : bText.localeCompare(aText);
+    });
+    rows.forEach(function(row) { tbody.appendChild(row); });
+}
+</script>
 {% endblock %}

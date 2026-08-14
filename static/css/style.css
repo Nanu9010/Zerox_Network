@@ -903,6 +903,244 @@ textarea {
 }
 
 /* ============================================
+   SHADCN-STYLE DATA TABLE
+   ============================================ */
+.data-table-wrap {
+  background: var(--bone);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.data-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.data-table-filter {
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--line);
+  background: var(--bone);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  min-width: 220px;
+  transition: border-color 0.2s ease;
+}
+
+.data-table-filter::placeholder {
+  color: var(--mid);
+}
+
+.data-table-filter:focus {
+  border-color: var(--ink);
+}
+
+.data-table-columns-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--line);
+  background: var(--bone);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.data-table-columns-btn:hover {
+  background: var(--bg-subtle);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table thead {
+  border-bottom: 1px solid var(--line);
+}
+
+.data-table th {
+  padding: 0.75rem 1.25rem;
+  text-align: left;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--mid);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+}
+
+.data-table th.th-center {
+  text-align: center;
+  width: 48px;
+}
+
+.data-table th.th-right {
+  text-align: right;
+}
+
+.data-table th .th-sort {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-left: 0.3rem;
+  vertical-align: middle;
+  opacity: 0.4;
+}
+
+.data-table th:hover .th-sort {
+  opacity: 0.7;
+}
+
+.data-table th.sorted .th-sort {
+  opacity: 1;
+}
+
+.th-sort-arrow {
+  font-size: 8px;
+  line-height: 1;
+  color: var(--mid);
+}
+
+.data-table td {
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  vertical-align: middle;
+}
+
+.data-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.data-table tbody tr:hover {
+  background: var(--bg-subtle);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Checkbox */
+.data-table .td-check {
+  width: 48px;
+  text-align: center;
+}
+
+.data-table .td-check input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--mid);
+  border-radius: 3px;
+  cursor: pointer;
+  accent-color: var(--ink);
+}
+
+/* Row actions (three dots) */
+.data-table .td-actions {
+  width: 48px;
+  text-align: right;
+}
+
+.row-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: var(--mid);
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.row-action-btn:hover {
+  color: var(--ink);
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.status-badge--success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge--warning {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.status-badge--error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge--neutral {
+  background: var(--bg-subtle);
+  color: var(--mid);
+}
+
+/* Table footer */
+.data-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--mid);
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.data-table-footer .pagination {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.data-table-footer .pagination-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  background: var(--bone);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.data-table-footer .pagination-btn:hover {
+  background: var(--bg-subtle);
+  border-color: var(--ink);
+}
+
+.data-table-footer .pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ============================================
    REDUCED MOTION
    ============================================ */
 @media (prefers-reduced-motion: reduce) {
