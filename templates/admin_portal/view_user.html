@@ -5,12 +5,12 @@
 {% block content %}
 <section style="background: var(--bg-surface); padding: 2rem 0; border-bottom: 1px solid var(--line);">
     <div class="container">
-    <div style="display: flex; flex-direction: column; md-flex-direction: row; justify-content: space-between; align-items: flex-start; md-align-items: center; gap: 1rem;">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 1rem;">
         <div>
             <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 1.75rem; margin-bottom: 0.25rem; color: var(--ink);">{{ view_user.username }}</h1>
             <p style="color: var(--mid); font-family: var(--font-body);">User Details & Activity</p>
         </div>
-        <a href="{% url 'admin_portal:edit_user' view_user.id %}" class="btn btn-primary" style="width: 100%; md-width: auto; justify-content: center; border-radius: 0; background: var(--ink); color: var(--bone); border: none; font-family: var(--font-body); padding: 0.5rem 1rem; transition: transform 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
+        <a href="{% url 'admin_portal:edit_user' view_user.id %}" class="btn btn-primary" style="justify-content: center; border-radius: 0; background: var(--ink); color: var(--bone); border: none; font-family: var(--font-body); padding: 0.5rem 1.5rem; transition: transform 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
             Edit User
         </a>
     </div>
@@ -96,7 +96,7 @@
     
     <div class="card" style="margin-top: 2rem; border: 1px solid var(--line); border-radius: 0; background: var(--bone); padding: 2rem;">
         <h4 style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); margin-bottom: 1.5rem;">Quick Actions</h4>
-        <div style="display: flex; flex-direction: column; md-flex-direction: row; gap: 1rem;">
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
             <a href="{% url 'admin_portal:edit_user' view_user.id %}" class="btn btn-primary" style="justify-content: center; border-radius: 0; background: var(--ink); color: var(--bone); border: none; font-family: var(--font-body); padding: 0.5rem 1rem; transition: transform 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">Edit User</a>
             {% if view_user.profile.is_blocked %}
                 <form method="POST" action="{% url 'admin_portal:unblock_user' view_user.id %}" style="display: flex; flex: 1;">

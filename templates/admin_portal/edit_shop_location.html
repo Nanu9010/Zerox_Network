@@ -141,6 +141,11 @@
         grid-template-columns: 1fr 1fr;
         gap: 1rem;
     }
+    @media (max-width: 640px) {
+        .sable-grid-2,
+        .sable-info-grid { grid-template-columns: 1fr; }
+        #locationMap { height: 280px !important; }
+    }
     .sable-section-title {
         font-family: var(--font-heading);
         font-weight: 800;

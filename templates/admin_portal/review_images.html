@@ -46,7 +46,7 @@
                     Size: {{ img.image.size|filesizeformat }}
                 </p>
                 
-                <div style="display: flex; flex-direction: column; md-flex-direction: row; gap: 0.75rem;">
+                <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
                     <form method="POST" style="flex: 1;">
                         {% csrf_token %}
                         <input type="hidden" name="image_id" value="{{ img.id }}">

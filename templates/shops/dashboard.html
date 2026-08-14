@@ -371,7 +371,7 @@
                     <p id="modalShopPhone" style="margin: 0; font-weight: 800; color: var(--ink);">Phone</p>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
+                <div class="finance-grid-3" style="gap: 0.5rem; margin-bottom: 1rem;">
                     <div class="sable-financial-cell">
                         <p style="margin: 0; font-size: 0.65rem; color: var(--mid); text-transform: uppercase; font-weight: 700;">Gross</p>
                         <p id="modalShopGross" style="margin: 0; font-weight: 800; font-family: var(--font-heading); font-size: 0.95rem; color: var(--ink);">&#8377;0</p>
@@ -431,7 +431,7 @@
     });
     </script>
 
-    <div class="grid" style="grid-template-columns: repeat(5, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;">
+    <div class="grid shop-metrics-grid" style="gap: 0.75rem; margin-bottom: 1.5rem;">
         <div class="sable-metric">
             <span>Total Orders</span>
             <h2>{{ order_counts.total }}</h2>
@@ -760,7 +760,7 @@
         };
         
         let html = `
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
+            <div class="finance-grid-3" style="gap: 0.5rem; margin-bottom: 1rem;">
                 <div class="sable-financial-cell">
                     <p style="margin: 0; font-size: 0.65rem; color: var(--mid); text-transform: uppercase; font-weight: 700;">Total</p>
                     <p style="margin: 0; font-weight: 800; font-family: var(--font-heading); font-size: 1.1rem; color: var(--ink);">\u20B9${order.total_price}</p>
@@ -795,7 +795,7 @@
                             <a href="${file.url}" download class="sable-btn sable-btn-primary" style="padding: 0.25rem 0.5rem; font-size: 0.7rem; text-decoration: none;">Download</a>
                         </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; font-size: 0.75rem;">
+                    <div class="file-detail-grid" style="gap: 0.4rem; font-size: 0.75rem;">
                         <div><span style="color: var(--mid);">Paper:</span> <strong style="color: var(--ink);">${file.paper_size}</strong></div>
                         <div><span style="color: var(--mid);">Color:</span> <strong style="color: var(--ink);">${file.color_type}</strong></div>
                         <div><span style="color: var(--mid);">Sides:</span> <strong style="color: var(--ink);">${file.print_side}</strong></div>
