@@ -1284,6 +1284,313 @@ textarea {
 }
 
 /* ============================================
+   MODAL / DIALOG
+   ============================================ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(16, 16, 16, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-card {
+  background: var(--bone);
+  border: 1px solid var(--line);
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.5rem 1.5rem 0;
+}
+
+.modal-header-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: var(--bone);
+  flex-shrink: 0;
+}
+
+.modal-header-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.modal-header-text {
+  flex: 1;
+}
+
+.modal-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--ink);
+  margin: 0 0 0.25rem;
+}
+
+.modal-subtitle {
+  font-size: 13px;
+  color: var(--mid);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: var(--mid);
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: var(--ink);
+}
+
+.modal-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.modal-body {
+  padding: 1.25rem 1.5rem;
+}
+
+.modal-divider {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 1.25rem 0;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0 1.5rem 1.5rem;
+}
+
+/* ============================================
+   FILE UPLOAD DROPZONE
+   ============================================ */
+.dropzone {
+  border: 1.5px dashed var(--line);
+  background: var(--bg-subtle);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropzone:hover,
+.dropzone.dragover {
+  border-color: var(--ink);
+  background: var(--bone);
+}
+
+.dropzone-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bone);
+  border: 1px solid var(--line);
+  color: var(--mid);
+  margin: 0 auto 1rem;
+  transition: all 0.2s ease;
+}
+
+.dropzone:hover .dropzone-icon,
+.dropzone.dragover .dropzone-icon {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.dropzone-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.dropzone-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--ink);
+  margin: 0 0 0.35rem;
+}
+
+.dropzone-desc {
+  font-size: 13px;
+  color: var(--mid);
+  margin: 0 0 1rem;
+}
+
+.dropzone-browse {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--bone);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dropzone-browse:hover {
+  border-color: var(--ink);
+}
+
+.dropzone input[type="file"] {
+  display: none;
+}
+
+/* File list after upload */
+.file-list {
+  margin-top: 1rem;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--bone);
+  border: 1px solid var(--line);
+  margin-bottom: 0.5rem;
+}
+
+.file-item-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-subtle);
+  color: var(--mid);
+  flex-shrink: 0;
+}
+
+.file-item-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.file-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-item-size {
+  font-size: 11px;
+  color: var(--mid);
+}
+
+.file-item-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--mid);
+  padding: 0.25rem;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.file-item-remove:hover {
+  color: var(--error);
+}
+
+.file-item-remove svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ============================================
+   FORM FIELD GROUP (in modal)
+   ============================================ */
+.field-group {
+  margin-bottom: 1rem;
+}
+
+.field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.field-select,
+.field-input {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--bone);
+  border: 1px solid var(--line);
+  outline: none;
+  transition: border-color 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.field-select {
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%238A8781' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  padding-right: 2.25rem;
+}
+
+.field-select:focus,
+.field-input:focus {
+  border-color: var(--ink);
+}
+
+/* ============================================
    REDUCED MOTION
    ============================================ */
 @media (prefers-reduced-motion: reduce) {
