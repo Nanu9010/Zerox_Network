@@ -259,7 +259,6 @@
             <div class="file-strip" id="fileSlider">
                 {% for file in files %}
                 <div class="file-thumb {% if forloop.first %}active{% endif %}" onclick="selectFile({{ file.id }})" id="card_{{ file.id }}">
-                    <!-- Top Controls: Copies +/- and Remove -->
                     <div class="file-controls-top">
                         <div class="copies-control" onclick="event.stopPropagation();">
                             <button type="button" class="copies-btn" onclick="event.stopPropagation(); adjustFileCopies({{ file.id }}, -1);">-</button>
@@ -268,23 +267,26 @@
                         </div>
                         <button type="button" class="remove-file-btn" onclick="event.stopPropagation(); removeFile({{ file.id }});" title="Remove file">&times;</button>
                     </div>
-                    <!-- Canvas for thumb -->
                     <canvas id="thumb_{{ file.id }}" style="width: 100%; height: 100px; object-fit: contain; margin-bottom: 0.5rem; background: var(--bone);"></canvas>
                     <div style="font-weight: 600; font-family: var(--font-body); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ file.file_name }}</div>
                     <div style="font-size: 0.7rem; color: var(--mid);">{{ file.pages_count }} pgs</div>
                 </div>
                 {% endfor %}
-                
-                <!-- Add Button -->
-                <div class="file-thumb" onclick="document.getElementById('addFileInput').click()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; border-style: dashed; opacity: 1;">
-                    <span style="font-size: 2rem; color: var(--ink);">+</span>
-                    <span style="font-size: 0.8rem; font-weight: 600; font-family: var(--font-body); color: var(--ink);">Add File</span>
-                </div>
             </div>
         </div>
         
-        <!-- Hidden file input -->
-        <input type="file" id="addFileInput" accept=".pdf,.jpg,.jpeg,.png" multiple style="display: none;" onchange="handleAddFiles(event)">
+        <!-- Add More Files: Dropzone -->
+        <div class="container" style="padding-top: 1.25rem; padding-bottom: 0.5rem;">
+            <div class="dropzone" id="addDropzone" onclick="document.getElementById('addFileInput').click()" ondragover="event.preventDefault(); this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="event.preventDefault(); this.classList.remove('dragover'); handleAddDrop(event)" style="padding: 1.75rem 1rem;">
+                <input type="file" id="addFileInput" accept=".pdf,.jpg,.jpeg,.png" multiple style="display: none;" onchange="handleAddFiles(event)">
+                <div class="dropzone-icon" style="width: 40px; height: 40px; margin-bottom: 0.75rem;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <p class="dropzone-title">Drop more files here</p>
+                <p class="dropzone-desc">or click to browse</p>
+                <span class="dropzone-browse">Add Files</span>
+            </div>
+        </div>
 
         <!-- STEP B: Settings -->
         <div class="container" style="padding-top: 1.5rem;">
@@ -651,6 +653,16 @@ function generateThumbnails() {
         }
     }
 }
+async function handleAddDrop(e) {
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        const dt = new DataTransfer();
+        for (let i = 0; i < files.length; i++) dt.items.add(files[i]);
+        document.getElementById('addFileInput').files = dt.files;
+        handleAddFiles({ target: { files: files, value: '' } });
+    }
+}
+
 async function handleAddFiles(event) {
     const newFiles = event.target.files;
     if (!newFiles.length) return;
