@@ -283,6 +283,24 @@
         }
 
         // ============================================
+        // TEXT BLOCK REVEAL ANIMATION
+        // ============================================
+        var tbWraps = document.querySelectorAll('.tb-wrap');
+        if (!prefersReduced && 'IntersectionObserver' in window && tbWraps.length > 0) {
+            var tbObs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('tb-in');
+                        tbObs.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+            tbWraps.forEach(function(el) { tbObs.observe(el); });
+        } else {
+            tbWraps.forEach(function(el) { el.classList.add('tb-in'); });
+        }
+
+        // ============================================
         // SCROLL LISTENER
         // ============================================
         var ticking = false;
@@ -345,6 +363,51 @@
             });
         }
     })();
+
+    // ============================================
+    // TEXT BLOCK ANIMATION HELPER
+    // Usage: tbReveal(element, { color: '#101010', delay: 0, dur: 0.6 })
+    // Or via HTML: <h2 data-tb data-tb-color="#101010" data-tb-delay="0.2">
+    // ============================================
+    window.tbReveal = function(el, opts) {
+        opts = opts || {};
+        var color = opts.color || 'var(--ink)';
+        var delay = opts.delay || 0;
+        var dur = opts.dur || 0.6;
+        var stagger = opts.stagger || 0.08;
+
+        el.classList.add('tb-wrap');
+        el.style.setProperty('--tb-dur', dur + 's');
+        el.style.position = 'relative';
+
+        var text = el.innerHTML;
+        var lines = text.split(/<br\s*\/?>/gi);
+
+        var html = '';
+        lines.forEach(function(line, i) {
+            var lineDelay = delay + (i * stagger);
+            var textDelay = lineDelay + dur / 2;
+            var exitDelay = lineDelay + dur * 0.4;
+            html += '<span class="tb-line" style="display:block;position:relative;overflow:hidden;">';
+            html += '<span class="tb-line-inner" style="display:block;">' + line + '</span>';
+            html += '<span class="tb-block tb-exit" style="background:' + color + ';';
+            html += '--tb-delay:' + lineDelay + 's;';
+            html += '--tb-text-delay:' + textDelay + 's;';
+            html += '--tb-exit-delay:' + exitDelay + 's;"></span>';
+            html += '</span>';
+        });
+
+        el.innerHTML = html;
+    };
+
+    // Auto-init: any element with [data-tb] gets text-block animation
+    document.querySelectorAll('[data-tb]').forEach(function(el) {
+        var color = el.getAttribute('data-tb-color') || 'var(--ink)';
+        var delay = parseFloat(el.getAttribute('data-tb-delay')) || 0;
+        var dur = parseFloat(el.getAttribute('data-tb-dur')) || 0.6;
+        var stagger = parseFloat(el.getAttribute('data-tb-stagger')) || 0.08;
+        tbReveal(el, { color: color, delay: delay, dur: dur, stagger: stagger });
+    });
     </script>
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
