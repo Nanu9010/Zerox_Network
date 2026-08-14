@@ -3,21 +3,21 @@
 {% block content %}
 <div class="container" style="max-width: 600px; margin: auto; padding: 2rem;">
   <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-      <a href="{% url 'orders:my_orders' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
-      <h2 style="margin: 0; font-weight: 600;">Raise a Dispute</h2>
+      <a href="{% url 'orders:my_orders' %}" class="btn btn-ghost" style="width: auto; min-width: auto; border-radius: 0; font-family: var(--font-body);">←</a>
+      <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Raise a Dispute</h2>
   </div>
-  <p class="text-center text-muted">Order #{{ order.id }} - {{ order.shop.name }}</p>
-  
-  <div class="alert alert-warning mt-3">
-    <small><strong>Note:</strong> You can only raise a dispute within 48 hours of pickup. Please provide clear evidence.</small>
+  <p style="text-align: center; color: var(--mid); font-family: var(--font-body);">Order #{{ order.id }} - {{ order.shop.name }}</p>
+
+  <div style="padding: 1rem; background: var(--bg-surface); border: 1px solid var(--line); border-radius: 0; margin-top: 1.5rem; font-family: var(--font-body); font-size: 0.875rem; color: var(--ink);">
+    <strong>Note:</strong> You can only raise a dispute within 48 hours of pickup. Please provide clear evidence.
   </div>
 
-  <form method="post" enctype="multipart/form-data" class="mt-4">
+  <form method="post" enctype="multipart/form-data" style="margin-top: 2rem;">
     {% csrf_token %}
-    
-    <div class="form-group mb-3">
-        <label class="form-label">Issue Type</label>
-        <select name="issue_type" class="form-control" required>
+
+    <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; margin-bottom: 0.5rem; font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 0.875rem;">Issue Type</label>
+        <select name="issue_type" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--line); border-radius: 0; background: var(--bone); color: var(--ink); font-family: var(--font-body); font-size: 1rem;">
             <option value="" disabled selected>Select an issue...</option>
             <option value="MISSING_FILES">Missing Files</option>
             <option value="POOR_QUALITY">Poor Print Quality</option>
@@ -26,19 +26,19 @@
         </select>
     </div>
 
-    <div class="form-group mb-3">
-      <label class="form-label">Description</label>
-      <textarea name="description" class="form-control" rows="4" placeholder="Describe what went wrong..." required></textarea>
+    <div style="margin-bottom: 1.5rem;">
+      <label style="display: block; margin-bottom: 0.5rem; font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 0.875rem;">Description</label>
+      <textarea name="description" rows="4" placeholder="Describe what went wrong..." required style="width: 100%; padding: 0.75rem; border: 1px solid var(--line); border-radius: 0; background: var(--bone); color: var(--ink); font-family: var(--font-body); font-size: 1rem; resize: vertical;"></textarea>
     </div>
 
-    <div class="form-group mb-3">
-      <label class="form-label">Proof Photo (Required)</label>
-      <input type="file" name="proof_image" accept="image/*" required class="form-control" />
-      <small class="text-muted">Please upload a photo of the printed papers you received.</small>
+    <div style="margin-bottom: 1.5rem;">
+      <label style="display: block; margin-bottom: 0.5rem; font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 0.875rem;">Proof Photo (Required)</label>
+      <input type="file" name="proof_image" accept="image/*" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--line); border-radius: 0; background: var(--bone); color: var(--ink); font-family: var(--font-body); font-size: 1rem;" />
+      <small style="color: var(--mid); font-family: var(--font-body); font-size: 0.875rem;">Please upload a photo of the printed papers you received.</small>
     </div>
 
-    <button type="submit" class="btn btn-primary btn-block" style="width: 100%; font-weight: 600;">Submit Dispute</button>
-    <a href="{% url 'orders:my_orders' %}" class="btn btn-ghost mt-2" style="width: 100%; text-align: center; display: block;">Cancel</a>
+    <button type="submit" class="btn btn-primary" style="width: 100%; font-weight: 600; border-radius: 0; font-family: var(--font-body); background: var(--ink); color: var(--bone); border: 1px solid var(--ink); padding: 0.75rem; font-size: 1rem; cursor: pointer; transition: translateY(-1px);">Submit Dispute</button>
+    <a href="{% url 'orders:my_orders' %}" class="btn btn-ghost" style="width: 100%; text-align: center; display: block; margin-top: 0.75rem; border-radius: 0; font-family: var(--font-body);">Cancel</a>
   </form>
 </div>
 {% endblock %}

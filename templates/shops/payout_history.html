@@ -3,82 +3,79 @@
 {% block title %}Payout History - {{ shop.name }}{% endblock %}
 
 {% block content %}
-<section style="background: var(--secondary); padding: 2rem 0;">
+<section style="background: var(--bg-surface); padding: 2rem 0; border-bottom: 1px solid var(--line);">
     <div class="container">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
             <a href="{% url 'shops:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
-            <h1 style="font-size: 2rem; margin: 0;">Payout History</h1>
+            <h1 style="font-size: 2rem; margin: 0; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Payout History</h1>
         </div>
-        <p style="color: var(--text-secondary);">Track your earnings and payouts</p>
+        <p style="color: var(--mid); font-family: var(--font-body);">Track your earnings and payouts</p>
     </div>
 </section>
 
 <section class="container" style="padding: 3rem 0;">
-    <!-- Summary Cards -->
     <div class="grid grid-3" style="margin-bottom: 2rem;">
-        <div class="card card-elevated" style="text-align: center;">
-            <div style="color: var(--text-muted); font-size: 0.875rem;">Total Earned</div>
-            <div style="font-size: 2rem; font-weight: 800; color: var(--primary);">₹{{ total_earned }}</div>
+        <div class="card" style="text-align: center; border: 1px solid var(--line); border-radius: 0; background: var(--bone);">
+            <div style="color: var(--mid); font-size: 0.875rem; font-family: var(--font-body);">Total Earned</div>
+            <div style="font-size: 2rem; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">₹{{ total_earned }}</div>
         </div>
-        <div class="card card-elevated" style="text-align: center;">
-            <div style="color: var(--text-muted); font-size: 0.875rem;">Paid Out</div>
-            <div style="font-size: 2rem; font-weight: 800; color: var(--success);">₹{{ total_paid }}</div>
+        <div class="card" style="text-align: center; border: 1px solid var(--line); border-radius: 0; background: var(--bone);">
+            <div style="color: var(--mid); font-size: 0.875rem; font-family: var(--font-body);">Paid Out</div>
+            <div style="font-size: 2rem; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">₹{{ total_paid }}</div>
         </div>
-        <div class="card card-elevated" style="text-align: center;">
-            <div style="color: var(--text-muted); font-size: 0.875rem;">Pending Balance</div>
-            <div style="font-size: 2rem; font-weight: 800; color: var(--warning);">₹{{ pending_balance }}</div>
+        <div class="card" style="text-align: center; border: 1px solid var(--line); border-radius: 0; background: var(--bone);">
+            <div style="color: var(--mid); font-size: 0.875rem; font-family: var(--font-body);">Pending Balance</div>
+            <div style="font-size: 2rem; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">₹{{ pending_balance }}</div>
         </div>
     </div>
 
-    <!-- Bank Details Link -->
-    <div class="card card-elevated" style="margin-bottom: 2rem;">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
+    <div class="card" style="margin-bottom: 2rem; border: 1px solid var(--line); border-radius: 0; background: var(--bone);">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.25rem;">
             <div>
-                <h3 style="margin: 0;">Bank Account</h3>
-                <p style="color: var(--text-secondary); margin: 0.25rem 0 0 0;">
+                <h3 style="margin: 0; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Bank Account</h3>
+                <p style="color: var(--mid); margin: 0.25rem 0 0 0; font-family: var(--font-body);">
                     {% if shop.bank_details.is_verified %}
-                        ✅ {{ shop.bank_details.bank_name }} ending in {{ shop.bank_details.bank_account_number|slice:"-4:" }}
+                        {{ shop.bank_details.bank_name }} ending in {{ shop.bank_details.bank_account_number|slice:"-4:" }}
                     {% else %}
-                        ⏳ Add bank details to receive payouts
+                        Add bank details to receive payouts
                     {% endif %}
                 </p>
             </div>
-            <a href="{% url 'shops:bank_details' %}" class="btn btn-ghost">
+            <a href="{% url 'shops:bank_details' %}" class="btn btn-ghost" style="font-family: var(--font-body);">
                 {% if shop.bank_details.is_verified %}Edit{% else %}Add Bank Details{% endif %} →
             </a>
         </div>
     </div>
 
-    <!-- Payouts List -->
-    <div class="card card-elevated">
-        <h2 style="margin-bottom: 1.5rem;">Payout History</h2>
-        
+    <div class="card" style="border: 1px solid var(--line); border-radius: 0; background: var(--bone);">
+        <h2 style="margin-bottom: 1.5rem; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Payout History</h2>
+
         {% if payouts %}
             {% for payout in payouts %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; border-bottom: 1px solid var(--line);">
                 <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div style="width: 48px; height: 48px; background: {% if payout.status == 'COMPLETED' %}hsl(145, 60%, 95%){% elif payout.status == 'FAILED' %}hsl(0, 60%, 95%){% else %}hsl(45, 100%, 95%){% endif %}; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                    <div style="width: 48px; height: 48px; background: var(--bg-surface); display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
                         {% if payout.status == 'COMPLETED' %}💰{% elif payout.status == 'FAILED' %}❌{% else %}⏳{% endif %}
                     </div>
                     <div>
-                        <div style="font-weight: 600;">₹{{ payout.amount }}</div>
-                        <div style="color: var(--text-muted); font-size: 0.875rem;">
+                        <div style="font-weight: 600; font-family: var(--font-body); color: var(--ink);">₹{{ payout.amount }}</div>
+                        <div style="color: var(--mid); font-size: 0.875rem; font-family: var(--font-body);">
                             {{ payout.payout_date|date:"M d, Y" }} • {{ payout.mode }}
                         </div>
                         {% if payout.razorpay_payout_id %}
-                        <div style="color: var(--text-muted); font-size: 0.75rem;">
+                        <div style="color: var(--mid); font-size: 0.75rem; font-family: var(--font-body);">
                             ID: {{ payout.razorpay_payout_id }}
                         </div>
                         {% endif %}
                     </div>
                 </div>
-                <span class="badge {% if payout.status == 'COMPLETED' %}badge-success{% elif payout.status == 'FAILED' %}badge-error{% elif payout.status == 'PROCESSING' %}badge-warning{% else %}badge-neutral{% endif %}">
+                <span class="badge {% if payout.status == 'COMPLETED' %}badge-success{% elif payout.status == 'FAILED' %}badge-error{% elif payout.status == 'PROCESSING' %}badge-warning{% else %}badge-neutral{% endif %}" style="border-radius: 0; font-family: var(--font-body);">
                     {{ payout.get_status_display }}
                 </span>
             </div>
             {% endfor %}
         {% else %}
-        <div style="padding: 3rem; text-align: center; color: var(--text-muted);">
+        <div style="padding: 3rem; text-align: center; color: var(--mid); font-family: var(--font-body);">
             No payouts yet. Complete orders to start earning!
         </div>
         {% endif %}

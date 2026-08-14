@@ -7,85 +7,85 @@
     <div class="container">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">💸 Shop Payouts</h1>
-                <p style="color: var(--text-secondary);">Manage pending transfers to shops</p>
+                <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 1.75rem; color: var(--ink); margin-bottom: 0.25rem;">Shop Payouts</h1>
+                <p style="font-family: var(--font-body); color: var(--mid);">Manage pending transfers to shops</p>
             </div>
-            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost">Back to Dashboard</a>
+            <a href="{% url 'admin_portal:dashboard' %}" style="font-family: var(--font-body); display: inline-block; padding: 0.5rem 1rem; background: var(--bone); color: var(--ink); border: 1px solid var(--line); border-radius: 0; text-decoration: none; font-size: 0.875rem; transition: all 0.15s ease;">Back to Dashboard</a>
         </div>
     </div>
 </section>
 
 <section class="container" style="padding: 2rem 0;">
-    <div class="card mb-4" style="background: linear-gradient(135deg, hsl(210, 20%, 98%) 0%, hsl(210, 20%, 95%) 100%);">
-        <h3 class="mb-2">Payout Summary</h3>
+    <div style="background: var(--bg-surface); border: 1px solid var(--line); border-radius: 0; padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); margin-bottom: 1rem;">Payout Summary</h3>
         <div class="grid grid-3">
             <div>
-                <p class="text-sm text-secondary mb-0">Total Platform Revenue</p>
-                <h2 class="text-primary mb-0">₹{{ summary.total_revenue|floatformat:2 }}</h2>
+                <p style="font-family: var(--font-body); font-size: 0.875rem; color: var(--mid); margin-bottom: 0.25rem;">Total Platform Revenue</p>
+                <h2 style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 1.5rem;">₹{{ summary.total_revenue|floatformat:2 }}</h2>
             </div>
             <div>
-                <p class="text-sm text-secondary mb-0">Total Paid Out</p>
-                <h2 class="text-success mb-0">₹{{ summary.total_paid|floatformat:2 }}</h2>
+                <p style="font-family: var(--font-body); font-size: 0.875rem; color: var(--mid); margin-bottom: 0.25rem;">Total Paid Out</p>
+                <h2 style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 1.5rem;">₹{{ summary.total_paid|floatformat:2 }}</h2>
             </div>
             <div>
-                <p class="text-sm text-secondary mb-0">Total Pending Payouts</p>
-                <h2 class="text-warning mb-0">₹{{ summary.total_pending|floatformat:2 }}</h2>
+                <p style="font-family: var(--font-body); font-size: 0.875rem; color: var(--mid); margin-bottom: 0.25rem;">Total Pending Payouts</p>
+                <h2 style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 1.5rem;">₹{{ summary.total_pending|floatformat:2 }}</h2>
             </div>
         </div>
     </div>
 
-    <div class="card card-elevated">
+    <div style="background: var(--bg-surface); border: 1px solid var(--line); border-radius: 0; padding: 1.5rem;">
         <div class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Shop</th>
-                        <th>Owner</th>
-                        <th>Gross Sales</th>
-                        <th>Net Earnings</th>
-                        <th>Already Paid</th>
-                        <th>Pending Balance</th>
-                        <th>Action</th>
+                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Shop</th>
+                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Owner</th>
+                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Gross Sales</th>
+                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Net Earnings</th>
+                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Already Paid</th>
+                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Pending Balance</th>
+                        <th style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); text-align: left; padding: 0.75rem 1rem; border-bottom: 2px solid var(--line);">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for shop in shops %}
                     <tr>
-                        <td>
+                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); color: var(--ink);">
                             <strong>{{ shop.name }}</strong><br>
-                            <span class="text-muted text-sm">{{ shop.location }}</span>
+                            <span style="font-size: 0.875rem; color: var(--mid);">{{ shop.location }}</span>
                         </td>
-                        <td>
+                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); color: var(--ink);">
                             {{ shop.owner.username }}<br>
-                            <small>{{ shop.phone }}</small>
+                            <small style="color: var(--mid);">{{ shop.phone }}</small>
                         </td>
-                        <td>₹{{ shop.gross|floatformat:2 }}</td>
-                        <td class="text-success">₹{{ shop.net_earnings|floatformat:2 }}</td>
-                        <td>₹{{ shop.paid_total|floatformat:2 }}</td>
-                        <td>
+                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); color: var(--ink);">₹{{ shop.gross|floatformat:2 }}</td>
+                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); color: var(--ink);">₹{{ shop.net_earnings|floatformat:2 }}</td>
+                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line); color: var(--ink);">₹{{ shop.paid_total|floatformat:2 }}</td>
+                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line);">
                             {% if shop.pending_balance > 0 %}
-                                <strong class="text-error" style="font-size: 1.1rem;">₹{{ shop.pending_balance|floatformat:2 }}</strong>
+                                <strong style="font-size: 1.1rem; color: var(--error);">₹{{ shop.pending_balance|floatformat:2 }}</strong>
                             {% else %}
-                                <span class="text-success">Settled</span>
+                                <span style="color: var(--ink);">Settled</span>
                             {% endif %}
                         </td>
-                        <td>
+                        <td style="font-family: var(--font-body); padding: 0.75rem 1rem; border-bottom: 1px solid var(--line);">
                             {% if shop.pending_balance > 0 %}
                             <form method="POST" action="{% url 'admin_portal:process_payout' shop.id %}" onsubmit="return confirm('Confirm that you have transferred ₹{{ shop.pending_balance }} to {{ shop.name }}?');">
                                 {% csrf_token %}
                                 <input type="hidden" name="amount" value="{{ shop.pending_balance }}">
-                                <button type="submit" class="btn btn-secondary text-sm">
+                                <button type="submit" style="font-family: var(--font-body); display: inline-block; padding: 0.375rem 0.75rem; background: var(--ink); color: var(--bone); border: 1px solid var(--ink); border-radius: 0; font-size: 0.875rem; cursor: pointer; transition: all 0.15s ease;">
                                     Mark Paid
                                 </button>
                             </form>
                             {% else %}
-                            <button class="btn btn-ghost text-sm" disabled>Paid</button>
+                            <button style="font-family: var(--font-body); display: inline-block; padding: 0.375rem 0.75rem; background: var(--bone); color: var(--mid); border: 1px solid var(--line); border-radius: 0; font-size: 0.875rem; cursor: not-allowed;" disabled>Paid</button>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center py-4">No shops found.</td>
+                        <td colspan="7" style="font-family: var(--font-body); text-align: center; padding: 2rem; color: var(--mid);">No shops found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

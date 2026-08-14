@@ -2,35 +2,258 @@
 
 {% block title %}Resolve Dispute - Admin{% endblock %}
 
+{% block extra_css %}
+<style>
+    :root {
+        --bone: #EFEDE8;
+        --ink: #101010;
+        --mid: #8A8781;
+        --bg-surface: #F4F3EF;
+        --line: #E2E0DA;
+        --error: #C43D3D;
+        --font-heading: 'Archivo', sans-serif;
+        --font-body: 'Archivo', sans-serif;
+    }
+    .sable-section {
+        background: var(--bg-surface);
+        padding: 2rem 0;
+    }
+    .sable-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .sable-heading {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        color: var(--ink);
+        font-size: 1.75rem;
+        margin: 0 0 0.25rem 0;
+    }
+    .sable-subheading {
+        font-family: var(--font-body);
+        color: var(--mid);
+        margin: 0 0 0.25rem 0;
+    }
+    .sable-subheading-sm {
+        font-family: var(--font-body);
+        color: var(--mid);
+        font-size: 0.875rem;
+        margin: 0;
+    }
+    .sable-card {
+        background: var(--bone);
+        border: 1px solid var(--line);
+        border-radius: 0;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .sable-card:last-child {
+        margin-bottom: 0;
+    }
+    .sable-card-warn {
+        background: var(--bg-surface);
+        border: 1px solid var(--line);
+        border-radius: 0;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .sable-title {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        font-size: 1.1rem;
+        color: var(--ink);
+        margin: 0 0 1rem 0;
+    }
+    .sable-body-text {
+        font-family: var(--font-body);
+        color: var(--ink);
+        line-height: 1.6;
+    }
+    .sable-detail-label {
+        font-family: var(--font-body);
+        font-weight: 600;
+        color: var(--ink);
+    }
+    .sable-btn {
+        font-family: var(--font-body);
+        font-weight: 600;
+        border-radius: 0;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: var(--bone);
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        transition: transform 0.15s ease;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .sable-btn:hover {
+        transform: translateY(-1px);
+    }
+    .sable-btn-secondary {
+        background: transparent;
+        color: var(--ink);
+    }
+    .sable-btn-ghost {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--ink);
+    }
+    .sable-form-label {
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--ink);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    .sable-form-input {
+        font-family: var(--font-body);
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--bone);
+        color: var(--ink);
+        font-size: 0.9rem;
+        box-sizing: border-box;
+        resize: vertical;
+    }
+    .sable-form-input::placeholder {
+        color: var(--mid);
+    }
+    .sable-form-group {
+        margin-bottom: 1.25rem;
+    }
+    .sable-btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .sable-option-card {
+        cursor: pointer;
+        padding: 1rem;
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--bone);
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    .sable-option-card:hover {
+        border-color: var(--mid);
+    }
+    .sable-option-card input[type="radio"] {
+        margin-top: 0.25rem;
+        flex-shrink: 0;
+    }
+    .sable-option-title {
+        font-family: var(--font-body);
+        font-weight: 700;
+        color: var(--ink);
+    }
+    .sable-option-desc {
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        color: var(--mid);
+        margin-top: 0.25rem;
+    }
+    .sable-file-row {
+        padding: 0.75rem 0;
+    }
+    .sable-file-row:not(:last-child) {
+        border-bottom: 1px dashed var(--line);
+        margin-bottom: 0.75rem;
+    }
+    .sable-file-name {
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--ink);
+        margin-bottom: 0.25rem;
+    }
+    .sable-file-detail {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: var(--mid);
+    }
+    .sable-file-detail strong {
+        color: var(--ink);
+    }
+    .sable-alert {
+        padding: 1rem;
+        border: 1px solid var(--mid);
+        border-radius: 0;
+        background: var(--bg-surface);
+        font-family: var(--font-body);
+        margin-bottom: 1.5rem;
+    }
+    .sable-alert strong {
+        color: var(--ink);
+    }
+    .sable-inner-box {
+        padding: 1rem;
+        background: var(--bg-surface);
+        border-radius: 0;
+        margin-top: 1rem;
+    }
+    .sable-inner-box-title {
+        font-family: var(--font-body);
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 0.5rem;
+    }
+    .sable-input-amount {
+        font-family: var(--font-body);
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--bone);
+        color: var(--ink);
+        font-size: 0.9rem;
+        box-sizing: border-box;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<section style="background: var(--secondary); padding: 2rem 0;">
+<section class="sable-section">
     <div class="container">
-        <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">⚖️ Resolve Dispute</h1>
-        <p style="color: var(--text-secondary); margin-bottom: 0.25rem;">Dispute #{{ dispute.id }}</p>
-        <p style="color: var(--text-secondary); font-size: 0.875rem;">Review evidence and make a decision</p>
+        <h1 class="sable-heading">Resolve Dispute</h1>
+        <p class="sable-subheading">Dispute #{{ dispute.id }}</p>
+        <p class="sable-subheading-sm">Review evidence and make a decision</p>
     </div>
 </section>
 
 <section class="container" style="padding: 3rem 0;">
-    <div style="max-width: 800px; margin: 0 auto;">
+    <div class="sable-container">
         
-        <div class="card card-elevated" style="margin-bottom: 2rem;">
-            <h3>Order Details</h3>
-            <p><strong>Order ID:</strong> #{{ dispute.order.id }}</p>
-            <p><strong>Shop:</strong> {{ dispute.order.shop.name }}</p>
-            <p><strong>Amount:</strong> ₹{{ dispute.order.total_price }}</p>
+        <div class="sable-card">
+            <h3 class="sable-title">Order Details</h3>
+            <p class="sable-body-text"><span class="sable-detail-label">Order ID:</span> #{{ dispute.order.id }}</p>
+            <p class="sable-body-text"><span class="sable-detail-label">Shop:</span> {{ dispute.order.shop.name }}</p>
+            <p class="sable-body-text"><span class="sable-detail-label">Amount:</span> ₹{{ dispute.order.total_price }}</p>
             
-            <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-light); border-radius: var(--radius-sm);">
-                <p style="font-weight: 600; margin-bottom: 0.5rem;">Print Configuration</p>
+            <div class="sable-inner-box">
+                <p class="sable-inner-box-title">Print Configuration</p>
                 {% for file in dispute.order.files.all %}
-                <div style="{% if not forloop.last %}margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px dashed var(--border-color);{% endif %}">
-                    <p style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem;">📄 {{ file.file_name }}</p>
-                    <div style="display: flex; flex-direction: column; md-flex-direction: row; gap: 0.5rem; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary);">
+                <div class="sable-file-row">
+                    <p class="sable-file-name">📄 {{ file.file_name }}</p>
+                    <div class="sable-file-detail">
                         <div>
                             <span>{{ file.pages_per_sheet }} up | {{ file.get_print_type_display }}</span><br>
                             <span>{{ file.paper_size }} | {% if file.color_type == 'COLOR' %}Color{% else %}B/W{% endif %}</span>
                         </div>
-                        <div style="md-text-align: right;">
+                        <div>
                             <span>{{ file.get_print_side_display }}</span><br>
                             <span><strong>{{ file.copies }} Copies</strong></span>
                         </div>
@@ -40,73 +263,79 @@
             </div>
         </div>
         
-        <div class="card" style="margin-bottom: 2rem; background: hsl(0, 60%, 97%);">
-            <h3>Customer Complaint</h3>
-            <p><strong>Issue:</strong> {{ dispute.get_issue_type_display }}</p>
-            <p>{{ dispute.description }}</p>
+        <div class="sable-card-warn">
+            <h3 class="sable-title">Customer Complaint</h3>
+            <p class="sable-body-text"><span class="sable-detail-label">Issue:</span> {{ dispute.get_issue_type_display }}</p>
+            <p class="sable-body-text">{{ dispute.description }}</p>
         </div>
         
         {% if dispute.shop_response %}
-        <div class="card" style="margin-bottom: 2rem; background: hsl(210, 60%, 97%);">
-            <h3>Shop Response</h3>
-            <p>{{ dispute.shop_response }}</p>
+        <div class="sable-card">
+            <h3 class="sable-title">Shop Response</h3>
+            <p class="sable-body-text">{{ dispute.shop_response }}</p>
         </div>
         {% endif %}
         
-        <div class="card card-elevated">
-            <h3 style="margin-bottom: 1.5rem;">Admin Decision</h3>
+        <div class="sable-card">
+            <h3 class="sable-title">Admin Decision</h3>
             
             <form method="POST">
                 {% csrf_token %}
                 
                 {% if user.profile.role == 'ADMIN' %}
-                <div class="form-group">
-                    <label class="form-label">Decision</label>
+                <div class="sable-form-group">
+                    <label class="sable-form-label">Decision</label>
                     <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <label class="feature-card" style="cursor: pointer; padding: 1rem; border: 2px solid var(--border-color);">
-                            <input type="radio" name="decision" value="approve_full" required style="margin-right: 0.5rem;">
-                            <strong>✅ Approve Full Refund</strong> - ₹{{ dispute.order.total_price }}
-                        </label>
-                        <label class="feature-card" style="cursor: pointer; padding: 1rem; border: 2px solid var(--border-color);">
-                            <input type="radio" name="decision" value="approve_partial" style="margin-right: 0.5rem;">
+                        <label class="sable-option-card">
+                            <input type="radio" name="decision" value="approve_full" required>
                             <div>
-                                <strong>⚖️ Approve Partial Refund</strong>
-                                <input type="number" name="refund_amount" class="form-input" placeholder="Enter amount" step="0.01" min="0" max="{{ dispute.order.total_price }}" style="margin-top: 0.5rem;">
+                                <div class="sable-option-title">✅ Approve Full Refund</div>
+                                <div class="sable-option-desc">₹{{ dispute.order.total_price }}</div>
                             </div>
                         </label>
-                        <label class="feature-card" style="cursor: pointer; padding: 1rem; border: 2px solid var(--border-color);">
-                            <input type="radio" name="decision" value="reject" style="margin-right: 0.5rem;">
-                            <strong>❌ Reject Refund</strong> - No refund issued
+                        <label class="sable-option-card">
+                            <input type="radio" name="decision" value="approve_partial">
+                            <div style="width: 100%;">
+                                <div class="sable-option-title">⚖️ Approve Partial Refund</div>
+                                <input type="number" name="refund_amount" class="sable-input-amount" placeholder="Enter amount" step="0.01" min="0" max="{{ dispute.order.total_price }}">
+                            </div>
+                        </label>
+                        <label class="sable-option-card">
+                            <input type="radio" name="decision" value="reject">
+                            <div>
+                                <div class="sable-option-title">❌ Reject Refund</div>
+                                <div class="sable-option-desc">No refund issued</div>
+                            </div>
                         </label>
                     </div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Admin Notes</label>
-                    <textarea name="admin_notes" class="form-input" rows="4" placeholder="Explain your decision..."></textarea>
+                <div class="sable-form-group">
+                    <label class="sable-form-label">Admin Notes</label>
+                    <textarea name="admin_notes" class="sable-form-input" rows="4" placeholder="Explain your decision..."></textarea>
                 </div>
                 
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; justify-content: center;">Submit Decision</button>
-                    <a href="{% url 'admin_portal:disputes' %}" class="btn btn-ghost" style="width: 100%; height: 48px; justify-content: center; display: flex; align-items: center;">Cancel</a>
+                <div class="sable-btn-group">
+                    <button type="submit" class="sable-btn" style="width: 100%;">Submit Decision</button>
+                    <a href="{% url 'admin_portal:disputes' %}" class="sable-btn sable-btn-ghost" style="width: 100%;">Cancel</a>
                 </div>
                 
                 {% else %}
-                <!-- STAFF VIEW -->
-                <div class="alert alert-warning mb-4">
+                
+                <div class="sable-alert">
                     <strong>Role Notice:</strong> As Staff, you can review proofs and leave a recommendation. Only Admins can finalize refunds.
                 </div>
                 
                 <input type="hidden" name="decision" value="recommend">
                 
-                <div class="form-group">
-                    <label class="form-label">Recommendation & Investigation Notes</label>
-                    <textarea name="admin_notes" class="form-input" rows="6" placeholder="What did you find? Should we refund? Explain here..." required></textarea>
+                <div class="sable-form-group">
+                    <label class="sable-form-label">Recommendation & Investigation Notes</label>
+                    <textarea name="admin_notes" class="sable-form-input" rows="6" placeholder="What did you find? Should we refund? Explain here..." required></textarea>
                 </div>
                 
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <button type="submit" class="btn btn-secondary" style="width: 100%; height: 48px; justify-content: center;">💾 Save Recommendation</button>
-                    <a href="{% url 'admin_portal:disputes' %}" class="btn btn-ghost" style="width: 100%; height: 48px; justify-content: center; display: flex; align-items: center;">Back</a>
+                <div class="sable-btn-group">
+                    <button type="submit" class="sable-btn" style="width: 100%;">Save Recommendation</button>
+                    <a href="{% url 'admin_portal:disputes' %}" class="sable-btn sable-btn-ghost" style="width: 100%;">Back</a>
                 </div>
                 {% endif %}
             </form>

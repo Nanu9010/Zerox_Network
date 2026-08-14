@@ -3,79 +3,78 @@
 {% block title %}{{ shop.name }} - Zerox{% endblock %}
 
 {% block extra_css %}
-<!-- Leaflet CSS for Map -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <style>
     #detailMap { 
         height: 200px; 
-        border-radius: var(--radius-md); 
+        border-radius: 0; 
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div style="background: white;">
-    <!-- Big Shop Image (Slider-like) -->
-    <div style="height: 250px; background: #000; position: relative; overflow: hidden;">
-        <img id="mainImage" src="{{ shop.get_primary_image }}" style="width: 100%; height: 100%; object-fit: cover;">
+<div style="background: var(--bone); min-height: 100vh;">
+    <div class="rv rv-scale" style="height: 250px; background: var(--ink); position: relative; overflow: hidden;">
+        <img id="mainImage" src="{{ shop.get_primary_image }}" style="width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.04); transition: filter 0.4s ease;" onmouseover="this.style.filter='grayscale(0)'" onmouseout="this.style.filter='grayscale(1) contrast(1.04)'">
         
-        <!-- Image count badge if multiple -->
         {% if shop.get_images.count > 1 %}
-        <div style="position: absolute; bottom: 1rem; right: 1rem; background: rgba(0,0,0,0.6); color: white; padding: 4px 12px; border-radius: 999px; font-size: 0.75rem;">
-            📸 {{ shop.get_images.count }} Photos
+        <div style="position: absolute; bottom: 1rem; right: 1rem; background: var(--ink); color: var(--bone); padding: 4px 12px; border-radius: 0; font-size: 0.75rem; font-family: var(--font-body);">
+            {{ shop.get_images.count }} Photos
         </div>
         {% endif %}
     </div>
 
-    <!-- Shop Info -->
-    <div class="container" style="padding-top: 1.5rem; padding-bottom: 2rem;">
-        <h1 style="font-size: 1.75rem; line-height: 1.2; margin-bottom: 0.5rem;">{{ shop.name }}</h1>
-        <p style="color: var(--text-secondary); margin-bottom: 1rem;">📍 {{ shop.location }}</p>
+    <div class="container rv" style="padding-top: 1.5rem; padding-bottom: 2rem;">
+        <p class="rv-text" style="color: var(--mid); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem; font-family: var(--font-body);">Shop</p>
+        <h1 class="rv-text rv-d1" style="font-family: var(--font-heading); font-weight: 800; font-size: 1.75rem; line-height: 1.2; margin-bottom: 0.5rem; color: var(--ink);">{{ shop.name }}</h1>
+        <p class="rv-text rv-d2" style="color: var(--mid); margin-bottom: 1rem; font-family: var(--font-body);">📍 {{ shop.location }}</p>
         
         {% if shop.latitude and shop.longitude %}
-        <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
+        <p class="rv-text rv-d3" style="color: var(--mid); font-size: 0.875rem; margin-bottom: 1rem; font-family: var(--font-body);">
             🌐 {{ shop.latitude|floatformat:4 }}, {{ shop.longitude|floatformat:4 }}
         </p>
         {% endif %}
         
-        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; font-weight: 600; font-size: 0.95rem;">
-            <span style="color: var(--primary);">₹{{ shop.a4_bw_price }} B/W</span>
-            <span style="color: #e5e7eb;">|</span>
-            <span style="color: var(--primary);">₹{{ shop.a4_color_price }} Color</span>
+        <div class="rv rv-d4" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; font-family: var(--font-heading);">
+            <div style="border: 1px solid var(--line); padding: 0.5rem 1rem; background: var(--bg-surface);">
+                <p style="color: var(--mid); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem; font-family: var(--font-body);">B/W</p>
+                <p style="font-weight: 800; font-size: 1.25rem; color: var(--ink);">₹{{ shop.a4_bw_price }}</p>
+            </div>
+            <div style="border: 1px solid var(--line); padding: 0.5rem 1rem; background: var(--bg-surface);">
+                <p style="color: var(--mid); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem; font-family: var(--font-body);">Color</p>
+                <p style="font-weight: 800; font-size: 1.25rem; color: var(--ink);">₹{{ shop.a4_color_price }}</p>
+            </div>
         </div>
 
-        <!-- Primary Action: Upload -->
-        <div class="card card-elevated" style="margin-bottom: 2rem; border-color: var(--primary);">
-            <form method="POST" action="{% url 'orders:upload' shop.id %}" enctype="multipart/form-data">
+        <div class="card rv rv-d5" style="margin-bottom: 2rem; border: 1px solid var(--line); border-radius: 0; background: var(--bg-surface); box-shadow: none;">
+            <form method="POST" action="{% url 'orders:upload' shop.id %}" enctype="multipart/form-data" style="padding: 1.5rem;">
                 {% csrf_token %}
                 
-                <!-- Inputs first (Required) -->
                 {% if not user.is_authenticated %}
-                <div class="form-group">
-                    <label class="form-label">Your Name</label>
-                    <input type="text" name="customer_name" class="form-input" placeholder="Enter name" required>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--mid); margin-bottom: 0.5rem; font-family: var(--font-body);">Your Name</label>
+                    <input type="text" name="customer_name" placeholder="Enter name" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--line); border-radius: 0; background: var(--bone); color: var(--ink); font-family: var(--font-body); font-size: 0.95rem; box-sizing: border-box;">
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Phone</label>
-                    <input type="tel" name="phone" class="form-input" placeholder="Phone number" required>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.75rem; text-transform: uppercase; color: var(--mid); margin-bottom: 0.5rem; font-family: var(--font-body);">Phone</label>
+                    <input type="tel" name="phone" placeholder="Phone number" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--line); border-radius: 0; background: var(--bone); color: var(--ink); font-family: var(--font-body); font-size: 0.95rem; box-sizing: border-box;">
                 </div>
                 {% else %}
                     <input type="hidden" name="customer_name" value="{{ user.get_full_name|default:user.username }}">
                     <input type="hidden" name="phone" value="{{ user.profile.phone }}">
                 {% endif %}
 
-                <!-- Big Upload Button -->
                 <div style="margin-top: 1rem;">
                     <input type="file" name="files" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" multiple required style="display: none;" onchange="handleFileSelect(this)">
                     
-                    <button type="button" class="btn btn-primary" onclick="document.getElementById('fileInput').click()" style="width: 100%; font-size: 1.125rem; padding: 1rem;">
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('fileInput').click()" style="width: 100%; font-size: 1.125rem; padding: 1rem; border-radius: 0; background: var(--ink); color: var(--bone); border: 1px solid var(--ink); font-family: var(--font-heading); font-weight: 800; cursor: pointer; transition: transform 0.2s ease, background 0.2s ease; text-transform: uppercase; letter-spacing: 1px;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
                         📄 Upload Documents
                     </button>
                     
                     <div id="filePreview" style="margin-top: 1rem; display: none;">
-                        <p style="color: var(--success); font-weight: 600; margin-bottom: 0.5rem;" id="fileCountText"></p>
-                        <button type="submit" class="btn btn-secondary" style="width: 100%;">
+                        <p style="color: var(--ink); font-weight: 800; margin-bottom: 0.5rem; font-family: var(--font-body);" id="fileCountText"></p>
+                        <button type="submit" class="btn btn-secondary" style="width: 100%; border-radius: 0; background: transparent; color: var(--ink); border: 1px solid var(--ink); font-family: var(--font-heading); font-weight: 800; padding: 1rem; cursor: pointer; transition: transform 0.2s ease, background 0.2s ease; text-transform: uppercase; letter-spacing: 1px;" onmouseover="this.style.transform='translateY(-1px)'; this.style.background='var(--ink)'; this.style.color='var(--bone)'" onmouseout="this.style.transform='translateY(0)'; this.style.background='transparent'; this.style.color='var(--ink)'">
                             Continue to Settings →
                         </button>
                     </div>
@@ -83,60 +82,58 @@
             </form>
         </div>
 
-        <!-- Sections -->
         <div style="display: grid; gap: 2rem;">
-            <!-- Price List -->
-            <section>
-                <h3 style="color: var(--text-secondary); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">Full Price List</h3>
-                <div class="grid-2" style="gap: 1rem;">
-                    <div style="padding: 1rem; background: var(--bg-light); border-radius: var(--radius-md);">
-                        <p style="color: var(--text-muted); font-size: 0.8rem;">A4 B/W</p>
-                        <p style="font-weight: 700; font-size: 1.25rem;">₹{{ shop.a4_bw_price }}</p>
+            <section class="rv rv-d6">
+                <p class="rv-text" style="color: var(--mid); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem; font-family: var(--font-body);">Pricing</p>
+                <h3 style="font-family: var(--font-heading); font-weight: 800; font-size: 1.25rem; color: var(--ink); margin-bottom: 1rem;">Full Price List</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                    <div style="padding: 1rem; border: 1px solid var(--line); background: var(--bg-surface);">
+                        <p style="color: var(--mid); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem; font-family: var(--font-body);">A4 B/W</p>
+                        <p style="font-weight: 800; font-size: 1.25rem; color: var(--ink); font-family: var(--font-heading);">₹{{ shop.a4_bw_price }}</p>
                     </div>
-                    <div style="padding: 1rem; background: var(--bg-light); border-radius: var(--radius-md);">
-                        <p style="color: var(--text-muted); font-size: 0.8rem;">A4 Color</p>
-                        <p style="font-weight: 700; font-size: 1.25rem;">₹{{ shop.a4_color_price }}</p>
+                    <div style="padding: 1rem; border: 1px solid var(--line); background: var(--bg-surface);">
+                        <p style="color: var(--mid); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem; font-family: var(--font-body);">A4 Color</p>
+                        <p style="font-weight: 800; font-size: 1.25rem; color: var(--ink); font-family: var(--font-heading);">₹{{ shop.a4_color_price }}</p>
                     </div>
-                     <div style="padding: 1rem; background: var(--bg-light); border-radius: var(--radius-md);">
-                        <p style="color: var(--text-muted); font-size: 0.8rem;">A3 B/W</p>
-                        <p style="font-weight: 700; font-size: 1.25rem;">₹{{ shop.a3_bw_price }}</p>
+                    <div style="padding: 1rem; border: 1px solid var(--line); background: var(--bg-surface);">
+                        <p style="color: var(--mid); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem; font-family: var(--font-body);">A3 B/W</p>
+                        <p style="font-weight: 800; font-size: 1.25rem; color: var(--ink); font-family: var(--font-heading);">₹{{ shop.a3_bw_price }}</p>
                     </div>
-                    <div style="padding: 1rem; background: var(--bg-light); border-radius: var(--radius-md);">
-                        <p style="color: var(--text-muted); font-size: 0.8rem;">A3 Color</p>
-                        <p style="font-weight: 700; font-size: 1.25rem;">₹{{ shop.a3_color_price }}</p>
+                    <div style="padding: 1rem; border: 1px solid var(--line); background: var(--bg-surface);">
+                        <p style="color: var(--mid); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 0.25rem; font-family: var(--font-body);">A3 Color</p>
+                        <p style="font-weight: 800; font-size: 1.25rem; color: var(--ink); font-family: var(--font-heading);">₹{{ shop.a3_color_price }}</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Photos -->
             {% if shop.get_images.count > 1 %}
-            <section>
-                 <h3 style="color: var(--text-secondary); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">Photos</h3>
-                 <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem;">
+            <section class="rv rv-d7">
+                <p class="rv-text" style="color: var(--mid); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem; font-family: var(--font-body);">Gallery</p>
+                <h3 style="font-family: var(--font-heading); font-weight: 800; font-size: 1.25rem; color: var(--ink); margin-bottom: 1rem;">Photos</h3>
+                <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem;">
                     {% for img in shop.get_images %}
-                    <img src="{{ img.image.url }}" style="height: 100px; width: 100px; object-fit: cover; border-radius: 8px; flex-shrink: 0;" onclick="document.getElementById('mainImage').src=this.src">
+                    <img src="{{ img.image.url }}" style="height: 100px; width: 100px; object-fit: cover; border-radius: 0; flex-shrink: 0; border: 1px solid var(--line); filter: grayscale(1) contrast(1.04); transition: filter 0.4s ease; cursor: pointer;" onclick="document.getElementById('mainImage').src=this.src" onmouseover="this.style.filter='grayscale(0)'" onmouseout="this.style.filter='grayscale(1) contrast(1.04)'">
                     {% endfor %}
-                 </div>
+                </div>
             </section>
             {% endif %}
             
-            <!-- Map -->
-            <section>
-                <h3 style="color: var(--text-secondary); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;">Location</h3>
+            <section class="rv rv-d8">
+                <p class="rv-text" style="color: var(--mid); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem; font-family: var(--font-body);">Map</p>
+                <h3 style="font-family: var(--font-heading); font-weight: 800; font-size: 1.25rem; color: var(--ink); margin-bottom: 1rem;">Location</h3>
                 {% if shop.latitude and shop.longitude %}
-                <div id="detailMap"></div>
+                <div id="detailMap" style="border: 1px solid var(--line);"></div>
                 {% else %}
-                <div style="background: #eee; height: 150px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                <div style="background: var(--bg-surface); height: 150px; border: 1px solid var(--line); border-radius: 0; display: flex; align-items: center; justify-content: center; color: var(--mid); font-family: var(--font-body);">
                     Location not available
                 </div>
                 {% endif %}
-                <p style="margin-top: 0.5rem; font-size: 0.9rem;">{{ shop.location }}</p>
+                <p style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--mid); font-family: var(--font-body);">{{ shop.location }}</p>
             </section>
         </div>
     </div>
 </div>
 
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
@@ -144,18 +141,16 @@
 function handleFileSelect(input) {
     if (input.files.length > 0) {
         document.getElementById('filePreview').style.display = 'block';
-        document.getElementById('fileCountText').innerText = `✅ ${input.files.length} document(s) selected`;
+        document.getElementById('fileCountText').innerText = `${input.files.length} document(s) selected`;
     }
 }
 
 {% if shop.latitude and shop.longitude %}
-// Initialize map
 const map = L.map('detailMap').setView([{{ shop.latitude }}, {{ shop.longitude }}], 15);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
-// Add marker
 L.marker([{{ shop.latitude }}, {{ shop.longitude }}]).addTo(map)
     .bindPopup('<strong>{{ shop.name }}</strong><br>{{ shop.location }}')
     .openPopup();

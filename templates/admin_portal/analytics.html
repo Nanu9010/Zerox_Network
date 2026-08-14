@@ -3,92 +3,89 @@
 {% block title %}Analytics - Admin{% endblock %}
 
 {% block content %}
-<section style="background: var(--secondary); padding: 2rem 0;">
+<section style="background: var(--bg-surface); padding: 2rem 0; border-bottom: 1px solid var(--line);">
     <div class="container">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
             <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
-            <h1 style="font-size: 2rem; margin: 0;">📊 Platform Analytics</h1>
+            <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 2rem; margin: 0; color: var(--ink);">Platform Analytics</h1>
         </div>
-        <p style="color: var(--text-secondary);">Revenue,  performance, and insights</p>
+        <p style="color: var(--mid); font-family: var(--font-body);">Revenue, performance, and insights</p>
     </div>
 </section>
 
 <section class="container" style="padding: 3rem 0;">
-    
-    <!-- Date Range Filter -->
+
     <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
         <a href="?range=7days" class="btn {% if range_filter == '7days' %}btn-primary{% else %}btn-ghost{% endif %}">Last 7 Days</a>
         <a href="?range=30days" class="btn {% if range_filter == '30days' %}btn-primary{% else %}btn-ghost{% endif %}">Last 30 Days</a>
     </div>
-    
-    <!-- Money Metrics -->
+
     <div class="grid grid-1 grid-2 mb-4">
-        <div class="card card-elevated" style="padding: 2rem; background: hsl(145, 60%, 97%);">
-            <h3 style="margin-bottom: 1.5rem;">💰 Revenue Breakdown</h3>
+        <div style="border: 1px solid var(--line); padding: 2rem; background: var(--bone);">
+            <h3 style="font-family: var(--font-heading); font-weight: 800; margin-bottom: 1.5rem; color: var(--ink);">Revenue Breakdown</h3>
             <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <div style="display: flex; justify-content: space-between; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);">
-                    <span>Total Revenue</span>
-                    <span style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">₹{{ total_revenue|floatformat:2 }}</span>
+                <div style="display: flex; justify-content: space-between; padding-bottom: 0.75rem; border-bottom: 1px solid var(--line);">
+                    <span style="font-family: var(--font-body); color: var(--ink);">Total Revenue</span>
+                    <span style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: var(--ink);">₹{{ total_revenue|floatformat:2 }}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);">
-                    <span>Platform Commission</span>
-                    <span style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">₹{{ total_commission|floatformat:2 }}</span>
+                <div style="display: flex; justify-content: space-between; padding-bottom: 0.75rem; border-bottom: 1px solid var(--line);">
+                    <span style="font-family: var(--font-body); color: var(--ink);">Platform Commission</span>
+                    <span style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 800; color: var(--ink);">₹{{ total_commission|floatformat:2 }}</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);">
-                    <span>Shop Payouts</span>
-                    <span style="font-size: 1.5rem; font-weight: 700; color: var(--text-secondary);">₹{{ shop_payouts|floatformat:2 }}</span>
+                <div style="display: flex; justify-content: space-between; padding-bottom: 0.75rem; border-bottom: 1px solid var(--line);">
+                    <span style="font-family: var(--font-body); color: var(--ink);">Shop Payouts</span>
+                    <span style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700; color: var(--mid);">₹{{ shop_payouts|floatformat:2 }}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
-                    <span style="color: hsl(0, 80%, 50%);">Total Refunds</span>
-                    <span style="font-size: 1.5rem; font-weight: 700; color: hsl(0, 80%, 50%);">₹{{ total_refunds|floatformat:2 }}</span>
+                    <span style="font-family: var(--font-body); color: var(--error);">Total Refunds</span>
+                    <span style="font-family: var(--font-heading); font-size: 1.5rem; font-weight: 700; color: var(--error);">₹{{ total_refunds|floatformat:2 }}</span>
                 </div>
             </div>
         </div>
-        
-        <div class="card card-elevated" style="padding: 2rem;">
-            <h3 style="margin-bottom: 1.5rem;">📦 Order Statistics</h3>
+
+        <div style="border: 1px solid var(--line); padding: 2rem; background: var(--surface);">
+            <h3 style="font-family: var(--font-heading); font-weight: 800; margin-bottom: 1.5rem; color: var(--ink);">Order Statistics</h3>
             <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                 {% for order_status in order_counts %}
-                <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--bg-light); border-radius: var(--radius-md);">
-                    <span>{{ order_status.status }}</span>
-                    <span style="font-weight: 700;">{{ order_status.count }}</span>
+                <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--bone); border: 1px solid var(--line);">
+                    <span style="font-family: var(--font-body); color: var(--ink);">{{ order_status.status }}</span>
+                    <span style="font-family: var(--font-heading); font-weight: 700; color: var(--ink);">{{ order_status.count }}</span>
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
-    
-    <!-- Top Shops -->
-    <div class="card card-elevated">
-        <h3 style="margin-bottom: 1.5rem;">🏆 Top 5 Performing Shops</h3>
+
+    <div style="border: 1px solid var(--line); padding: 2rem; background: var(--surface);">
+        <h3 style="font-family: var(--font-heading); font-weight: 800; margin-bottom: 1.5rem; color: var(--ink);">Top 5 Performing Shops</h3>
         <div class="table-responsive">
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
-                    <tr style="border-bottom: 2px solid var(--border-color);">
-                        <th style="padding: 1rem; text-align: left;">Rank</th>
-                        <th style="padding: 1rem; text-align: left;">Shop Name</th>
-                        <th style="padding: 1rem; text-align: left;">Location</th>
-                        <th style="padding: 1rem; text-align: right;">Total Orders</th>
-                        <th style="padding: 1rem; text-align: right;">Rating</th>
+                    <tr style="border-bottom: 2px solid var(--ink);">
+                        <th style="padding: 1rem; text-align: left; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Rank</th>
+                        <th style="padding: 1rem; text-align: left; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Shop Name</th>
+                        <th style="padding: 1rem; text-align: left; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Location</th>
+                        <th style="padding: 1rem; text-align: right; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Total Orders</th>
+                        <th style="padding: 1rem; text-align: right; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Rating</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for shop in top_shops %}
-                    <tr style="border-bottom: 1px solid var(--border-color);">
-                        <td style="padding: 1rem;">
+                    <tr style="border-bottom: 1px solid var(--line);">
+                        <td style="padding: 1rem; font-family: var(--font-body); color: var(--ink);">
                             {% if forloop.counter == 1 %}🥇
                             {% elif forloop.counter == 2 %}🥈
                             {% elif forloop.counter == 3 %}🥉
                             {% else %}{{ forloop.counter }}{% endif %}
                         </td>
-                        <td style="padding: 1rem;"><strong>{{ shop.name }}</strong></td>
-                        <td style="padding: 1rem;">{{ shop.location }}</td>
-                        <td style="padding: 1rem; text-align: right; font-weight: 700;">{{ shop.order_count }}</td>
-                        <td style="padding: 1rem; text-align: right;">⭐ {{ shop.rating }}</td>
+                        <td style="padding: 1rem; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">{{ shop.name }}</td>
+                        <td style="padding: 1rem; font-family: var(--font-body); color: var(--mid);">{{ shop.location }}</td>
+                        <td style="padding: 1rem; text-align: right; font-family: var(--font-heading); font-weight: 700; color: var(--ink);">{{ shop.order_count }}</td>
+                        <td style="padding: 1rem; text-align: right; font-family: var(--font-body); color: var(--ink);">⭐ {{ shop.rating }}</td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                        <td colspan="5" style="padding: 2rem; text-align: center; color: var(--mid); font-family: var(--font-body);">
                             No data available
                         </td>
                     </tr>
@@ -97,6 +94,6 @@
             </table>
         </div>
     </div>
-    
+
 </section>
 {% endblock %}

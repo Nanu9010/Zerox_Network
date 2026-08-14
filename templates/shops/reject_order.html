@@ -2,22 +2,118 @@
 
 {% block title %}Reject Order - Shop Dashboard{% endblock %}
 
+{% block extra_css %}
+<style>
+    :root {
+        --bone: #EFEDE8;
+        --ink: #101010;
+        --mid: #8A8781;
+        --bg-surface: #F4F3EF;
+        --line: #E2E0DA;
+        --error: #C43D3D;
+        --font-heading: 'Archivo', sans-serif;
+        --font-body: 'Archivo', sans-serif;
+    }
+    .sable-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .sable-card {
+        background: var(--bone);
+        border: 1px solid var(--line);
+        border-radius: 0;
+        padding: 2rem;
+    }
+    .sable-heading {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        color: var(--ink);
+        font-size: 1.5rem;
+        margin: 0;
+    }
+    .sable-subtitle {
+        font-family: var(--font-body);
+        color: var(--mid);
+        margin-bottom: 1.5rem;
+    }
+    .sable-btn {
+        font-family: var(--font-body);
+        font-weight: 600;
+        border-radius: 0;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: var(--bone);
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        transition: transform 0.15s ease;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 0.9rem;
+        flex: 1;
+    }
+    .sable-btn:hover {
+        transform: translateY(-1px);
+    }
+    .sable-btn-secondary {
+        background: transparent;
+        color: var(--ink);
+    }
+    .sable-btn-ghost {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--ink);
+    }
+    .sable-form-label {
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--ink);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    .sable-form-input {
+        font-family: var(--font-body);
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--bone);
+        color: var(--ink);
+        font-size: 0.9rem;
+        box-sizing: border-box;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    .sable-form-group {
+        margin-bottom: 1.25rem;
+    }
+    .sable-btn-row {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <section class="container" style="padding: 3rem 0;">
-    <div style="max-width: 600px; margin: 0 auto;">
-        <div class="card">
+    <div class="sable-container">
+        <div class="sable-card">
             <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                <a href="{% url 'shops:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
-                <h2 style="margin: 0;">Reject Order #{{ order.id }}</h2>
+                <a href="{% url 'shops:dashboard' %}" class="sable-btn sable-btn-ghost" style="width: auto; min-width: auto; flex: none;">←</a>
+                <h2 class="sable-heading">Reject Order #{{ order.id }}</h2>
             </div>
-            <p class="text-muted">Please provide a reason for rejecting this order. The customer will be refunded automatically.</p>
+            <p class="sable-subtitle">Please provide a reason for rejecting this order. The customer will be refunded automatically.</p>
             
-            <form method="POST" style="margin-top: 1.5rem;">
+            <form method="POST">
                 {% csrf_token %}
                 
-                <div class="form-group">
-                    <label class="form-label">Rejection Reason</label>
-                    <select name="reason" class="form-select" required>
+                <div class="sable-form-group">
+                    <label class="sable-form-label">Rejection Reason</label>
+                    <select name="reason" class="sable-form-input" required>
                         <option value="">Select a reason...</option>
                         <option value="Printer broken">Printer broken</option>
                         <option value="No paper">No paper available</option>
@@ -28,9 +124,9 @@
                     </select>
                 </div>
                 
-                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                    <button type="submit" class="btn btn-accent" style="flex: 1;">Confirm Rejection</button>
-                    <a href="{% url 'shops:dashboard' %}" class="btn btn-ghost" style="flex: 1;">Cancel</a>
+                <div class="sable-btn-row">
+                    <button type="submit" class="sable-btn">Confirm Rejection</button>
+                    <a href="{% url 'shops:dashboard' %}" class="sable-btn sable-btn-ghost">Cancel</a>
                 </div>
             </form>
         </div>

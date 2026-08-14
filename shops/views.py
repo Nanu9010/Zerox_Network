@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.http import HttpResponse
-from .models import Shop
+from .models import Shop, ShopImage
+from .forms import ShopImageForm
 from orders.models import Order
 from django.db.models import Sum
 
@@ -159,6 +160,21 @@ def shop_dashboard(request):
     else:
         selected_shop = shops.first()
     
+    # Handle image upload from dashboard
+    if request.method == 'POST' and 'upload_image' in request.POST:
+        form = ShopImageForm(request.POST, request.FILES)
+        if form.is_valid():
+            shop_image = form.save(commit=False)
+            shop_image.shop = selected_shop
+            shop_image.is_approved = False
+            shop_image.save()
+            messages.success(request, 'Image uploaded! It will be live after admin approval.')
+            return redirect('shops:dashboard')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+    
     # Get all orders for selected shop
     orders = selected_shop.orders.all().order_by('-created_at')
     
@@ -249,7 +265,9 @@ def shop_dashboard(request):
             'earned': total_earned,
             'pending': pending_payout,
             'paid': selected_shop.paid_total
-        }
+        },
+        'shop_images': selected_shop.images.all().order_by('-is_primary', '-created_at')[:6],
+        'shop_image_form': ShopImageForm(),
     }
     
     return render(request, 'shops/dashboard.html', context)

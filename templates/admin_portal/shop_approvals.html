@@ -3,114 +3,380 @@
 {% block title %}Shop Approvals - Admin{% endblock %}
 
 {% block content %}
-<section style="background: var(--secondary); padding: 2rem 0;">
-    <div class="container">
-        <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">🏪 Shop Management</h1>
-        <p style="color: var(--text-secondary);">Approve, reject, or suspend shops</p>
-    </div>
+<style>
+:root {
+--bone: #EFEDE8; --ink: #101010; --mid: #8A8781; --bg-surface: #F4F3EF; --line: #E2E0DA; --error: #C43D3D; --font-heading: 'Archivo', sans-serif; --font-body: 'Archivo', sans-serif;
+}
+
+body {
+background: var(--bone);
+color: var(--ink);
+font-family: var(--font-body);
+margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+font-family: var(--font-heading);
+font-weight: 800;
+margin: 0;
+}
+
+.sable-container {
+max-width: 1200px;
+margin: 0 auto;
+padding: 0 2rem;
+}
+
+.sable-header {
+background: var(--ink);
+padding: 3rem 0;
+margin-bottom: 2rem;
+}
+
+.sable-header h1 {
+color: var(--bone);
+font-size: 2rem;
+margin-bottom: 0.5rem;
+}
+
+.sable-header p {
+color: var(--mid);
+font-size: 1rem;
+}
+
+.sable-filters {
+display: flex;
+gap: 0;
+margin-bottom: 2.5rem;
+border: 1px solid var(--line);
+overflow: hidden;
+}
+
+.sable-filter-btn {
+flex: 1;
+padding: 1rem 1.5rem;
+background: var(--bone);
+border: none;
+border-right: 1px solid var(--line);
+color: var(--ink);
+font-family: var(--font-body);
+font-size: 0.9rem;
+font-weight: 600;
+cursor: pointer;
+text-decoration: none;
+text-align: center;
+transition: all 0.2s ease;
+}
+
+.sable-filter-btn:last-child {
+border-right: none;
+}
+
+.sable-filter-btn:hover {
+background: var(--bg-surface);
+}
+
+.sable-filter-btn.active {
+background: var(--ink);
+color: var(--bone);
+}
+
+.sable-shop-card {
+background: var(--bone);
+border: 1px solid var(--line);
+border-radius: 0;
+padding: 2rem;
+margin-bottom: 1.5rem;
+}
+
+.sable-shop-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 1.5rem;
+padding-bottom: 1.5rem;
+border-bottom: 1px solid var(--line);
+}
+
+.sable-shop-name {
+font-size: 1.5rem;
+font-family: var(--font-heading);
+font-weight: 800;
+}
+
+.sable-badge {
+padding: 0.5rem 1rem;
+font-size: 0.8rem;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+}
+
+.sable-badge-approved {
+background: var(--ink);
+color: var(--bone);
+}
+
+.sable-badge-pending {
+background: var(--mid);
+color: var(--bone);
+}
+
+.sable-shop-details {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 1.5rem;
+margin-bottom: 1.5rem;
+}
+
+.sable-detail-item {
+padding: 1rem;
+background: var(--bg-surface);
+border: 1px solid var(--line);
+}
+
+.sable-detail-label {
+font-size: 0.75rem;
+color: var(--mid);
+text-transform: uppercase;
+letter-spacing: 0.1em;
+margin-bottom: 0.5rem;
+}
+
+.sable-detail-value {
+font-weight: 600;
+font-size: 0.95rem;
+}
+
+.sable-price-section {
+padding: 1.5rem;
+background: var(--bg-surface);
+border: 1px solid var(--line);
+margin-bottom: 1.5rem;
+}
+
+.sable-price-title {
+font-size: 0.9rem;
+font-weight: 700;
+color: var(--ink);
+margin-bottom: 1rem;
+}
+
+.sable-price-grid {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 1rem;
+}
+
+.sable-price-item {
+font-size: 0.9rem;
+padding: 0.75rem;
+background: var(--bone);
+border: 1px solid var(--line);
+}
+
+.sable-actions {
+display: flex;
+gap: 1rem;
+padding-top: 1.5rem;
+border-top: 1px solid var(--line);
+}
+
+.sable-btn {
+padding: 1rem 2rem;
+font-family: var(--font-body);
+font-size: 0.9rem;
+font-weight: 600;
+border: 1px solid var(--ink);
+border-radius: 0;
+cursor: pointer;
+text-decoration: none;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+gap: 0.5rem;
+transition: all 0.2s ease;
+flex: 1;
+}
+
+.sable-btn:hover {
+transform: translateY(-1px);
+}
+
+.sable-btn-primary {
+background: var(--ink);
+color: var(--bone);
+}
+
+.sable-btn-primary:hover {
+background: #202020;
+}
+
+.sable-btn-secondary {
+background: var(--bone);
+color: var(--ink);
+}
+
+.sable-btn-secondary:hover {
+background: var(--bg-surface);
+}
+
+.sable-btn-danger {
+background: var(--bone);
+color: var(--error);
+border-color: var(--error);
+}
+
+.sable-btn-danger:hover {
+background: var(--error);
+color: var(--bone);
+}
+
+.sable-empty-state {
+text-align: center;
+padding: 6rem 2rem;
+background: var(--bone);
+border: 1px solid var(--line);
+}
+
+.sable-empty-icon {
+font-size: 4rem;
+margin-bottom: 1.5rem;
+}
+
+.sable-empty-title {
+font-size: 1.5rem;
+margin-bottom: 1rem;
+}
+
+.sable-empty-text {
+color: var(--mid);
+font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+.sable-filters {
+flex-direction: column;
+}
+
+.sable-filter-btn {
+border-right: none;
+border-bottom: 1px solid var(--line);
+}
+
+.sable-filter-btn:last-child {
+border-bottom: none;
+}
+
+.sable-shop-details {
+grid-template-columns: 1fr;
+}
+
+.sable-price-grid {
+grid-template-columns: 1fr;
+}
+
+.sable-actions {
+flex-direction: column;
+}
+}
+</style>
+
+<section class="sable-header">
+<div class="sable-container">
+<h1>Shop Management</h1>
+<p>Approve, reject, or suspend shops</p>
+</div>
 </section>
 
-<section class="container" style="padding: 3rem 0;">
-    
-    <!-- Filter Tabs -->
-    <div style="display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap;">
-        <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto; padding: 0.5rem 1rem;">
-            ⏳ Pending ({{ shops|length }})
-        </a>
-        <a href="?status=approved" class="btn {% if status_filter == 'approved' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto; padding: 0.5rem 1rem;">
-            ✅ Approved
-        </a>
-        <a href="?status=all" class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto; padding: 0.5rem 1rem;">
-            📋 All Shops
-        </a>
-    </div>
-    
-    <!-- Shop List -->
-    {% if shops %}
-        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            {% for shop in shops %}
-            <div class="card card-elevated">
-                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                    
-                    <!-- Shop Info -->
-                    <div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
-                            <h3 style="margin: 0; font-size: 1.25rem;">{{ shop.name }}</h3>
-                            {% if shop.is_approved %}
-                                <span class="badge badge-success">✅ Approved</span>
-                            {% else %}
-                                <span class="badge badge-warning">⏳ Pending</span>
-                            {% endif %}
-                        </div>
-                        
-                        <div style="display: grid; grid-template-columns: 1fr; md-grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-                            <div>
-                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Location</p>
-                                <p style="font-weight: 600; font-size: 0.875rem;">📍 {{ shop.location }}</p>
-                            </div>
-                            <div>
-                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Phone</p>
-                                <p style="font-weight: 600; font-size: 0.875rem;">📞 {{ shop.phone }}</p>
-                            </div>
-                            <div>
-                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">Owner</p>
-                                <p style="font-weight: 600; font-size: 0.875rem;">👤 {{ shop.owner.username }}</p>
-                            </div>
-                            <div>
-                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem;">QR Code</p>
-                                <p style="font-weight: 600; font-family: monospace; font-size: 0.875rem;">{{ shop.qr_code }}</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Price List -->
-                        <div style="padding: 1.25rem; background: var(--bg-light); border-radius: var(--radius-md);">
-                            <p style="font-weight: 700; margin-bottom: 0.75rem; font-size: 0.9rem; color: var(--primary);">💰 Price List</p>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.85rem;">
-                                <div>A4 B/W: <strong>₹{{ shop.a4_bw_price }}</strong></div>
-                                <div>A4 Color: <strong>₹{{ shop.a4_color_price }}</strong></div>
-                                <div>A3 B/W: <strong>₹{{ shop.a3_bw_price }}</strong></div>
-                                <div>A3 Color: <strong>₹{{ shop.a3_color_price }}</strong></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Actions -->
-                    <div style="display: flex; flex-direction: column; gap: 0.75rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
-                        {% if not shop.is_approved %}
-                            <div style="display: flex; gap: 1rem;">
-                                <form method="POST" action="{% url 'admin_portal:approve_shop' shop.id %}" style="margin: 0; flex: 1;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; justify-content: center;">
-                                        ✅ Approve
-                                    </button>
-                                </form>
-                                <a href="{% url 'admin_portal:reject_shop' shop.id %}" class="btn btn-ghost" style="flex: 1; height: 48px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);">
-                                    ❌ Reject
-                                </a>
-                            </div>
-                        {% else %}
-                            <a href="{% url 'admin_portal:suspend_shop' shop.id %}" class="btn btn-ghost" style="width: 100%; height: 48px; display: flex; align-items: center; justify-content: center; border-color: hsl(0, 80%, 50%); color: hsl(0, 80%, 50%);">
-                                🚫 Suspend Shop
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="card text-center" style="padding: 4rem 2rem;">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
-            <h3>No shops found</h3>
-            <p class="text-muted">
-                {% if status_filter == 'pending' %}
-                    All shops have been reviewed!
-                {% else %}
-                    Try a different filter
-                {% endif %}
-            </p>
-        </div>
-    {% endif %}
-    
+<section class="sable-container" style="padding-bottom: 4rem;">
+
+<div class="sable-filters">
+<a href="?status=pending" class="sable-filter-btn {% if status_filter == 'pending' %}active{% endif %}">
+Pending ({{ shops|length }})
+</a>
+<a href="?status=approved" class="sable-filter-btn {% if status_filter == 'approved' %}active{% endif %}">
+Approved
+</a>
+<a href="?status=all" class="sable-filter-btn {% if status_filter == 'all' %}active{% endif %}">
+All Shops
+</a>
+</div>
+
+{% if shops %}
+{% for shop in shops %}
+<div class="sable-shop-card">
+<div class="sable-shop-header">
+<h2 class="sable-shop-name">{{ shop.name }}</h2>
+{% if shop.is_approved %}
+<span class="sable-badge sable-badge-approved">Approved</span>
+{% else %}
+<span class="sable-badge sable-badge-pending">Pending</span>
+{% endif %}
+</div>
+
+<div class="sable-shop-details">
+<div class="sable-detail-item">
+<div class="sable-detail-label">Location</div>
+<div class="sable-detail-value">{{ shop.location }}</div>
+</div>
+<div class="sable-detail-item">
+<div class="sable-detail-label">Phone</div>
+<div class="sable-detail-value">{{ shop.phone }}</div>
+</div>
+<div class="sable-detail-item">
+<div class="sable-detail-label">Owner</div>
+<div class="sable-detail-value">{{ shop.owner.username }}</div>
+</div>
+<div class="sable-detail-item">
+<div class="sable-detail-label">QR Code</div>
+<div class="sable-detail-value" style="font-family: monospace;">{{ shop.qr_code }}</div>
+</div>
+</div>
+
+<div class="sable-price-section">
+<div class="sable-price-title">Price List</div>
+<div class="sable-price-grid">
+<div class="sable-price-item">A4 B/W: ₹{{ shop.a4_bw_price }}</div>
+<div class="sable-price-item">A4 Color: ₹{{ shop.a4_color_price }}</div>
+<div class="sable-price-item">A3 B/W: ₹{{ shop.a3_bw_price }}</div>
+<div class="sable-price-item">A3 Color: ₹{{ shop.a3_color_price }}</div>
+</div>
+</div>
+
+<div class="sable-actions">
+{% if not shop.is_approved %}
+<form method="POST" action="{% url 'admin_portal:approve_shop' shop.id %}" style="flex: 1;">
+{% csrf_token %}
+<button type="submit" class="sable-btn sable-btn-primary">
+Approve
+</button>
+</form>
+<a href="{% url 'admin_portal:reject_shop' shop.id %}" class="sable-btn sable-btn-secondary">
+Reject
+</a>
+{% else %}
+<a href="{% url 'admin_portal:suspend_shop' shop.id %}" class="sable-btn sable-btn-danger">
+Suspend Shop
+</a>
+{% endif %}
+</div>
+</div>
+{% endfor %}
+
+{% else %}
+<div class="sable-empty-state">
+<div class="sable-empty-icon">📭</div>
+<h3 class="sable-empty-title">No shops found</h3>
+<p class="sable-empty-text">
+{% if status_filter == 'pending' %}
+All shops have been reviewed!
+{% else %}
+Try a different filter
+{% endif %}
+</p>
+</div>
+{% endif %}
+
 </section>
 {% endblock %}

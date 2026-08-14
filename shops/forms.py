@@ -23,8 +23,8 @@ class ShopImageForm(forms.ModelForm):
             try:
                 img = Image.open(image)
                 width, height = img.size
-                if width < 1280 or height < 720:
-                     raise ValidationError(f"Image resolution too low ({width}x{height}). Minimum 1280x720 required.")
+                if width < 720 or height < 720:
+                     raise ValidationError(f"Image resolution too low ({width}x{height}). Minimum 720x720 required.")
             except ImportError:
                 # If PIL not installed (though Django ImageField usually requires it), skip check
                 pass

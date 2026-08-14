@@ -3,20 +3,405 @@
 {% block title %}Manage Shops - Admin Portal{% endblock %}
 
 {% block content %}
-<div class="container mt-4 mb-4">
-    <div style="display: flex; flex-direction: column; md-flex-direction: row; align-items: flex-start; md-align-items: center; justify-content: space-between; margin-bottom: 2rem; gap: 1rem;">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
-            <h1 class="mb-0" style="font-size: 1.5rem;">Manage Shops</h1>
+<style>
+:root {
+    --bone: #EFEDE8;
+    --ink: #101010;
+    --mid: #8A8781;
+    --bg-surface: #F4F3EF;
+    --line: #E2E0DA;
+    --error: #C43D3D;
+    --font-heading: 'Archivo', sans-serif;
+    --font-body: 'Archivo', sans-serif;
+}
+
+body {
+    background: var(--bg-surface);
+    color: var(--ink);
+    font-family: var(--font-body);
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0;
+    padding: 0;
+}
+
+p {
+    font-family: var(--font-body);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+.card {
+    border: 1px solid var(--line);
+    border-radius: 0;
+    background: var(--bone);
+    padding: 1.5rem;
+    box-shadow: none;
+    transition: all 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-1px);
+}
+
+.btn {
+    font-family: var(--font-body);
+    font-weight: 600;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    background: var(--bone);
+    color: var(--ink);
+    font-size: 0.9rem;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--ink);
+}
+
+.btn-primary {
+    background: var(--ink);
+    color: var(--bone);
+    border-color: var(--ink);
+}
+
+.btn-primary:hover {
+    background: #1a1a1a;
+    border-color: #1a1a1a;
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--mid);
+    border-color: var(--line);
+}
+
+.btn-ghost:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+}
+
+.btn-secondary {
+    background: var(--bg-surface);
+    color: var(--ink);
+    border-color: var(--line);
+}
+
+.btn-secondary:hover {
+    background: var(--bone);
+    border-color: var(--ink);
+}
+
+.badge {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0;
+    display: inline-block;
+    border: 1px solid var(--line);
+    background: var(--bg-surface);
+    color: var(--mid);
+}
+
+.badge-neutral {
+    background: var(--bg-surface);
+    color: var(--mid);
+    border-color: var(--line);
+}
+
+.badge-success {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-color: #a5d6a7;
+}
+
+.badge-error {
+    background: #ffebee;
+    color: var(--error);
+    border-color: #ef9a9a;
+}
+
+.badge-primary {
+    background: var(--ink);
+    color: var(--bone);
+    border-color: var(--ink);
+}
+
+.form-input {
+    font-family: var(--font-body);
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    background: var(--bone);
+    color: var(--ink);
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--ink);
+}
+
+.form-input::placeholder {
+    color: var(--mid);
+}
+
+.form-label {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.text-secondary {
+    color: var(--mid);
+}
+
+.text-sm {
+    font-size: 0.85rem;
+}
+
+.text-muted {
+    color: var(--mid);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-1 { margin-top: 0.25rem; }
+.mt-4 { margin-top: 1rem; }
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 0.25rem; }
+.mb-3 { margin-bottom: 1rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+.p-3 { padding: 1rem; }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    max-width: 400px;
+    width: 90%;
+    margin: 2rem;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    background: var(--bone);
+    box-shadow: none;
+}
+
+.modal-header {
+    background: var(--ink);
+    color: var(--bone);
+    padding: 1rem 1.5rem;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.shop-status {
+    border-left: 4px solid var(--line);
+    padding-left: 1rem;
+}
+
+.shop-status.suspended {
+    border-left-color: var(--error);
+}
+
+.shop-status.pending {
+    border-left-color: #ff9800;
+}
+
+.shop-status.approved {
+    border-left-color: #2e7d32;
+}
+
+.reason-box {
+    background: #ffebee;
+    border: 1px solid #ef9a9a;
+    border-radius: 0;
+    padding: 0.75rem;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    color: var(--error);
+}
+
+.suspension-box {
+    background: #fff3e0;
+    border: 1px solid #ffcc80;
+    border-radius: 0;
+    padding: 0.75rem;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    color: #e65100;
+}
+
+.back-btn {
+    width: auto;
+    min-width: auto;
+}
+
+.action-btn {
+    flex: 1;
+    min-width: 100px;
+    height: 44px;
+}
+
+.action-btn-full {
+    width: 100%;
+    height: 44px;
+}
+
+.footer-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .search-form {
+        flex-direction: row;
+    }
+}
+
+.search-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.header-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .header-actions {
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.shop-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.shop-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.shop-details {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.shop-owner {
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+}
+
+.shop-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem 0;
+}
+</style>
+
+<div class="container">
+    <div class="header-actions">
+        <div class="header-left">
+            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost back-btn">←</a>
+            <h1 style="font-size: 1.5rem;">Manage Shops</h1>
         </div>
         <div class="badge badge-neutral">Total: {{ shops.count }}</div>
     </div>
 
     <!-- Search -->
     <div class="card p-3 mb-4">
-        <form method="GET" style="display: flex; flex-direction: column; md-flex-direction: row; gap: 1rem;">
+        <form method="GET" class="search-form">
             <input type="text" name="search" class="form-input" placeholder="Search by name or owner email..." value="{{ search_query }}">
-            <div style="display: flex; gap: 0.5rem;">
+            <div class="search-actions">
                 <button type="submit" class="btn btn-primary" style="flex: 2;">Search</button>
                 {% if search_query %}
                     <a href="{% url 'admin_portal:manage_shops' %}" class="btn btn-ghost" style="flex: 1; min-width: auto;">Clear</a>
@@ -28,20 +413,20 @@
     <!-- Shops List -->
     <div class="grid">
         {% for shop in shops %}
-        <div class="card" style="border-left: 4px solid {% if shop.is_suspended %}var(--error){% elif shop.is_verified %}var(--success){% else %}var(--warning){% endif %};">
-            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <div class="card shop-status {% if shop.is_suspended %}suspended{% elif shop.is_verified %}approved{% else %}pending{% endif %}">
+            <div class="shop-info">
                 <div>
-                    <h3 class="mb-1" style="display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                    <h3 class="shop-header mb-1">
                         {{ shop.name }}
                         {% if shop.is_suspended %}<span class="badge badge-error">SUSPENDED</span>
-                        {% elif not shop.is_verified %}<span class="badge" style="background: hsl(40, 100%, 95%); color: hsl(40, 100%, 40%);">PENDING APPROVAL</span>
+                        {% elif not shop.is_verified %}<span class="badge badge-neutral">PENDING APPROVAL</span>
                         {% else %}<span class="badge badge-success">APPROVED</span>{% endif %}
                     </h3>
                     <p class="text-secondary text-sm mb-1">
                         📍 {{ shop.location }}<br>
                         📞 {{ shop.phone }}
                     </p>
-                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                    <div class="shop-details">
                         <span class="badge badge-neutral">Earnings: ₹{{ shop.earnings_total }}</span>
                         <span class="badge badge-neutral">Orders: {{ shop.total_orders }}</span>
                         <span class="badge badge-primary" style="font-weight: 600;">Commission: {{ shop.commission_rate }}%</span>
@@ -51,23 +436,23 @@
                     </div>
                 </div>
                 
-                <div style="padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                <div class="shop-owner">
                     <p class="text-sm text-secondary mb-3">Owner: {{ shop.owner.email }}</p>
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <div class="shop-actions">
                         {% if not shop.is_verified %}
                             {# Pending Approval — Show Approve/Reject #}
                             <form method="POST" action="{% url 'admin_portal:approve_shop' shop.id %}" style="flex: 1; min-width: 100px;">
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="approve">
-                                <button type="submit" class="btn btn-primary" style="width: 100%; height: 44px;">✅ Approve</button>
+                                <button type="submit" class="btn btn-primary action-btn-full">✅ Approve</button>
                             </form>
-                            <button onclick="openRejectModal('{{ shop.id }}', '{{ shop.name }}')" class="btn btn-ghost" style="flex: 1; min-width: 100px; height: 44px; color: var(--error); border: 1px solid var(--error);">❌ Reject</button>
+                            <button onclick="openRejectModal('{{ shop.id }}', '{{ shop.name }}')" class="btn btn-ghost action-btn" style="color: var(--error); border-color: var(--error);">❌ Reject</button>
                         {% elif shop.is_suspended %}
                             {# Suspended — Show Activate #}
                             <form method="POST" action="{% url 'admin_portal:toggle_shop_status' shop.id %}" style="flex: 1; min-width: 100px;">
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="activate">
-                                <button type="submit" class="btn btn-ghost" style="color: var(--success); width: 100%; height: 44px;">Activate</button>
+                                <button type="submit" class="btn btn-ghost action-btn" style="color: #2e7d32;">Activate</button>
                             </form>
                         {% else %}
                             {# Approved & Active — Show Hide/Suspend #}
@@ -75,33 +460,33 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="suspend">
                                 <input type="hidden" name="reason" value="Hidden by admin">
-                                <button type="submit" class="btn btn-ghost" style="color: hsl(40, 100%, 50%); width: 100%; height: 44px;">👁️‍🗨️ Hide from Find Shops</button>
+                                <button type="submit" class="btn btn-ghost action-btn" style="color: #e65100;">👁️‍🗨️ Hide from Find Shops</button>
                             </form>
                         {% endif %}
                         
-                        <a href="{% url 'shops:detail' shop.id %}" class="btn btn-secondary" style="flex: 1; min-width: 100px; height: 44px; display: flex; align-items: center; justify-content: center;" target="_blank">View</a>
+                        <a href="{% url 'shops:detail' shop.id %}" class="btn btn-secondary action-btn" style="display: flex; align-items: center; justify-content: center;" target="_blank">View</a>
                         
-                        <a href="{% url 'admin_portal:edit_shop_location' shop.id %}" class="btn btn-secondary" style="flex: 1; min-width: 100px; height: 44px; display: flex; align-items: center; justify-content: center;">📍 Location</a>
+                        <a href="{% url 'admin_portal:edit_shop_location' shop.id %}" class="btn btn-secondary action-btn" style="display: flex; align-items: center; justify-content: center;">📍 Location</a>
                         
-                        <button onclick="openCommissionModal('{{ shop.id }}', '{{ shop.name }}', '{{ shop.commission_rate }}')" class="btn btn-ghost" style="flex: 1; min-width: 100px; height: 44px; color: var(--primary);">Commission</button>
+                        <button onclick="openCommissionModal('{{ shop.id }}', '{{ shop.name }}', '{{ shop.commission_rate }}')" class="btn btn-ghost action-btn" style="color: var(--ink);">Commission</button>
                     </div>
                 </div>
             </div>
             
             {% if shop.rejection_reason %}
-            <div style="background: hsl(0, 80%, 95%); border: 1px solid hsl(0, 80%, 85%); border-radius: var(--radius-md); padding: 0.75rem; margin-top: 0.75rem; font-size: 0.875rem; color: hsl(0, 80%, 40%);">
+            <div class="reason-box">
                 <strong>Rejection Reason:</strong> {{ shop.rejection_reason }}
             </div>
             {% endif %}
             
             {% if shop.suspension_reason %}
-            <div style="background: hsl(0, 80%, 95%); border: 1px solid hsl(0, 80%, 85%); border-radius: var(--radius-md); padding: 0.75rem; margin-top: 0.75rem; font-size: 0.875rem; color: hsl(0, 80%, 40%);">
+            <div class="suspension-box">
                 <strong>Suspension Reason:</strong> {{ shop.suspension_reason }}
             </div>
             {% endif %}
         </div>
         {% empty %}
-        <div class="text-center py-4">
+        <div class="empty-state">
             <p class="text-muted">No shops found matching your search.</p>
         </div>
         {% endfor %}
@@ -109,50 +494,54 @@
 </div>
 
 <!-- Reject Modal -->
-<div id="rejectModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-    <div class="card" style="max-width: 400px; width: 90%; margin: 2rem;">
-        <h3 class="mb-3">❌ Reject Shop</h3>
-        <p class="text-secondary text-sm mb-3">Shop: <strong id="rejectShopName"></strong></p>
-        
-        <form method="POST" action="{% url 'admin_portal:manage_shops' %}" id="rejectForm">
-            {% csrf_token %}
-            <input type="hidden" name="action" value="reject">
-            <input type="hidden" name="shop_id" id="rejectShopId">
+<div id="rejectModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">❌ Reject Shop</div>
+        <div class="modal-body">
+            <p class="text-secondary text-sm mb-3">Shop: <strong id="rejectShopName"></strong></p>
             
-            <div class="form-group mb-3">
-                <label class="form-label">Rejection Reason</label>
-                <input type="text" name="reason" class="form-input" placeholder="Enter reason for rejection" required>
-            </div>
-            
-            <div style="display: flex; gap: 1rem;">
-                <button type="submit" class="btn btn-ghost" style="flex: 1; color: var(--error); border: 1px solid var(--error);">Reject Shop</button>
-                <button type="button" onclick="closeRejectModal()" class="btn btn-secondary" style="flex: 1;">Cancel</button>
-            </div>
-        </form>
+            <form method="POST" action="{% url 'admin_portal:manage_shops' %}" id="rejectForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="reject">
+                <input type="hidden" name="shop_id" id="rejectShopId">
+                
+                <div class="form-group mb-3">
+                    <label class="form-label">Rejection Reason</label>
+                    <input type="text" name="reason" class="form-input" placeholder="Enter reason for rejection" required>
+                </div>
+                
+                <div class="footer-actions">
+                    <button type="submit" class="btn btn-ghost" style="flex: 1; color: var(--error); border-color: var(--error);">Reject Shop</button>
+                    <button type="button" onclick="closeRejectModal()" class="btn btn-secondary" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
 <!-- Commission Modal -->
-<div id="commissionModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
-    <div class="card" style="max-width: 400px; width: 90%; margin: 2rem;">
-        <h3 class="mb-3">Set Commission Rate</h3>
-        <p class="text-secondary text-sm mb-3">Shop: <strong id="modalShopName"></strong></p>
-        
-        <form method="POST" action="{% url 'admin_portal:set_commission' %}">
-            {% csrf_token %}
-            <input type="hidden" name="shop_id" id="modalShopId">
+<div id="commissionModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">Set Commission Rate</div>
+        <div class="modal-body">
+            <p class="text-secondary text-sm mb-3">Shop: <strong id="modalShopName"></strong></p>
             
-            <div class="form-group mb-3">
-                <label class="form-label">Commission Rate (%)</label>
-                <input type="number" name="commission_rate" id="modalCommissionRate" class="form-input" min="0" max="100" step="0.01" required>
-                <p class="text-sm text-muted mt-1">Platform's share of each order (e.g., 15 for 15%)</p>
-            </div>
-            
-            <div style="display: flex; gap: 1rem;">
-                <button type="submit" class="btn btn-primary" style="flex: 1;">Save</button>
-                <button type="button" onclick="closeCommissionModal()" class="btn btn-ghost" style="flex: 1;">Cancel</button>
-            </div>
-        </form>
+            <form method="POST" action="{% url 'admin_portal:set_commission' %}">
+                {% csrf_token %}
+                <input type="hidden" name="shop_id" id="modalShopId">
+                
+                <div class="form-group mb-3">
+                    <label class="form-label">Commission Rate (%)</label>
+                    <input type="number" name="commission_rate" id="modalCommissionRate" class="form-input" min="0" max="100" step="0.01" required>
+                    <p class="text-sm text-muted mt-1">Platform's share of each order (e.g., 15 for 15%)</p>
+                </div>
+                
+                <div class="footer-actions">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Save</button>
+                    <button type="button" onclick="closeCommissionModal()" class="btn btn-ghost" style="flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -179,7 +568,6 @@ function closeRejectModal() {
     document.getElementById('rejectModal').style.display = 'none';
 }
 
-// Close modals on outside click
 document.getElementById('commissionModal').addEventListener('click', function(e) {
     if (e.target === this) closeCommissionModal();
 });

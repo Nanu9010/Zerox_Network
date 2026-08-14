@@ -3,82 +3,80 @@
 {% block title %}Refunds - Admin{% endblock %}
 
 {% block content %}
-<section style="background: var(--secondary); padding: 2rem 0;">
+<section style="background: var(--bg-surface); padding: 2rem 0; border-bottom: 1px solid var(--line);">
     <div class="container">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
             <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
-            <h1 style="font-size: 2rem; margin: 0;">💰 Refund Processing</h1>
+            <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 2rem; margin: 0; color: var(--ink);">Refund Processing</h1>
         </div>
-        <p style="color: var(--text-secondary);">Process refunds and track completions</p>
+        <p style="color: var(--mid); font-family: var(--font-body);">Process refunds and track completions</p>
     </div>
 </section>
 
 <section class="container" style="padding: 3rem 0;">
     
-    <!-- Filter Tabs -->
     <div style="display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap;">
-        <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto;">
-            ⏳ Pending
+        <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto; border-radius: 0; border: 1px solid var(--line); background: {% if status_filter == 'pending' %}var(--ink){% else %}var(--bone){% endif %}; color: {% if status_filter == 'pending' %}var(--bone){% else %}var(--ink){% endif %}; font-family: var(--font-body); font-size: 0.875rem; padding: 0.5rem 1rem; transition: transform 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
+            Pending
         </a>
-        <a href="?status=completed" class="btn {% if status_filter == 'completed' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto;">
-            ✅ Completed
+        <a href="?status=completed" class="btn {% if status_filter == 'completed' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto; border-radius: 0; border: 1px solid var(--line); background: {% if status_filter == 'completed' %}var(--ink){% else %}var(--bone){% endif %}; color: {% if status_filter == 'completed' %}var(--bone){% else %}var(--ink){% endif %}; font-family: var(--font-body); font-size: 0.875rem; padding: 0.5rem 1rem; transition: transform 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
+            Completed
         </a>
-        <a href="?status=all" class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto;">
-            📋 All
+        <a href="?status=all" class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto; border-radius: 0; border: 1px solid var(--line); background: {% if status_filter == 'all' %}var(--ink){% else %}var(--bone){% endif %}; color: {% if status_filter == 'all' %}var(--bone){% else %}var(--ink){% endif %}; font-family: var(--font-body); font-size: 0.875rem; padding: 0.5rem 1rem; transition: transform 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
+            All
         </a>
     </div>
     
-    <!-- Refunds Table -->
-    <div class="card p-0" style="overflow: hidden;">
+    <div class="card" style="border: 1px solid var(--line); border-radius: 0; background: var(--bone); overflow: hidden;">
         <div class="table-responsive" style="margin-bottom: 0;">
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
-                    <tr style="border-bottom: 2px solid var(--border-color); background: var(--bg-subtle);">
-                        <th style="padding: 1rem; text-align: left;">Order</th>
-                        <th style="padding: 1rem; text-align: left;">Amount</th>
-                        <th style="padding: 1rem; text-align: left;">Reason</th>
-                        <th style="padding: 1rem; text-align: left;">Status</th>
-                        <th style="padding: 1rem; text-align: right;">Action</th>
+                    <tr style="border-bottom: 2px solid var(--line); background: var(--bg-surface);">
+                        <th style="padding: 1rem; text-align: left; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Order</th>
+                        <th style="padding: 1rem; text-align: left; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Amount</th>
+                        <th style="padding: 1rem; text-align: left; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Reason</th>
+                        <th style="padding: 1rem; text-align: left; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Status</th>
+                        <th style="padding: 1rem; text-align: right; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for refund in refunds %}
-                    <tr style="border-bottom: 1px solid var(--border-color);">
-                        <td style="padding: 1rem;">
-                            <strong>#{{ refund.order.id }}</strong>
-                            <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">{{ refund.order.shop.name }}</p>
+                    <tr style="border-bottom: 1px solid var(--line);">
+                        <td style="padding: 1rem; font-family: var(--font-body);">
+                            <strong style="color: var(--ink);">#{{ refund.order.id }}</strong>
+                            <p style="font-size: 0.75rem; color: var(--mid); margin: 0;">{{ refund.order.shop.name }}</p>
+                        </td>
+                        <td style="padding: 1rem; font-family: var(--font-body);">
+                            <span style="font-size: 1.15rem; font-weight: 800; color: var(--ink);">₹{{ refund.amount }}</span>
                         </td>
                         <td style="padding: 1rem;">
-                            <span style="font-size: 1.15rem; font-weight: 800; color: var(--primary);">₹{{ refund.amount }}</span>
-                        </td>
-                        <td style="padding: 1rem;">
-                            <span class="badge" style="font-size: 0.75rem;">{{ refund.get_reason_display }}</span>
+                            <span class="badge" style="font-size: 0.75rem; border-radius: 0; border: 1px solid var(--line); background: var(--bg-surface); color: var(--ink); font-family: var(--font-body); padding: 0.25rem 0.5rem;">{{ refund.get_reason_display }}</span>
                         </td>
                         <td style="padding: 1rem;">
                             {% if refund.status == 'PENDING' %}
-                                <span class="badge badge-warning">⏳ Pending</span>
+                                <span class="badge badge-warning" style="border-radius: 0; border: 1px solid var(--mid); background: var(--mid); color: var(--bone); font-family: var(--font-body); font-size: 0.75rem; padding: 0.25rem 0.5rem;">Pending</span>
                             {% elif refund.status == 'COMPLETED' %}
-                                <span class="badge badge-success">✅ Done</span>
+                                <span class="badge badge-success" style="border-radius: 0; border: 1px solid var(--ink); background: var(--ink); color: var(--bone); font-family: var(--font-body); font-size: 0.75rem; padding: 0.25rem 0.5rem;">Done</span>
                             {% else %}
-                                <span class="badge">{{ refund.status }}</span>
+                                <span class="badge" style="border-radius: 0; border: 1px solid var(--line); background: var(--bg-surface); color: var(--ink); font-family: var(--font-body); font-size: 0.75rem; padding: 0.25rem 0.5rem;">{{ refund.status }}</span>
                             {% endif %}
                         </td>
                         <td style="padding: 1rem; text-align: right;">
                             {% if refund.status == 'PENDING' %}
                                 <form method="POST" action="{% url 'admin_portal:process_refund' refund.id %}" style="display: inline;">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-primary" style="padding: 0.5rem 0.75rem; font-size: 0.75rem; width: auto; min-width: auto; min-height: auto;">
+                                    <button type="submit" class="btn btn-primary" style="padding: 0.5rem 0.75rem; font-size: 0.75rem; width: auto; min-width: auto; min-height: auto; border-radius: 0; background: var(--ink); color: var(--bone); border: none; font-family: var(--font-body); cursor: pointer; transition: transform 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
                                         Process
                                     </button>
                                 </form>
                             {% else %}
-                                <span style="font-size: 0.75rem; color: var(--text-muted);">✓</span>
+                                <span style="font-size: 0.75rem; color: var(--mid); font-family: var(--font-body);">Done</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                        <td colspan="5" style="padding: 3rem; text-align: center; color: var(--mid); font-family: var(--font-body);">
                             No refunds found
                         </td>
                     </tr>

@@ -3,33 +3,32 @@
 {% block title %}Bank Details - {{ shop.name }}{% endblock %}
 
 {% block content %}
-<section style="background: var(--secondary); padding: 2rem 0;">
+<section style="background: var(--bone); padding: 2rem 0; border-bottom: 1px solid var(--line);">
     <div class="container">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-            <a href="{% url 'shops:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
-            <h1 style="font-size: 2rem; margin: 0;">Bank Details</h1>
+            <a href="{% url 'shops:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto; border-radius: 0; font-family: var(--font-heading);">←</a>
+            <h1 style="font-size: 2rem; margin: 0; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Bank Details</h1>
         </div>
-        <p style="color: var(--text-secondary);">Add your bank account for daily payouts</p>
+        <p style="color: var(--mid); font-family: var(--font-body);">Add your bank account for daily payouts</p>
     </div>
 </section>
 
 <section class="container" style="padding: 3rem 0;">
     <div style="max-width: 700px; margin: 0 auto;">
-        <!-- Status Card -->
-        <div class="card card-elevated" style="margin-bottom: 2rem;">
-            <div style="display: flex; align-items: center; gap: 1rem; padding: 1.25rem; background: {% if bank_details.is_verified %}hsl(145, 60%, 95%){% else %}hsl(45, 100%, 95%){% endif %}; border-radius: var(--radius-md);">
-                <div style="width: 48px; height: 48px; background: {% if bank_details.is_verified %}var(--success){% else %}var(--warning){% endif %}; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+        <div style="border: 1px solid var(--line); padding: 1.25rem; margin-bottom: 2rem; border-radius: 0; background: var(--bg-surface);">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 48px; height: 48px; background: {% if bank_details.is_verified %}var(--ink){% else %}var(--mid){% endif %}; border-radius: 0; display: flex; align-items: center; justify-content: center; color: var(--bone); font-size: 1.5rem;">
                     {% if bank_details.is_verified %}✓{% else %}⏳{% endif %}
                 </div>
                 <div>
-                    <h3 style="margin: 0; font-size: 1.125rem;">
+                    <h3 style="margin: 0; font-size: 1.125rem; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">
                         {% if bank_details.is_verified %}
                             Bank Account Verified
                         {% else %}
                             Verification Pending
                         {% endif %}
                     </h3>
-                    <p style="color: var(--text-secondary); margin: 0; font-size: 0.875rem;">
+                    <p style="color: var(--mid); margin: 0; font-size: 0.875rem; font-family: var(--font-body);">
                         {% if bank_details.is_verified %}
                             Your bank details are verified. You will receive daily payouts.
                         {% else %}
@@ -40,86 +39,89 @@
             </div>
         </div>
 
-        <!-- Bank Details Form -->
-        <div class="card card-elevated">
-            <h2 style="margin-bottom: 1.5rem;">Bank Account Information</h2>
-            
+        <div style="border: 1px solid var(--line); padding: 1.5rem; border-radius: 0; background: var(--bg-surface);">
+            <h2 style="margin-bottom: 1.5rem; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Bank Account Information</h2>
+
             <form method="POST">
                 {% csrf_token %}
-                
+
                 <div class="form-group">
-                    <label class="form-label">Account Holder Name *</label>
-                    <input type="text" name="account_holder_name" class="form-input" 
+                    <label class="form-label" style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block;">Account Holder Name *</label>
+                    <input type="text" name="account_holder_name" class="form-input"
                            value="{{ form_data.account_holder_name|default:bank_details.account_holder_name }}"
-                           placeholder="Enter name as per bank records" required>
+                           placeholder="Enter name as per bank records" required
+                           style="border-radius: 0; border: 1px solid var(--line); background: var(--bone); color: var(--ink); font-family: var(--font-body); padding: 0.75rem 1rem; width: 100%; box-sizing: border-box;">
                 </div>
-                
+
                 <div class="form-group">
-                    <label class="form-label">Bank Account Number *</label>
-                    <input type="text" name="bank_account_number" class="form-input" 
+                    <label class="form-label" style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block;">Bank Account Number *</label>
+                    <input type="text" name="bank_account_number" class="form-input"
                            value="{{ form_data.bank_account_number|default:bank_details.bank_account_number }}"
                            placeholder="Enter your bank account number" required
-                           pattern="[0-9]{9,18}" title="9-18 digits">
+                           pattern="[0-9]{9,18}" title="9-18 digits"
+                           style="border-radius: 0; border: 1px solid var(--line); background: var(--bone); color: var(--ink); font-family: var(--font-body); padding: 0.75rem 1rem; width: 100%; box-sizing: border-box;">
                 </div>
-                
+
                 <div class="form-group">
-                    <label class="form-label">Confirm Account Number *</label>
-                    <input type="text" name="confirm_account" class="form-input" 
+                    <label class="form-label" style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block;">Confirm Account Number *</label>
+                    <input type="text" name="confirm_account" class="form-input"
                            value="{{ form_data.confirm_account|default:bank_details.bank_account_number }}"
-                           placeholder="Re-enter account number" required>
+                           placeholder="Re-enter account number" required
+                           style="border-radius: 0; border: 1px solid var(--line); background: var(--bone); color: var(--ink); font-family: var(--font-body); padding: 0.75rem 1rem; width: 100%; box-sizing: border-box;">
                 </div>
-                
+
                 <div class="grid grid-2">
                     <div class="form-group">
-                        <label class="form-label">IFSC Code *</label>
-                        <input type="text" name="ifsc_code" class="form-input" 
+                        <label class="form-label" style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block;">IFSC Code *</label>
+                        <input type="text" name="ifsc_code" class="form-input"
                                value="{{ form_data.ifsc_code|default:bank_details.ifsc_code }}"
                                placeholder="e.g., HDFC0001234" required
                                pattern="[A-Z]{4}0[A-Z0-9]{6}" title="e.g., HDFC0001234"
-                               style="text-transform: uppercase;">
+                               style="text-transform: uppercase; border-radius: 0; border: 1px solid var(--line); background: var(--bone); color: var(--ink); font-family: var(--font-body); padding: 0.75rem 1rem; width: 100%; box-sizing: border-box;">
                     </div>
-                    
+
                     <div class="form-group">
-                        <label class="form-label">Bank Name</label>
-                        <input type="text" name="bank_name" class="form-input" 
+                        <label class="form-label" style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block;">Bank Name</label>
+                        <input type="text" name="bank_name" class="form-input"
                                value="{{ form_data.bank_name|default:bank_details.bank_name }}"
-                               placeholder="e.g., HDFC Bank">
+                               placeholder="e.g., HDFC Bank"
+                               style="border-radius: 0; border: 1px solid var(--line); background: var(--bone); color: var(--ink); font-family: var(--font-body); padding: 0.75rem 1rem; width: 100%; box-sizing: border-box;">
                     </div>
                 </div>
-                
+
                 <div class="form-group">
-                    <label class="form-label">UPI ID (Optional)</label>
-                    <input type="text" name="upi_id" class="form-input" 
+                    <label class="form-label" style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; display: block;">UPI ID (Optional)</label>
+                    <input type="text" name="upi_id" class="form-input"
                            value="{{ form_data.upi_id|default:bank_details.upi_id }}"
-                           placeholder="e.g., yourname@upi">
-                    <small style="color: var(--text-muted);">Alternative payout method via UPI</small>
+                           placeholder="e.g., yourname@upi"
+                           style="border-radius: 0; border: 1px solid var(--line); background: var(--bone); color: var(--ink); font-family: var(--font-body); padding: 0.75rem 1rem; width: 100%; box-sizing: border-box;">
+                    <small style="color: var(--mid); font-family: var(--font-body);">Alternative payout method via UPI</small>
                 </div>
-                
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-top: 1rem;">
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-top: 1rem; border-radius: 0; background: var(--ink); color: var(--bone); font-family: var(--font-heading); font-weight: 800; border: none; cursor: pointer; transition: transform 0.15s ease, background 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)';this.style.background='#000'" onmouseout="this.style.transform='none';this.style.background='var(--ink)'">
                     💾 Save Bank Details
                 </button>
             </form>
         </div>
 
-        <!-- Recent Payouts -->
         {% if recent_payouts %}
-        <div class="card card-elevated" style="margin-top: 2rem;">
-            <h2 style="margin-bottom: 1.5rem;">Recent Payouts</h2>
-            
+        <div style="border: 1px solid var(--line); padding: 1.5rem; margin-top: 2rem; border-radius: 0; background: var(--bg-surface);">
+            <h2 style="margin-bottom: 1.5rem; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Recent Payouts</h2>
+
             {% for payout in recent_payouts %}
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid var(--line);">
                 <div>
-                    <div style="font-weight: 600;">₹{{ payout.amount }}</div>
-                    <div style="color: var(--text-muted); font-size: 0.875rem;">{{ payout.payout_date }}</div>
+                    <div style="font-weight: 600; font-family: var(--font-body); color: var(--ink);">₹{{ payout.amount }}</div>
+                    <div style="color: var(--mid); font-size: 0.875rem; font-family: var(--font-body);">{{ payout.payout_date }}</div>
                 </div>
-                <span class="badge {% if payout.status == 'COMPLETED' %}badge-success{% elif payout.status == 'FAILED' %}badge-error{% else %}badge-neutral{% endif %}">
+                <span class="badge {% if payout.status == 'COMPLETED' %}badge-success{% elif payout.status == 'FAILED' %}badge-error{% else %}badge-neutral{% endif %}" style="border-radius: 0; font-family: var(--font-heading); font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em;">
                     {{ payout.status }}
                 </span>
             </div>
             {% endfor %}
-            
-            <div style="padding: 1rem; text-align: center;">
-                <a href="{% url 'shops:payout_history' %}" style="color: var(--primary); font-weight: 600;">
+
+            <div style="padding: 1rem 0; text-align: center;">
+                <a href="{% url 'shops:payout_history' %}" style="color: var(--ink); font-weight: 800; font-family: var(--font-heading); text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem;">
                     View All Payouts →
                 </a>
             </div>

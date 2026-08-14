@@ -3,101 +3,98 @@
 {% block title %}Payout History - Admin Portal{% endblock %}
 
 {% block content %}
-<section style="background: var(--secondary); padding: 2rem 0;">
+<section style="background: var(--bg-surface); padding: 2rem 0; border-bottom: 1px solid var(--line);">
     <div class="container">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
             <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
-            <h1 style="font-size: 2rem; margin: 0;">Payout History</h1>
+            <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 2rem; margin: 0; color: var(--ink);">Payout History</h1>
         </div>
-        <p style="color: var(--text-secondary);">Track all payouts to shop owners</p>
+        <p style="color: var(--mid); font-family: var(--font-body);">Track all payouts to shop owners</p>
     </div>
 </section>
 
 <section class="container" style="padding: 3rem 0;">
-    <!-- Summary Cards -->
     <div class="grid grid-3" style="margin-bottom: 2rem;">
-        <div class="card card-elevated" style="text-align: center;">
-            <div style="color: var(--text-muted); font-size: 0.875rem;">Total Paid</div>
-            <div style="font-size: 2rem; font-weight: 800; color: var(--success);">₹{{ total_paid }}</div>
+        <div class="card" style="text-align: center; border: 1px solid var(--line); border-radius: 0; background: var(--bone); padding: 1.5rem;">
+            <div style="color: var(--mid); font-size: 0.875rem; font-family: var(--font-body);">Total Paid</div>
+            <div style="font-family: var(--font-heading); font-weight: 800; font-size: 2rem; color: var(--ink);">₹{{ total_paid }}</div>
         </div>
-        <div class="card card-elevated" style="text-align: center;">
-            <div style="color: var(--text-muted); font-size: 0.875rem;">Pending</div>
-            <div style="font-size: 2rem; font-weight: 800; color: var(--warning);">₹{{ pending_payouts }}</div>
+        <div class="card" style="text-align: center; border: 1px solid var(--line); border-radius: 0; background: var(--bone); padding: 1.5rem;">
+            <div style="color: var(--mid); font-size: 0.875rem; font-family: var(--font-body);">Pending</div>
+            <div style="font-family: var(--font-heading); font-weight: 800; font-size: 2rem; color: var(--ink);">₹{{ pending_payouts }}</div>
         </div>
-        <div class="card card-elevated" style="text-align: center;">
-            <div style="color: var(--text-muted); font-size: 0.875rem;">Failed</div>
-            <div style="font-size: 2rem; font-weight: 800; color: var(--error);">₹{{ total_failed }}</div>
+        <div class="card" style="text-align: center; border: 1px solid var(--line); border-radius: 0; background: var(--bone); padding: 1.5rem;">
+            <div style="color: var(--mid); font-size: 0.875rem; font-family: var(--font-body);">Failed</div>
+            <div style="font-family: var(--font-heading); font-weight: 800; font-size: 2rem; color: var(--error);">₹{{ total_failed }}</div>
         </div>
     </div>
 
-    <!-- Filters -->
     <div style="display: flex; gap: 0.5rem; margin-bottom: 2rem;">
-        <a href="?status=all" class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-ghost{% endif %}">
+        <a href="?status=all" class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-ghost{% endif %}" style="border-radius: 0; border: 1px solid var(--line); background: {% if status_filter == 'all' %}var(--ink){% else %}var(--bone){% endif %}; color: {% if status_filter == 'all' %}var(--bone){% else %}var(--ink){% endif %}; font-family: var(--font-body); font-size: 0.875rem; padding: 0.5rem 1rem;">
             All
         </a>
-        <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-ghost{% endif %}">
+        <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-ghost{% endif %}" style="border-radius: 0; border: 1px solid var(--line); background: {% if status_filter == 'pending' %}var(--ink){% else %}var(--bone){% endif %}; color: {% if status_filter == 'pending' %}var(--bone){% else %}var(--ink){% endif %}; font-family: var(--font-body); font-size: 0.875rem; padding: 0.5rem 1rem;">
             Pending
         </a>
-        <a href="?status=processing" class="btn {% if status_filter == 'processing' %}btn-primary{% else %}btn-ghost{% endif %}">
+        <a href="?status=processing" class="btn {% if status_filter == 'processing' %}btn-primary{% else %}btn-ghost{% endif %}" style="border-radius: 0; border: 1px solid var(--line); background: {% if status_filter == 'processing' %}var(--ink){% else %}var(--bone){% endif %}; color: {% if status_filter == 'processing' %}var(--bone){% else %}var(--ink){% endif %}; font-family: var(--font-body); font-size: 0.875rem; padding: 0.5rem 1rem;">
             Processing
         </a>
-        <a href="?status=completed" class="btn {% if status_filter == 'completed' %}btn-primary{% else %}btn-ghost{% endif %}">
+        <a href="?status=completed" class="btn {% if status_filter == 'completed' %}btn-primary{% else %}btn-ghost{% endif %}" style="border-radius: 0; border: 1px solid var(--line); background: {% if status_filter == 'completed' %}var(--ink){% else %}var(--bone){% endif %}; color: {% if status_filter == 'completed' %}var(--bone){% else %}var(--ink){% endif %}; font-family: var(--font-body); font-size: 0.875rem; padding: 0.5rem 1rem;">
             Completed
         </a>
-        <a href="?status=failed" class="btn {% if status_filter == 'failed' %}btn-primary{% else %}btn-ghost{% endif %}">
+        <a href="?status=failed" class="btn {% if status_filter == 'failed' %}btn-primary{% else %}btn-ghost{% endif %}" style="border-radius: 0; border: 1px solid var(--line); background: {% if status_filter == 'failed' %}var(--ink){% else %}var(--bone){% endif %}; color: {% if status_filter == 'failed' %}var(--bone){% else %}var(--ink){% endif %}; font-family: var(--font-body); font-size: 0.875rem; padding: 0.5rem 1rem;">
             Failed
         </a>
     </div>
 
-    <!-- Payouts Table -->
-    <div class="card card-elevated">
+    <div class="card" style="border: 1px solid var(--line); border-radius: 0; background: var(--bone);">
         {% if payouts %}
         <div style="overflow-x: auto;">
             <table style="width: 100%; border-collapse: collapse;">
                 <thead>
-                    <tr style="border-bottom: 2px solid var(--border-color);">
-                        <th style="padding: 1rem; text-align: left;">ID</th>
-                        <th style="padding: 1rem; text-align: left;">Shop</th>
-                        <th style="padding: 1rem; text-align: right;">Amount</th>
-                        <th style="padding: 1rem; text-align: center;">Mode</th>
-                        <th style="padding: 1rem; text-align: center;">Status</th>
-                        <th style="padding: 1rem; text-align: left;">Date</th>
-                        <th style="padding: 1rem; text-align: center;">Actions</th>
+                    <tr style="border-bottom: 2px solid var(--line); background: var(--bg-surface);">
+                        <th style="padding: 1rem; text-align: left; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">ID</th>
+                        <th style="padding: 1rem; text-align: left; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Shop</th>
+                        <th style="padding: 1rem; text-align: right; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Amount</th>
+                        <th style="padding: 1rem; text-align: center; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Mode</th>
+                        <th style="padding: 1rem; text-align: center; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Status</th>
+                        <th style="padding: 1rem; text-align: left; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Date</th>
+                        <th style="padding: 1rem; text-align: center; font-family: var(--font-heading); font-weight: 800; color: var(--ink);">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for payout in payouts %}
-                    <tr style="border-bottom: 1px solid var(--border-color);">
-                        <td style="padding: 1rem;">#{{ payout.id }}</td>
-                        <td style="padding: 1rem;">
-                            <div style="font-weight: 600;">{{ payout.shop.name }}</div>
-                            <div style="color: var(--text-muted); font-size: 0.875rem;">{{ payout.shop.owner.email }}</div>
+                    <tr style="border-bottom: 1px solid var(--line);">
+                        <td style="padding: 1rem; font-family: var(--font-body); color: var(--ink);">#{{ payout.id }}</td>
+                        <td style="padding: 1rem; font-family: var(--font-body);">
+                            <div style="font-weight: 600; color: var(--ink);">{{ payout.shop.name }}</div>
+                            <div style="color: var(--mid); font-size: 0.875rem;">{{ payout.shop.owner.email }}</div>
                         </td>
-                        <td style="padding: 1rem; text-align: right; font-weight: 600;">
+                        <td style="padding: 1rem; text-align: right; font-family: var(--font-body); font-weight: 600; color: var(--ink);">
                             ₹{{ payout.amount }}
                         </td>
                         <td style="padding: 1rem; text-align: center;">
-                            <span class="badge badge-neutral">{{ payout.mode }}</span>
+                            <span class="badge badge-neutral" style="border-radius: 0; border: 1px solid var(--line); background: var(--bg-surface); color: var(--ink); font-family: var(--font-body); font-size: 0.75rem; padding: 0.25rem 0.5rem;">{{ payout.mode }}</span>
                         </td>
                         <td style="padding: 1rem; text-align: center;">
-                            <span class="badge {% if payout.status == 'COMPLETED' %}badge-success{% elif payout.status == 'FAILED' %}badge-error{% elif payout.status == 'PROCESSING' %}badge-warning{% else %}badge-neutral{% endif %}">
+                            <span class="badge {% if payout.status == 'COMPLETED' %}badge-success{% elif payout.status == 'FAILED' %}badge-error{% elif payout.status == 'PROCESSING' %}badge-warning{% else %}badge-neutral{% endif %}" style="border-radius: 0; border: 1px solid var(--line); font-family: var(--font-body); font-size: 0.75rem; padding: 0.25rem 0.5rem; background: {% if payout.status == 'COMPLETED' %}var(--ink); color: var(--bone);{% elif payout.status == 'FAILED' %}var(--error); color: var(--bone);{% elif payout.status == 'PROCESSING' %}var(--mid); color: var(--bone);{% else %}var(--bg-surface); color: var(--ink);{% endif %}">
                                 {{ payout.status }}
                             </span>
                         </td>
-                        <td style="padding: 1rem; color: var(--text-muted);">
+                        <td style="padding: 1rem; color: var(--mid); font-family: var(--font-body);">
                             {{ payout.payout_date }}
                         </td>
                         <td style="padding: 1rem; text-align: center;">
                             {% if payout.status == 'FAILED' %}
                             <form method="POST" action="{% url 'admin_portal:retry_payout' payout.id %}" style="display: inline;">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-ghost" style="padding: 0.25rem 0.75rem; font-size: 0.875rem;">
-                                    🔄 Retry
+                                <button type="submit" class="btn btn-ghost" style="padding: 0.25rem 0.75rem; font-size: 0.875rem; border-radius: 0; border: 1px solid var(--line); background: var(--bone); color: var(--ink); font-family: var(--font-body); transition: transform 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
+                                    Retry
                                 </button>
                             </form>
                             {% endif %}
                             {% if payout.razorpay_payout_id %}
-                            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;">
+                            <span style="font-size: 0.75rem; color: var(--mid); display: block; margin-top: 0.25rem; font-family: var(--font-body);">
                                 {{ payout.razorpay_payout_id }}
                             </span>
                             {% endif %}
@@ -108,7 +105,7 @@
             </table>
         </div>
         {% else %}
-        <div style="padding: 3rem; text-align: center; color: var(--text-muted);">
+        <div style="padding: 3rem; text-align: center; color: var(--mid); font-family: var(--font-body);">
             No payouts found matching the filter.
         </div>
         {% endif %}

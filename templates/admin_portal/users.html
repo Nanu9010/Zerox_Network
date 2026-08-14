@@ -3,94 +3,130 @@
 {% block title %}User Management - Admin{% endblock %}
 
 {% block content %}
-<section style="background: var(--secondary); padding: 2rem 0;">
+<style>
+:root {
+--bone: #EFEDE8; --ink: #101010; --mid: #8A8781; --bg-surface: #F4F3EF; --line: #E2E0DA; --error: #C43D3D; --font-heading: 'Archivo', sans-serif; --font-body: 'Archivo', sans-serif;
+}
+* { box-sizing: border-box; }
+body { font-family: var(--font-body); color: var(--ink); background: var(--bone); }
+.section-header { background: var(--bg-surface); padding: 2rem 0; border-bottom: 1px solid var(--line); }
+.section-header h1 { font-family: var(--font-heading); font-weight: 800; font-size: 2rem; margin: 0; color: var(--ink); }
+.section-header p { color: var(--mid); margin: 0.5rem 0 0; }
+.btn { font-family: var(--font-body); border: none; cursor: pointer; border-radius: 0; padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 600; text-decoration: none; display: inline-block; text-align: center; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn-primary { background: var(--ink); color: var(--bone); border: 1px solid var(--ink); }
+.btn-primary:hover { background: #202020; }
+.btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+.btn-ghost:hover { background: var(--bg-surface); }
+.btn-secondary { background: var(--bg-surface); color: var(--ink); border: 1px solid var(--line); }
+.btn-secondary:hover { background: var(--line); }
+.filter-bar { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.filter-bar .btn { flex: 1; min-width: unset; }
+.add-btn { width: 100%; text-align: center; }
+.card { border: 1px solid var(--line); background: var(--bone); border-radius: 0; }
+.table-responsive { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead tr { border-bottom: 2px solid var(--line); }
+th, td { padding: 1rem; text-align: left; font-family: var(--font-body); }
+th { font-family: var(--font-heading); font-weight: 800; color: var(--ink); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+tbody tr { border-bottom: 1px solid var(--line); }
+tbody tr:hover { background: var(--bg-surface); }
+.badge { display: inline-block; padding: 0.25rem 0.65rem; font-size: 0.75rem; font-weight: 600; border: 1px solid var(--line); border-radius: 0; font-family: var(--font-body); }
+.badge-error { background: var(--error); color: var(--bone); border-color: var(--error); }
+.badge-success { background: var(--ink); color: var(--bone); border-color: var(--ink); }
+.badge-blue { background: transparent; color: #2B6CB0; border-color: #2B6CB0; }
+.badge-green { background: transparent; color: #2F855A; border-color: #2F855A; }
+.badge-orange { background: transparent; color: #C05621; border-color: #C05621; }
+.badge-purple { background: transparent; color: #6B46C1; border-color: #6B46C1; }
+.badge-gray { background: transparent; color: var(--mid); border-color: var(--mid); }
+.btn-unblock { background: transparent; color: #2F855A; border: 1px solid #2F855A; }
+.btn-unblock:hover { background: #2F855A; color: var(--bone); }
+.btn-block { background: transparent; color: var(--error); border: 1px solid var(--error); }
+.btn-block:hover { background: var(--error); color: var(--bone); }
+.action-btn { padding: 0.5rem 0.75rem; font-size: 0.875rem; width: auto; min-width: auto; min-height: auto; }
+.back-btn { width: auto; min-width: auto; font-size: 1.25rem; padding: 0.5rem 0.75rem; }
+.empty-row td { padding: 3rem; text-align: center; color: var(--mid); }
+</style>
+
+<section class="section-header">
     <div class="container">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
-            <h1 style="font-size: 2rem; margin: 0;">👥 User Management</h1>
+            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost back-btn">←</a>
+            <h1>User Management</h1>
         </div>
-        <p style="color: var(--text-secondary);">Manage users and permissions</p>
+        <p>Manage users and permissions</p>
     </div>
 </section>
 
 <section class="container" style="padding: 3rem 0;">
-    
-    <!-- Top Actions -->
+
     <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2.5rem;">
-        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <a href="?role=all" class="btn {% if role_filter == 'all' %}btn-primary{% else %}btn-ghost{% endif %}" style="min-width: unset; flex: 1;">All</a>
-            <a href="?role=CUSTOMER" class="btn {% if role_filter == 'CUSTOMER' %}btn-primary{% else %}btn-ghost{% endif %}" style="min-width: unset; flex: 1;">👤 Customer</a>
-            <a href="?role=SHOP" class="btn {% if role_filter == 'SHOP' %}btn-primary{% else %}btn-ghost{% endif %}" style="min-width: unset; flex: 1;">🏪 Shop</a>
-            <a href="?role=ADMIN" class="btn {% if role_filter == 'ADMIN' %}btn-primary{% else %}btn-ghost{% endif %}" style="min-width: unset; flex: 1;">👑 Admin</a>
-            <a href="?role=STAFF" class="btn {% if role_filter == 'STAFF' %}btn-primary{% else %}btn-ghost{% endif %}" style="min-width: unset; flex: 1;">📋 Staff</a>
+        <div class="filter-bar">
+            <a href="?role=all" class="btn {% if role_filter == 'all' %}btn-primary{% else %}btn-ghost{% endif %}">All</a>
+            <a href="?role=CUSTOMER" class="btn {% if role_filter == 'CUSTOMER' %}btn-primary{% else %}btn-ghost{% endif %}">Customer</a>
+            <a href="?role=SHOP" class="btn {% if role_filter == 'SHOP' %}btn-primary{% else %}btn-ghost{% endif %}">Shop</a>
+            <a href="?role=ADMIN" class="btn {% if role_filter == 'ADMIN' %}btn-primary{% else %}btn-ghost{% endif %}">Admin</a>
+            <a href="?role=STAFF" class="btn {% if role_filter == 'STAFF' %}btn-primary{% else %}btn-ghost{% endif %}">Staff</a>
         </div>
-        <a href="{% url 'admin_portal:add_user' %}?role={{ role_filter }}" class="btn btn-primary" style="width: 100%;">
-            ➕ Add {% if role_filter == 'CUSTOMER' %}Customer{% elif role_filter == 'SHOP' %}Shop Owner{% elif role_filter == 'STAFF' %}Staff{% elif role_filter == 'ADMIN' %}Admin{% else %}User{% endif %}
+        <a href="{% url 'admin_portal:add_user' %}?role={{ role_filter }}" class="btn btn-primary add-btn">
+            + Add {% if role_filter == 'CUSTOMER' %}Customer{% elif role_filter == 'SHOP' %}Shop Owner{% elif role_filter == 'STAFF' %}Staff{% elif role_filter == 'ADMIN' %}Admin{% else %}User{% endif %}
         </a>
     </div>
-    
-    <!-- User Table -->
+
     <div class="card">
         <div class="table-responsive">
-            <table style="width: 100%; border-collapse: collapse;">
+            <table>
                 <thead>
-                    <tr style="border-bottom: 2px solid var(--border-color);">
-                        <th style="padding: 1rem; text-align: left;">Name</th>
-                        <th style="padding: 1rem; text-align: left;">Email</th>
-                        <th style="padding: 1rem; text-align: left;">Role</th>
-                        <th style="padding: 1rem; text-align: left;">Status</th>
-                        <th style="padding: 1rem; text-align: right;">Actions</th>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for user in users %}
-                    <tr style="border-bottom: 1px solid var(--border-color);">
-                        <td style="padding: 1rem;">
+                    <tr>
+                        <td>
                             <strong>{{ user.username }}</strong>
                         </td>
-                        <td style="padding: 1rem;">{{ user.email|default:"No email" }}</td>
-                        <td style="padding: 1rem;">
+                        <td>{{ user.email|default:"No email" }}</td>
+                        <td>
                             {% if user.profile.role == 'CUSTOMER' %}
-                                <span class="badge" style="background: hsl(210, 100%, 95%); color: hsl(210, 100%, 40%);">👤 Customer</span>
+                                <span class="badge badge-blue">Customer</span>
                             {% elif user.profile.role == 'SHOP' %}
-                                <span class="badge" style="background: hsl(145, 60%, 95%); color: var(--primary);">🏪 Shop</span>
+                                <span class="badge badge-green">Shop</span>
                             {% elif user.profile.role == 'ADMIN' %}
-                                <span class="badge" style="background: hsl(30, 100%, 95%); color: hsl(30, 100%, 40%);">👑 Admin</span>
+                                <span class="badge badge-orange">Admin</span>
                             {% elif user.profile.role == 'STAFF' %}
-                                <span class="badge" style="background: hsl(280, 60%, 95%); color: hsl(280, 60%, 40%);">📋 Staff</span>
+                                <span class="badge badge-purple">Staff</span>
                             {% else %}
-                                <span class="badge" style="background: hsl(0, 0%, 95%); color: hsl(0, 0%, 40%);">❓ No Role</span>
+                                <span class="badge badge-gray">No Role</span>
                             {% endif %}
                         </td>
-                        <td style="padding: 1rem;">
+                        <td>
                             {% if user.profile.is_blocked %}
-                                <span class="badge badge-error">🚫 Blocked</span>
+                                <span class="badge badge-error">Blocked</span>
                             {% else %}
-                                <span class="badge badge-success">✅ Active</span>
+                                <span class="badge badge-success">Active</span>
                             {% endif %}
                         </td>
-                        <td style="padding: 1rem; text-align: right;">
+                        <td style="text-align: right;">
                             <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-                                <a href="{% url 'admin_portal:view_user' user.id %}" class="btn btn-ghost" style="padding: 0.5rem 0.75rem; font-size: 0.875rem; width: auto; min-width: auto; min-height: auto;">
-                                    👁️
-                                </a>
-                                <a href="{% url 'admin_portal:edit_user' user.id %}" class="btn btn-secondary" style="padding: 0.5rem 0.75rem; font-size: 0.875rem; width: auto; min-width: auto; min-height: auto;">
-                                    ✏️
-                                </a>
+                                <a href="{% url 'admin_portal:view_user' user.id %}" class="btn btn-ghost action-btn">View</a>
+                                <a href="{% url 'admin_portal:edit_user' user.id %}" class="btn btn-secondary action-btn">Edit</a>
                                 {% if user.profile.role != 'ADMIN' %}
                                     {% if user.profile.is_blocked %}
                                         <form method="POST" action="{% url 'admin_portal:unblock_user' user.id %}" style="display: inline;">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-ghost" style="padding: 0.5rem 0.75rem; font-size: 0.875rem; background: hsl(145, 60%, 95%); color: var(--primary); width: auto; min-width: auto; min-height: auto;">
-                                                Unblock
-                                            </button>
+                                            <button type="submit" class="btn btn-unblock action-btn">Unblock</button>
                                         </form>
                                     {% else %}
                                         <form method="POST" action="{% url 'admin_portal:block_user' user.id %}" style="display: inline;">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-ghost" style="padding: 0.5rem 0.75rem; font-size: 0.875rem; border-color: hsl(0, 80%, 50%); color: hsl(0, 80%, 50%); width: auto; min-width: auto; min-height: auto;">
-                                                Block
-                                            </button>
+                                            <button type="submit" class="btn btn-block action-btn">Block</button>
                                         </form>
                                     {% endif %}
                                 {% endif %}
@@ -99,15 +135,13 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-muted);">
-                            No users found
-                        </td>
+                        <td colspan="5" class="empty-row">No users found</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
-    
+
 </section>
 {% endblock %}

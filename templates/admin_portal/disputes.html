@@ -2,121 +2,459 @@
 
 {% block title %}Disputes - Admin{% endblock %}
 
-
 {% block content %}
-<section style="background: var(--secondary); padding: 2rem 0;">
-    <div class="container">
-        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
-            <h1 style="font-size: 2rem; margin: 0;">⚖️ Dispute Resolution</h1>
-        </div>
-        <p style="color: var(--text-secondary);">Review and resolve customer disputes</p>
+<style>
+  :root {
+    --bone: #EFEDE8;
+    --ink: #101010;
+    --mid: #8A8781;
+    --bg-surface: #F4F3EF;
+    --line: #E2E0DA;
+    --error: #C43D3D;
+    --font-heading: 'Archivo', sans-serif;
+    --font-body: 'Archivo', sans-serif;
+  }
+
+  .disputes-hero {
+    background: var(--ink);
+    padding: 2.5rem 0;
+  }
+
+  .disputes-hero .hero-title {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--bone);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .disputes-hero .hero-sub {
+    color: var(--mid);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    margin-top: 0.35rem;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 1px solid var(--mid);
+    color: var(--bone);
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 0;
+    transition: all 0.15s ease;
+  }
+
+  .back-btn:hover {
+    background: var(--bone);
+    color: var(--ink);
+    transform: translateY(-1px);
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 2rem;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    overflow: hidden;
+  }
+
+  .filter-tab {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    background: var(--bg-surface);
+    color: var(--mid);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    border: none;
+    border-right: 1px solid var(--line);
+    border-radius: 0;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .filter-tab:last-child {
+    border-right: none;
+  }
+
+  .filter-tab:hover {
+    background: var(--bone);
+    color: var(--ink);
+    transform: translateY(-1px);
+  }
+
+  .filter-tab.active {
+    background: var(--ink);
+    color: var(--bone);
+  }
+
+  .dispute-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--line);
+    border-radius: 0;
+    padding: 1.5rem;
+  }
+
+  .dispute-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .dispute-title {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .status-badge {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.3rem 0.75rem;
+    border-radius: 0;
+  }
+
+  .badge-pending {
+    background: #F59E0B;
+    color: #101010;
+  }
+
+  .badge-resolved {
+    background: var(--ink);
+    color: var(--bone);
+  }
+
+  .meta-text {
+    font-family: var(--font-body);
+    font-size: 0.825rem;
+    color: var(--mid);
+    margin: 0;
+  }
+
+  .meta-label {
+    font-family: var(--font-body);
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .order-files-box {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    font-size: 0.8rem;
+    background: var(--bone);
+  }
+
+  .order-files-box p {
+    font-family: var(--font-body);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--ink);
+  }
+
+  .file-entry {
+    padding-bottom: 0.65rem;
+    margin-bottom: 0.65rem;
+    border-bottom: 1px dashed var(--line);
+  }
+
+  .file-entry:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .file-name {
+    font-family: var(--font-body);
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    color: var(--ink);
+  }
+
+  .file-details {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+    color: var(--mid);
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+  }
+
+  @media (min-width: 600px) {
+    .file-details {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .special-note {
+    margin-top: 0.5rem;
+    color: #92400E;
+    padding: 0.5rem;
+    background: #FEF3C7;
+    border-radius: 0;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+  }
+
+  .issue-box {
+    padding: 1.25rem;
+    background: var(--bone);
+    border-left: 4px solid var(--error);
+    margin-bottom: 1rem;
+  }
+
+  .issue-box .label {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .issue-box .desc {
+    color: var(--mid);
+    line-height: 1.6;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+  }
+
+  .response-box {
+    padding: 1.25rem;
+    background: var(--bone);
+    border-left: 4px solid var(--mid);
+  }
+
+  .response-box .label {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .response-box .desc {
+    color: var(--mid);
+    line-height: 1.6;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+  }
+
+  .actions-bar {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .resolve-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 48px;
+    background: var(--ink);
+    color: var(--bone);
+    border: none;
+    border-radius: 0;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s ease;
+  }
+
+  .resolve-btn:hover {
+    background: #2A2A2A;
+    transform: translateY(-1px);
+  }
+
+  .resolution-box {
+    padding: 1.25rem;
+    background: var(--bone);
+    border-radius: 0;
+  }
+
+  .resolution-label {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    color: var(--mid);
+  }
+
+  .refund-approved {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .refund-approved .status-text {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .refund-approved .amount {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .refund-rejected {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: var(--mid);
+    margin: 0;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--bg-surface);
+    border: 1px solid var(--line);
+    border-radius: 0;
+  }
+
+  .empty-state .icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state h3 {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state p {
+    color: var(--mid);
+    font-family: var(--font-body);
+  }
+</style>
+
+<section class="disputes-hero">
+  <div class="container">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+      <a href="{% url 'admin_portal:dashboard' %}" class="back-btn">←</a>
+      <h1 class="hero-title">⚖️ Dispute Resolution</h1>
     </div>
+    <p class="hero-sub">Review and resolve customer disputes</p>
+  </div>
 </section>
 
 <section class="container" style="padding: 3rem 0;">
-    
-    <!-- Filter Tabs -->
-    <div style="display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap;">
-        <a href="?status=pending" class="btn {% if status_filter == 'pending' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto; padding: 0.5rem 1rem;">
-            ⏳ Pending
-        </a>
-        <a href="?status=resolved" class="btn {% if status_filter == 'resolved' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto; padding: 0.5rem 1rem;">
-            ✅ Resolved
-        </a>
-        <a href="?status=all" class="btn {% if status_filter == 'all' %}btn-primary{% else %}btn-ghost{% endif %}" style="flex: 1; min-width: auto; padding: 0.5rem 1rem;">
-            📋 All
-        </a>
-    </div>
-    
-    <!-- Disputes List -->
-    {% if disputes %}
-        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            {% for dispute in disputes %}
-            <div class="card card-elevated">
-                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                    
-                    <!-- Dispute Info -->
-                    <div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
-                            <h3 style="margin: 0; font-size: 1.25rem;">Dispute #{{ dispute.id }}</h3>
-                            {% if dispute.status == 'PENDING' %}
-                                <span class="badge badge-warning">⏳ Pending Review</span>
-                            {% else %}
-                                <span class="badge badge-success">✅ Resolved</span>
-                            {% endif %}
-                        </div>
-                        
-                        <div style="margin-bottom: 1.5rem;">
-                            <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem;">Order #{{ dispute.order.id }}</p>
-                            <p style="font-weight: 600; margin-bottom: 0.25rem;">Shop: {{ dispute.order.shop.name }}</p>
-                            <p style="font-size: 0.875rem;">Customer: {{ dispute.raised_by.username }}</p>
-                            
-                            <!-- Detailed Order Settings -->
-                            <div style="margin-top: 1rem; padding: 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 0.85rem; background: var(--bg-light);">
-                                <p style="font-weight: 700; margin-bottom: 0.5rem;">Files in Order:</p>
-                                {% for file in dispute.order.files.all %}
-                                <div style="{% if not forloop.last %}margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px dashed var(--border-color);{% endif %}">
-                                    <p style="font-weight: 600; margin-bottom: 0.25rem; color: var(--primary);">📄 {{ file.file_name }}</p>
-                                    <div style="display: grid; grid-template-columns: 1fr; md-grid-template-columns: 1fr 1fr; gap: 0.25rem; color: var(--text-secondary);">
-                                        <span>• {{ file.pages_per_sheet }} up | {{ file.get_print_type_display }}</span>
-                                        <span>• {{ file.paper_size }} | {% if file.color_type == 'COLOR' %}Color{% else %}B/W{% endif %}</span>
-                                        <span>• <strong>{{ file.copies }} Copies</strong></span>
-                                    </div>
-                                    {% if file.special_note %}
-                                        <div style="margin-top: 0.5rem; color: #B45309; padding: 0.5rem; background: #FFFBEB; border-radius: 4px;">
-                                            Note: "{{ file.special_note }}"
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        
-                        <div style="padding: 1.25rem; background: hsl(0, 60%, 97%); border-radius: var(--radius-md); margin-bottom: 1rem; border-left: 4px solid var(--error);">
-                            <p style="font-weight: 700; margin-bottom: 0.5rem; font-size: 1rem;">📝 Issue: {{ dispute.get_issue_type_display }}</p>
-                            <p style="color: var(--text-secondary); line-height: 1.6;">{{ dispute.description }}</p>
-                        </div>
-                        
-                        {% if dispute.shop_response %}
-                        <div style="padding: 1.25rem; background: hsl(210, 60%, 97%); border-radius: var(--radius-md); border-left: 4px solid var(--primary);">
-                            <p style="font-weight: 700; margin-bottom: 0.5rem; font-size: 1rem;">🏪 Shop Response:</p>
-                            <p style="color: var(--text-secondary); line-height: 1.6;">{{ dispute.shop_response }}</p>
-                        </div>
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Actions -->
-                    <div style="padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
-                        {% if dispute.status == 'PENDING' %}
-                            <a href="{% url 'admin_portal:resolve_dispute' dispute.id %}" class="btn btn-primary" style="width: 100%; height: 48px; justify-content: center;">
-                                ⚖️ Resolve Dispute
-                            </a>
-                        {% else %}
-                            <div style="padding: 1.25rem; background: hsl(145, 60%, 97%); border-radius: var(--radius-md);">
-                                <p style="font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--text-secondary);">Final Decision:</p>
-                                {% if dispute.refund_approved %}
-                                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <p style="font-weight: 700; color: var(--primary); margin: 0;">✅ Refund Approved</p>
-                                        <p style="font-size: 1.5rem; font-weight: 800; color: var(--primary); margin: 0;">₹{{ dispute.refund_amount }}</p>
-                                    </div>
-                                {% else %}
-                                    <p style="font-weight: 700; color: var(--text-muted); margin: 0;">❌ Refund Rejected</p>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
+
+  <div class="filter-tabs">
+    <a href="?status=pending" class="filter-tab {% if status_filter == 'pending' %}active{% endif %}">Pending</a>
+    <a href="?status=resolved" class="filter-tab {% if status_filter == 'resolved' %}active{% endif %}">Resolved</a>
+    <a href="?status=all" class="filter-tab {% if status_filter == 'all' %}active{% endif %}">All</a>
+  </div>
+
+  {% if disputes %}
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      {% for dispute in disputes %}
+      <div class="dispute-card">
+        <div class="dispute-header">
+          <h3 class="dispute-title">Dispute #{{ dispute.id }}</h3>
+          {% if dispute.status == 'PENDING' %}
+            <span class="status-badge badge-pending">⏳ Pending Review</span>
+          {% else %}
+            <span class="status-badge badge-resolved">✅ Resolved</span>
+          {% endif %}
+        </div>
+
+        <div>
+          <p class="meta-text" style="margin-bottom: 0.2rem;">Order #{{ dispute.order.id }}</p>
+          <p class="meta-label" style="margin-bottom: 0.2rem;">Shop: {{ dispute.order.shop.name }}</p>
+          <p class="meta-text">Customer: {{ dispute.raised_by.username }}</p>
+
+          <div class="order-files-box">
+            <p>Files in Order:</p>
+            {% for file in dispute.order.files.all %}
+            <div class="file-entry">
+              <p class="file-name">📄 {{ file.file_name }}</p>
+              <div class="file-details">
+                <span>• {{ file.pages_per_sheet }} up | {{ file.get_print_type_display }}</span>
+                <span>• {{ file.paper_size }} | {% if file.color_type == 'COLOR' %}Color{% else %}B/W{% endif %}</span>
+                <span>• <strong>{{ file.copies }} Copies</strong></span>
+              </div>
+              {% if file.special_note %}
+                <div class="special-note">Note: "{{ file.special_note }}"</div>
+              {% endif %}
             </div>
             {% endfor %}
+          </div>
         </div>
-    {% else %}
-        <div class="card text-center" style="padding: 4rem 2rem;">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
-            <h3>No disputes to review</h3>
-            <p class="text-muted">All disputes have been resolved!</p>
+
+        <div class="issue-box">
+          <p class="label">📝 Issue: {{ dispute.get_issue_type_display }}</p>
+          <p class="desc">{{ dispute.description }}</p>
         </div>
-    {% endif %}
-    
+
+        {% if dispute.shop_response %}
+        <div class="response-box">
+          <p class="label">🏪 Shop Response:</p>
+          <p class="desc">{{ dispute.shop_response }}</p>
+        </div>
+        {% endif %}
+
+        <div class="actions-bar">
+          {% if dispute.status == 'PENDING' %}
+            <a href="{% url 'admin_portal:resolve_dispute' dispute.id %}" class="resolve-btn">
+              ⚖️ Resolve Dispute
+            </a>
+          {% else %}
+            <div class="resolution-box">
+              <p class="resolution-label">Final Decision:</p>
+              {% if dispute.refund_approved %}
+                <div class="refund-approved">
+                  <p class="status-text">✅ Refund Approved</p>
+                  <p class="amount">₹{{ dispute.refund_amount }}</p>
+                </div>
+              {% else %}
+                <p class="refund-rejected">❌ Refund Rejected</p>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="icon">✅</div>
+      <h3>No disputes to review</h3>
+      <p>All disputes have been resolved!</p>
+    </div>
+  {% endif %}
+
 </section>
 {% endblock %}

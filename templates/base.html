@@ -6,45 +6,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Zerox - Find Print Shops Near You{% endblock %}</title>
 
-    <!-- Fonts: Manrope -->
+    <!-- Fonts: Archivo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    
+
+    <!-- Cursor Glow -->
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <!-- Scroll Progress -->
+    <div id="prog"></div>
+
     <nav class="navbar">
         <div class="container navbar-content">
             <a href="/" class="navbar-brand">
                 <span class="navbar-brand-icon">Z</span>
                 Zerox
             </a>
-            
+
             <!-- Desktop Menu -->
             <ul class="navbar-nav desktop-only">
                 <li><a href="/" class="navbar-link">Home</a></li>
                 <li><a href="/shop/list/" class="navbar-link">Find Shops</a></li>
-                
+
                 {% if user.is_authenticated %}
                     {% if user.is_staff or user.is_superuser %}
-                        {# Admin / Staff #}
                         <li><a href="{% url 'admin_portal:dashboard' %}" class="navbar-link">Dashboard</a></li>
                     {% elif user.profile.role == 'CUSTOMER' %}
-                        {# Customer #}
-                        <li><a href="#" class="navbar-link">How it Works</a></li>
                         <li><a href="{% url 'orders:my_orders' %}" class="navbar-link">My Orders</a></li>
                     {% endif %}
-                    
+
                     <li>
                         <a href="{% url 'core:my_dashboard' %}" class="navbar-link" style="position: relative;">
                             🔔
                             {% if unread_notifications %}
-                            <span style="position: absolute; top: -4px; right: -4px; background: hsl(0, 80%, 50%); color: white; font-size: 0.6rem; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                            <span style="position: absolute; top: -4px; right: -4px; background: var(--ink); color: var(--bone); font-size: 0.55rem; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">
                                 {{ unread_notifications }}
                             </span>
                             {% endif %}
@@ -53,20 +56,19 @@
                     <li><a href="{% url 'core:profile' %}" class="navbar-link">Profile</a></li>
                     <li><a href="{% url 'core:logout' %}" class="navbar-link" style="color: var(--error);">Logout</a></li>
                 {% else %}
-                    <li><a href="#" class="navbar-link">How it Works</a></li>
                     <li><a href="{% url 'core:login' %}" class="navbar-link">Login</a></li>
                 {% endif %}
             </ul>
 
             <!-- Mobile Menu Toggle -->
             <button class="menu-toggle" onclick="openMenu()">
-                <div style="width: 24px; height: 2px; background: var(--text-primary); margin-bottom: 6px;"></div>
-                <div style="width: 24px; height: 2px; background: var(--text-primary); margin-bottom: 6px;"></div>
-                <div style="width: 24px; height: 2px; background: var(--text-primary);"></div>
+                <div style="width: 24px; height: 2px; background: var(--ink); margin-bottom: 6px; transition: transform 0.3s ease;"></div>
+                <div style="width: 24px; height: 2px; background: var(--ink); margin-bottom: 6px; transition: transform 0.3s ease;"></div>
+                <div style="width: 24px; height: 2px; background: var(--ink); transition: transform 0.3s ease;"></div>
             </button>
         </div>
     </nav>
-    
+
     <!-- Mobile Overlay Menu -->
     <div id="mobileMenu" class="mobile-menu-overlay">
         <div class="mobile-menu-card">
@@ -74,57 +76,53 @@
                 <div class="navbar-brand">
                     <span class="navbar-brand-icon">Z</span> Zerox
                 </div>
-                <button onclick="closeMenu()" style="background: none; border: 2px solid var(--warning); color: var(--text-primary); border-radius: 50%; width: 40px; height: 40px; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                <button onclick="closeMenu()" style="background: none; border: 1px solid var(--line); color: var(--ink); width: 40px; height: 40px; font-size: 1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.3s ease;">
                     ✕
                 </button>
             </div>
-            
+
             <ul class="mobile-menu-list">
                 <li><a href="/" onclick="closeMenu()">Home</a></li>
                 <li><a href="/shop/list/" onclick="closeMenu()">Find Shops</a></li>
-                
+
                 {% if user.is_authenticated %}
                     {% if user.is_staff or user.is_superuser %}
-                        {# Admin / Staff #}
                         <li><a href="{% url 'admin_portal:dashboard' %}" onclick="closeMenu()">Dashboard</a></li>
                     {% elif user.profile.role == 'CUSTOMER' %}
-                        {# Customer #}
-                        <li><a href="#" onclick="closeMenu()">How it Works</a></li>
                         <li><a href="{% url 'orders:my_orders' %}" onclick="closeMenu()">My Orders</a></li>
                     {% endif %}
-                    
-                    <li style="margin-top: 1rem; border-top: 1px solid var(--bg-subtle); padding-top: 1rem;">
+
+                    <li style="margin-top: 1rem; border-top: 1px solid var(--line); padding-top: 1rem;">
                         <a href="{% url 'core:my_dashboard' %}" onclick="closeMenu()">
                             🔔 Notifications
                             {% if unread_notifications %}
-                            <span style="background: hsl(0, 80%, 50%); color: white; font-size: 0.65rem; padding: 0.1rem 0.4rem; border-radius: 999px; margin-left: 0.25rem; font-weight: 700;">{{ unread_notifications }}</span>
+                            <span style="background: var(--ink); color: var(--bone); font-size: 0.55rem; padding: 0.1rem 0.4rem; border-radius: 999px; margin-left: 0.25rem; font-weight: 700;">{{ unread_notifications }}</span>
                             {% endif %}
                         </a>
                     </li>
                     <li><a href="{% url 'core:profile' %}" onclick="closeMenu()">Profile</a></li>
                     <li><a href="{% url 'core:logout' %}" style="color: var(--error);" onclick="closeMenu()">Logout</a></li>
                 {% else %}
-                    <li><a href="#" onclick="closeMenu()">How it Works</a></li>
                     <li style="margin-top: 1rem;">
-                        <a href="{% url 'core:login' %}" class="btn btn-primary" onclick="closeMenu()">Login / Signup</a>
+                        <a href="{% url 'core:login' %}" class="btn btn-primary" onclick="closeMenu()" style="text-align: center;">Login / Signup</a>
                     </li>
                 {% endif %}
             </ul>
         </div>
     </div>
-    
+
     <!-- Main Content -->
     <main style="min-height: 60vh;">
         {% block content %}{% endblock %}
     </main>
-    
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container text-center mb-4">
-            <div class="navbar-brand justify-content-center mb-2" style="justify-content: center;">
+            <div class="navbar-brand justify-content-center mb-2" style="justify-content: center; color: var(--bone);">
                 <span class="navbar-brand-icon">Z</span> Zerox
             </div>
-            <p class="text-secondary" style="max-width: 400px; margin: 0 auto;">
+            <p style="max-width: 400px; margin: 0 auto; color: rgba(239,237,232,0.5); font-size: 13px;">
                 India's First & Only Self-Service<br>Printing Vending Network
             </p>
         </div>
@@ -146,20 +144,19 @@
                     <a href="#" class="footer-link">Linkedin</a>
                 </div>
             </div>
-            
+
             <div class="footer-bottom mt-4 pt-4 text-center">
-                <div class="mb-3" style="display: flex; justify-content: center; gap: 2rem; color: var(--text-muted);">
-                    <a href="#" class="text-muted" style="text-decoration: none;">Terms & Conditions</a>
-                    <a href="#" class="text-muted" style="text-decoration: none;">Privacy Policy</a>
+                <div class="mb-3" style="display: flex; justify-content: center; gap: 2rem;">
+                    <a href="#" style="color: rgba(239,237,232,0.4); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">Terms</a>
+                    <a href="#" style="color: rgba(239,237,232,0.4); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;">Privacy</a>
                 </div>
-                <p class="text-muted text-sm">
-                    &copy; 2026 Zerox Automate<br>
-                    Unit of Echto Ventures LLP
+                <p style="font-size: 11px; color: rgba(239,237,232,0.3);">
+                    &copy; 2026 Zerox Automate &mdash; Unit of Echto Ventures LLP
                 </p>
             </div>
         </div>
     </footer>
-    
+
     <!-- Scripts -->
     <script>
     function openMenu() {
@@ -171,12 +168,100 @@
         document.getElementById('mobileMenu').classList.remove('active');
         document.body.style.overflow = '';
     }
-    
+
     document.getElementById('mobileMenu').addEventListener('click', function(e) {
         if (e.target === this) {
             closeMenu();
         }
     });
+
+    // ============================================
+    // CURSOR GLOW
+    // ============================================
+    (function() {
+        var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var glow = document.getElementById('cursorGlow');
+        var mouseX = 0, mouseY = 0, glowX = 0, glowY = 0;
+
+        document.addEventListener('mousemove', function(e) {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            glow.style.opacity = '1';
+        });
+        document.addEventListener('mouseleave', function() {
+            glow.style.opacity = '0';
+        });
+
+        function animateGlow() {
+            glowX += (mouseX - glowX) * 0.08;
+            glowY += (mouseY - glowY) * 0.08;
+            glow.style.left = glowX + 'px';
+            glow.style.top = glowY + 'px';
+            if (!prefersReduced) requestAnimationFrame(animateGlow);
+        }
+        if (!prefersReduced) animateGlow();
+
+        // ============================================
+        // MAGNETIC CURSOR
+        // ============================================
+        if (!prefersReduced) {
+            document.querySelectorAll('.magnetic').forEach(function(el) {
+                el.addEventListener('mousemove', function(e) {
+                    var rect = el.getBoundingClientRect();
+                    var x = e.clientX - rect.left - rect.width / 2;
+                    var y = e.clientY - rect.top - rect.height / 2;
+                    el.style.transform = 'translate(' + (x * 0.15) + 'px, ' + (y * 0.15) + 'px)';
+                });
+                el.addEventListener('mouseleave', function() {
+                    el.style.transform = 'translate(0, 0)';
+                });
+            });
+        }
+
+        // ============================================
+        // SCROLL PROGRESS
+        // ============================================
+        var prog = document.getElementById('prog');
+        function updateProgress() {
+            var h = document.documentElement.scrollHeight - window.innerHeight;
+            var p = h > 0 ? window.scrollY / h : 0;
+            prog.style.transform = 'scaleX(' + p + ')';
+        }
+
+        // ============================================
+        // SCROLL REVEAL
+        // ============================================
+        var revealEls = document.querySelectorAll('.rv, .rv-spring, .rv-left, .rv-right, .rv-scale, .rv-blur');
+        if (!prefersReduced && 'IntersectionObserver' in window) {
+            var obs = new IntersectionObserver(function(entries) {
+                entries.forEach(function(e) {
+                    if (e.isIntersecting) {
+                        e.target.classList.add('in');
+                        obs.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+            revealEls.forEach(function(el) { obs.observe(el); });
+        } else {
+            revealEls.forEach(function(el) { el.classList.add('in'); });
+        }
+
+        // ============================================
+        // SCROLL LISTENER
+        // ============================================
+        var ticking = false;
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                requestAnimationFrame(function() {
+                    updateProgress();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }, { passive: true });
+
+        updateProgress();
+    })();
     </script>
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}

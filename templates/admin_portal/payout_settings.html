@@ -3,40 +3,38 @@
 {% block title %}Payout Settings - Admin Portal{% endblock %}
 
 {% block content %}
-<section style="background: var(--secondary); padding: 2rem 0;">
+<section style="background: var(--bg-surface); padding: 2rem 0; border-bottom: 1px solid var(--line);">
     <div class="container">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
             <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
-            <h1 style="font-size: 2rem; margin: 0;">Payout Settings</h1>
+            <h1 style="font-family: var(--font-heading); font-weight: 800; font-size: 2rem; margin: 0; color: var(--ink);">Payout Settings</h1>
         </div>
-        <p style="color: var(--text-secondary);">Configure automatic daily payouts to shop owners</p>
+        <p style="color: var(--mid); font-family: var(--font-body);">Configure automatic daily payouts to shop owners</p>
     </div>
 </section>
 
 <section class="container" style="padding: 3rem 0;">
     <div style="max-width: 700px; margin: 0 auto;">
-        <div class="card card-elevated">
-            <h2 style="margin-bottom: 1.5rem;">Payout Configuration</h2>
+        <div class="card" style="border: 1px solid var(--line); border-radius: 0; background: var(--bone); padding: 2rem;">
+            <h2 style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); margin-bottom: 1.5rem;">Payout Configuration</h2>
             
             <form method="POST">
                 {% csrf_token %}
                 
-                <!-- Enable/Disable -->
-                <div class="form-group">
-                    <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-family: var(--font-body);">
                         <input type="checkbox" name="payout_enabled" 
                                {% if config.payout_enabled %}checked{% endif %}
-                               style="width: 20px; height: 20px;">
-                        <span style="font-weight: 600;">Enable Automatic Payouts</span>
+                               style="width: 20px; height: 20px; accent-color: var(--ink);">
+                        <span style="font-weight: 600; color: var(--ink);">Enable Automatic Payouts</span>
                     </label>
-                    <small style="color: var(--text-muted);">When enabled, payouts will be processed automatically on schedule</small>
+                    <small style="color: var(--mid); font-family: var(--font-body);">When enabled, payouts will be processed automatically on schedule</small>
                 </div>
                 
-                <!-- Schedule -->
-                <div class="grid grid-2" style="margin-top: 1.5rem;">
+                <div class="grid grid-2" style="margin-bottom: 1.5rem;">
                     <div class="form-group">
-                        <label class="form-label">Payout Hour (0-23)</label>
-                        <select name="payout_hour" class="form-input">
+                        <label class="form-label" style="font-family: var(--font-body); color: var(--ink); font-size: 0.875rem; font-weight: 600; display: block; margin-bottom: 0.5rem;">Payout Hour (0-23)</label>
+                        <select name="payout_hour" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid var(--line); border-radius: 0; background: var(--bg-surface); color: var(--ink); font-family: var(--font-body); font-size: 0.875rem;">
                             {% for h in "012345678901234567890123"|make_list %}
                             <option value="{{ forloop.counter0 }}" {% if config.payout_hour == forloop.counter0 %}selected{% endif %}>
                                 {{ forloop.counter0|stringformat:"02d" }}:00
@@ -46,8 +44,8 @@
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Payout Minute (0-59)</label>
-                        <select name="payout_minute" class="form-input">
+                        <label class="form-label" style="font-family: var(--font-body); color: var(--ink); font-size: 0.875rem; font-weight: 600; display: block; margin-bottom: 0.5rem;">Payout Minute (0-59)</label>
+                        <select name="payout_minute" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid var(--line); border-radius: 0; background: var(--bg-surface); color: var(--ink); font-family: var(--font-body); font-size: 0.875rem;">
                             {% for m in "000510152025303540455055"|make_list %}
                             {% if forloop.counter0 < 12 %}
                             <option value="{{ forloop.counter0|add:forloop.counter0 }}" 
@@ -60,10 +58,9 @@
                     </div>
                 </div>
                 
-                <!-- Payout Mode -->
-                <div class="form-group" style="margin-top: 1rem;">
-                    <label class="form-label">Default Payout Mode</label>
-                    <select name="payout_mode" class="form-input">
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label class="form-label" style="font-family: var(--font-body); color: var(--ink); font-size: 0.875rem; font-weight: 600; display: block; margin-bottom: 0.5rem;">Default Payout Mode</label>
+                    <select name="payout_mode" class="form-input" style="width: 100%; padding: 0.75rem; border: 1px solid var(--line); border-radius: 0; background: var(--bg-surface); color: var(--ink); font-family: var(--font-body); font-size: 0.875rem;">
                         <option value="IMPS" {% if config.payout_mode == 'IMPS' %}selected{% endif %}>IMPS (Instant, 24x7)</option>
                         <option value="NEFT" {% if config.payout_mode == 'NEFT' %}selected{% endif %}>NEFT (2-3 hours, banking hours)</option>
                         <option value="RTGS" {% if config.payout_mode == 'RTGS' %}selected{% endif %}>RTGS (Instant, ₹2 lakh+)</option>
@@ -71,15 +68,14 @@
                     </select>
                 </div>
                 
-                <!-- Payout Days -->
-                <div class="form-group" style="margin-top: 1rem;">
-                    <label class="form-label">Payout Days</label>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label class="form-label" style="font-family: var(--font-body); color: var(--ink); font-size: 0.875rem; font-weight: 600; display: block; margin-bottom: 0.5rem;">Payout Days</label>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                         {% with days="Mon,Tue,Wed,Thu,Fri,Sat,Sun"|split %}
                         {% for day in days %}
-                        <label style="display: flex; align-items: center; gap: 0.25rem; padding: 0.5rem 1rem; background: var(--bg-light); border-radius: var(--radius-md); cursor: pointer;">
+                        <label style="display: flex; align-items: center; gap: 0.25rem; padding: 0.5rem 1rem; background: var(--bg-surface); border: 1px solid var(--line); border-radius: 0; cursor: pointer; font-family: var(--font-body); color: var(--ink); font-size: 0.875rem;">
                             <input type="checkbox" name="payout_days" value="{{ forloop.counter0 }}" 
-                                   {% if forloop.counter0 in config.payout_days %}checked{% endif %}>
+                                   {% if forloop.counter0 in config.payout_days %}checked{% endif %} style="accent-color: var(--ink);">
                             {{ day }}
                         </label>
                         {% endfor %}
@@ -87,45 +83,44 @@
                     </div>
                 </div>
                 
-                <!-- RazorpayX Account -->
-                <div class="form-group" style="margin-top: 1.5rem;">
-                    <label class="form-label">RazorpayX Business Account Number</label>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label class="form-label" style="font-family: var(--font-body); color: var(--ink); font-size: 0.875rem; font-weight: 600; display: block; margin-bottom: 0.5rem;">RazorpayX Business Account Number</label>
                     <input type="text" name="razorpayx_account_number" class="form-input" 
                            value="{{ config.razorpayx_account_number }}"
-                           placeholder="Enter your RazorpayX account number">
-                    <small style="color: var(--text-muted);">Account from which payouts will be debited</small>
+                           placeholder="Enter your RazorpayX account number"
+                           style="width: 100%; padding: 0.75rem; border: 1px solid var(--line); border-radius: 0; background: var(--bg-surface); color: var(--ink); font-family: var(--font-body); font-size: 0.875rem;">
+                    <small style="color: var(--mid); font-family: var(--font-body);">Account from which payouts will be debited</small>
                 </div>
                 
-                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-top: 1.5rem;">
-                    💾 Save Settings
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; margin-top: 0.5rem; border-radius: 0; background: var(--ink); color: var(--bone); border: none; font-family: var(--font-body); font-weight: 600; cursor: pointer; transition: transform 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
+                    Save Settings
                 </button>
             </form>
         </div>
 
-        <!-- Current Status -->
-        <div class="card card-elevated" style="margin-top: 2rem;">
-            <h3 style="margin-bottom: 1rem;">Current Status</h3>
+        <div class="card" style="margin-top: 2rem; border: 1px solid var(--line); border-radius: 0; background: var(--bone); padding: 2rem;">
+            <h3 style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); margin-bottom: 1rem;">Current Status</h3>
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
-                <div style="padding: 1rem; background: var(--bg-light); border-radius: var(--radius-md);">
-                    <div style="color: var(--text-muted); font-size: 0.875rem;">Status</div>
-                    <div style="font-weight: 600; color: {% if config.payout_enabled %}var(--success){% else %}var(--error){% endif %};">
+                <div style="padding: 1rem; background: var(--bg-surface); border: 1px solid var(--line); border-radius: 0;">
+                    <div style="color: var(--mid); font-size: 0.875rem; font-family: var(--font-body);">Status</div>
+                    <div style="font-weight: 600; color: {% if config.payout_enabled %}var(--ink){% else %}var(--error){% endif %}; font-family: var(--font-body);">
                         {% if config.payout_enabled %}ENABLED{% else %}DISABLED{% endif %}
                     </div>
                 </div>
-                <div style="padding: 1rem; background: var(--bg-light); border-radius: var(--radius-md);">
-                    <div style="color: var(--text-muted); font-size: 0.875rem;">Schedule</div>
-                    <div style="font-weight: 600;">
+                <div style="padding: 1rem; background: var(--bg-surface); border: 1px solid var(--line); border-radius: 0;">
+                    <div style="color: var(--mid); font-size: 0.875rem; font-family: var(--font-body);">Schedule</div>
+                    <div style="font-weight: 600; color: var(--ink); font-family: var(--font-body);">
                         {{ config.payout_hour|stringformat:"02d" }}:{{ config.payout_minute|stringformat:"02d" }} ({{ config.payout_mode }})
                     </div>
                 </div>
             </div>
             
-            <div style="margin-top: 1.5rem; padding: 1rem; background: hsl(220, 60%, 95%); border-radius: var(--radius-md);">
-                <h4 style="margin-bottom: 0.5rem;">Manual Payout Command</h4>
-                <code style="display: block; padding: 0.75rem; background: var(--bg-surface); border-radius: var(--radius-sm); font-size: 0.875rem;">
+            <div style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-surface); border: 1px solid var(--line); border-radius: 0;">
+                <h4 style="font-family: var(--font-heading); font-weight: 800; color: var(--ink); margin-bottom: 0.5rem;">Manual Payout Command</h4>
+                <code style="display: block; padding: 0.75rem; background: var(--bone); border: 1px solid var(--line); border-radius: 0; font-size: 0.875rem; color: var(--ink); font-family: var(--font-body);">
                     python manage.py process_daily_payouts --dry-run
                 </code>
-                <small style="color: var(--text-muted);">Use --dry-run to preview, remove to actually process</small>
+                <small style="color: var(--mid); font-family: var(--font-body);">Use --dry-run to preview, remove to actually process</small>
             </div>
         </div>
     </div>

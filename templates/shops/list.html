@@ -4,27 +4,19 @@
 
 {% block extra_css %}
 <!-- Leaflet CSS for Map -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="" crossorigin="" />
 <style>
-    #map { 
-        height: 400px; 
-        border-radius: var(--radius-md); 
+    #map {
+        height: 400px;
         margin-bottom: 1rem;
         z-index: 1;
+        border: 1px solid var(--line);
     }
-    .shop-popup {
-        min-width: 200px;
-    }
-    .shop-popup h4 {
-        margin: 0 0 0.5rem 0;
-        font-size: 1rem;
-    }
-    .shop-popup p {
-        margin: 0.25rem 0;
-        font-size: 0.875rem;
-        color: #666;
-    }
+    .shop-popup { min-width: 200px; }
+    .shop-popup h4 { margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 700; }
+    .shop-popup p { margin: 0.25rem 0; font-size: 0.875rem; color: var(--mid); }
+
     .view-toggle {
         display: flex;
         gap: 0.5rem;
@@ -33,27 +25,29 @@
     .view-toggle button {
         flex: 1;
         padding: 0.75rem;
-        border: 2px solid var(--border-color);
-        background: white;
-        border-radius: var(--radius-md);
+        border: 1px solid var(--line);
+        background: var(--bone);
         cursor: pointer;
+        font-family: var(--font-body);
+        font-size: 11px;
         font-weight: 600;
-        transition: all 0.2s;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
     }
     .view-toggle button.active {
-        border-color: var(--primary);
-        background: hsl(145, 60%, 98%);
-        color: var(--primary);
+        border-color: var(--ink);
+        background: var(--ink);
+        color: var(--bone);
     }
+
     .autocomplete-dropdown {
         position: absolute;
         top: 100%;
         left: 0;
         right: 0;
-        background: white;
-        border: 1px solid var(--border-color);
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow-md);
+        background: var(--bone);
+        border: 1px solid var(--line);
         max-height: 200px;
         overflow-y: auto;
         z-index: 1000;
@@ -62,182 +56,171 @@
     .autocomplete-item {
         padding: 0.75rem 1rem;
         cursor: pointer;
-        border-bottom: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
     }
-    .autocomplete-item:hover {
-        background: var(--bg-light);
-    }
-    .autocomplete-item:last-child {
-        border-bottom: none;
-    }
+    .autocomplete-item:hover { background: var(--bg-subtle); }
+    .autocomplete-item:last-child { border-bottom: none; }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
-    <!-- Header -->
-    <div style="margin-bottom: 2rem;">
-        <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">Find Print Shops</h1>
-        <p style="color: var(--text-secondary);">Discover nearby print shops and upload files instantly</p>
-    </div>
+<section style="padding: clamp(40px, 7vh, 86px) 0;">
+    <div class="container">
 
-    <!-- Search & Location Bar -->
-    <div class="card card-elevated" style="margin-bottom: 2rem;">
-        <form method="GET" id="searchForm">
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <!-- Search Input with Autocomplete -->
-                <div style="flex: 2; min-width: 250px; position: relative;">
-                    <div style="position: relative;">
-                        <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary);">🔍</span>
-                        <input type="text" 
-                               name="search" 
-                               id="searchInput"
-                               class="form-input" 
-                               placeholder="Search by name or location..." 
-                               value="{{ search_query }}"
-                               autocomplete="off"
-                               style="padding-left: 3rem; border-radius: 999px;">
+        <!-- Header -->
+        <div style="margin-bottom: 2.5rem;">
+            <p class="rv-text" style="font-size: 10px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; color: var(--mid); margin-bottom: 0.5rem;">Discover</p>
+            <h1 class="rv-blur" style="font-size: clamp(32px, 5vw, 56px); font-weight: 800; line-height: 0.9; letter-spacing: -0.03em;">Find Print Shops</h1>
+        </div>
+
+        <!-- Search & Location Bar -->
+        <div class="rv-left rv-d1" style="margin-bottom: 2rem; padding: 1.5rem; border: 1px solid var(--line); background: var(--bg-surface);">
+            <form method="GET" id="searchForm">
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <!-- Search Input with Autocomplete -->
+                    <div style="flex: 2; min-width: 250px; position: relative;">
+                        <div style="position: relative;">
+                            <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--mid); font-size: 0.875rem;">🔍</span>
+                            <input type="text"
+                                   name="search"
+                                   id="searchInput"
+                                   class="form-input"
+                                   placeholder="Search by name or location..."
+                                   value="{{ search_query }}"
+                                   autocomplete="off"
+                                   style="padding-left: 3rem;">
+                        </div>
+                        <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
                     </div>
-                    <div id="autocompleteDropdown" class="autocomplete-dropdown"></div>
+
+                    <!-- Distance Filter -->
+                    <div style="flex: 1; min-width: 150px;">
+                        <select name="distance" class="form-input">
+                            <option value="5" {% if not max_distance or max_distance == '5' %}selected{% endif %}>Within 5 km</option>
+                            <option value="1" {% if max_distance == '1' %}selected{% endif %}>Within 1 km</option>
+                            <option value="3" {% if max_distance == '3' %}selected{% endif %}>Within 3 km</option>
+                            <option value="10" {% if max_distance == '10' %}selected{% endif %}>Within 10 km</option>
+                            <option value="25" {% if max_distance == '25' %}selected{% endif %}>Within 25 km</option>
+                            <option value="" {% if max_distance == '' %}selected{% endif %}>Any Distance</option>
+                        </select>
+                    </div>
+
+                    <!-- Location Button -->
+                    <button type="button" onclick="getMyLocation()" class="btn btn-secondary" style="white-space: nowrap; padding: 0.75rem 1.5rem;" id="locationBtn">
+                        <span>Use My Location</span>
+                    </button>
                 </div>
-                
-                <!-- Distance Filter -->
-                <div style="flex: 1; min-width: 150px;">
-                    <select name="distance" class="form-input" style="border-radius: 999px;">
-                        <option value="5" {% if not max_distance or max_distance == '5' %}selected{% endif %}>Within 5 km</option>
-                        <option value="1" {% if max_distance == '1' %}selected{% endif %}>Within 1 km</option>
-                        <option value="3" {% if max_distance == '3' %}selected{% endif %}>Within 3 km</option>
-                        <option value="10" {% if max_distance == '10' %}selected{% endif %}>Within 10 km</option>
-                        <option value="25" {% if max_distance == '25' %}selected{% endif %}>Within 25 km</option>
-                        <option value="" {% if max_distance == '' %}selected{% endif %}>Any Distance</option>
-                    </select>
+
+                <!-- Hidden fields for coordinates -->
+                <input type="hidden" name="lat" id="userLat" value="{{ user_lat }}">
+                <input type="hidden" name="lon" id="userLon" value="{{ user_lon }}">
+            </form>
+
+            <!-- Location Status -->
+            <div id="locationStatus" style="margin-top: 1rem; display: none;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem;">
+                    <span>✓</span>
+                    <span id="locationText">Location detected</span>
+                    <button type="button" onclick="clearLocation()" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 0.875rem; text-decoration: underline;">Clear</button>
                 </div>
-                
-                <!-- Location Button -->
-                <button type="button" onclick="getMyLocation()" class="btn btn-secondary" style="border-radius: 999px; white-space: nowrap; padding: 0.75rem 1.5rem;" id="locationBtn">
-                    📍 Use My Location
-                </button>
-            </div>
-            
-            <!-- Hidden fields for coordinates -->
-            <input type="hidden" name="lat" id="userLat" value="{{ user_lat }}">
-            <input type="hidden" name="lon" id="userLon" value="{{ user_lon }}">
-        </form>
-        
-        <!-- Location Status -->
-        <div id="locationStatus" style="margin-top: 1rem; display: none;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success); font-size: 0.875rem;">
-                <span>✓</span>
-                <span id="locationText">Location detected</span>
-                <button type="button" onclick="clearLocation()" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 0.875rem; text-decoration: underline;">Clear</button>
             </div>
         </div>
-    </div>
 
-    <!-- View Toggle (List/Map) -->
-    <div class="view-toggle">
-        <button type="button" id="listViewBtn" class="active" onclick="switchView('list')">
-            📋 List View
-        </button>
-        <button type="button" id="mapViewBtn" onclick="switchView('map')">
-            🗺️ Map View
-        </button>
-    </div>
-
-    <!-- Map View -->
-    <div id="mapView" style="display: none;">
-        <div id="map"></div>
-    </div>
-
-    <!-- List View -->
-    <div id="listView">
-        <!-- Results Count -->
-        {% if user_lat and user_lon %}
-        <div style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
-            Showing shops sorted by distance from your location
+        <!-- View Toggle -->
+        <div class="view-toggle rv-scale rv-d2">
+            <button type="button" id="listViewBtn" class="active" onclick="switchView('list')">List View</button>
+            <button type="button" id="mapViewBtn" onclick="switchView('map')">Map View</button>
         </div>
-        {% endif %}
-        
-        <!-- Shop List -->
-        <div class="grid">
-            {% for item in shop_data %}
-            <div class="card p-0" style="padding: 0; overflow: hidden; border: 1px solid rgba(0,0,0,0.05);">
-                <!-- Shop Image -->
-                <div style="height: 180px; position: relative; background: var(--bg-subtle);">
-                    <img src="{{ item.shop.get_primary_image }}" alt="{{ item.shop.name }}" style="width: 100%; height: 100%; object-fit: cover;">
-                    <span class="badge {% if item.shop.is_open %}badge-success{% else %}badge-error{% endif %}" style="position: absolute; top: 1rem; right: 1rem; box-shadow: var(--shadow-sm);">
-                        {% if item.shop.is_open %}Open{% else %}Closed{% endif %}
-                    </span>
-                    {% if item.distance is not None %}
-                    <div style="position: absolute; bottom: 1rem; left: 1rem; background: rgba(0,0,0,0.8); color: white; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600;">
-                        📍 {% if item.distance < 1 %}{{ item.distance|floatformat:0 }} m{% else %}{{ item.distance }} km{% endif %}
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <div style="padding: 1.25rem;">
-                    <!-- Title & Location -->
-                    <h3>{{ item.shop.name }}</h3>
-                    
-                    <div class="text-secondary mb-2 text-sm" style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span>⭐ {{ item.shop.rating|default:"5.0" }}</span>
-                        <span>•</span>
-                        <span>{{ item.shop.location }}</span>
-                    </div>
-                    
-                    {% if item.distance is not None %}
-                    <div class="text-sm mb-2" style="color: var(--primary); font-weight: 600;">
-                        📍 {% if item.distance < 1 %}{{ item.distance|floatformat:0 }} m away{% else %}{{ item.distance }} km away{% endif %}
-                    </div>
-                    {% endif %}
-                    
-                    <!-- Pricing Pivot -->
-                    <p class="text-primary" style="font-weight: 800; font-size: 1.125rem;">
-                        ₹{{ item.shop.a4_bw_price }}<span class="text-secondary" style="font-weight: 400; font-size: 0.9rem;">/page (B/W)</span>
-                    </p>
-                    
-                    <!-- Action -->
-                    <a href="{% url 'shops:detail' item.shop.id %}" class="btn btn-primary">
-                        Upload & Print
-                    </a>
-                </div>
-            </div>
-            {% empty %}
-            <div class="text-center py-4" style="grid-column: 1 / -1;">
-                <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
-                <h3>No shops found</h3>
-                <p class="text-muted">Try adjusting your search or location filters</p>
-            </div>
-            {% endfor %}
+
+        <!-- Map View -->
+        <div id="mapView" style="display: none;">
+            <div id="map"></div>
         </div>
+
+        <!-- List View -->
+        <div id="listView">
+            {% if user_lat and user_lon %}
+            <div style="margin-bottom: 1rem; color: var(--mid); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase;">
+                Showing shops sorted by distance from your location
+            </div>
+            {% endif %}
+
+            <!-- Shop Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: clamp(12px, 1.8vw, 26px);">
+                {% for item in shop_data %}
+                <div class="rv-scale rv-d{{ forloop.counter|add:"0" }}" style="border: 1px solid var(--line); overflow: hidden; transition: border-color 0.3s ease;">
+                    <!-- Shop Image -->
+                    <div style="height: 200px; position: relative; background: var(--bg-subtle);">
+                        <img src="{{ item.shop.get_primary_image }}" alt="{{ item.shop.name }}" style="width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.04); transition: filter 0.5s ease;" onmouseover="this.style.filter='grayscale(0) contrast(1.04)'" onmouseout="this.style.filter='grayscale(1) contrast(1.04)'">
+                        <span class="badge {% if item.shop.is_open %}badge-success{% else %}badge-error{% endif %}" style="position: absolute; top: 1rem; right: 1rem;">
+                            {% if item.shop.is_open %}Open{% else %}Closed{% endif %}
+                        </span>
+                        {% if item.distance is not None %}
+                        <div style="position: absolute; bottom: 1rem; left: 1rem; background: var(--ink); color: var(--bone); padding: 0.25rem 0.75rem; font-size: 11px; font-weight: 600; letter-spacing: 0.05em;">
+                            📍 {% if item.distance < 1 %}{{ item.distance|floatformat:0 }} m{% else %}{{ item.distance }} km{% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div style="padding: 1.25rem;">
+                        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 0.25rem;">{{ item.shop.name }}</h3>
+
+                        <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 12px; color: var(--mid); margin-bottom: 0.5rem;">
+                            <span>⭐ {{ item.shop.rating|default:"5.0" }}</span>
+                            <span>•</span>
+                            <span>{{ item.shop.location }}</span>
+                        </div>
+
+                        {% if item.distance is not None %}
+                        <div style="font-size: 12px; color: var(--mid); margin-bottom: 0.75rem;">
+                            📍 {% if item.distance < 1 %}{{ item.distance|floatformat:0 }} m away{% else %}{{ item.distance }} km away{% endif %}
+                        </div>
+                        {% endif %}
+
+                        <p style="font-weight: 800; font-size: 1.125rem; margin-bottom: 1rem;">
+                            ₹{{ item.shop.a4_bw_price }}<span style="font-weight: 400; font-size: 12px; color: var(--mid);">/page (B/W)</span>
+                        </p>
+
+                        <a href="{% url 'shops:detail' item.shop.id %}" class="btn btn-primary magnetic" style="width: 100%; text-align: center;">
+                            <span>Upload & Print</span>
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="text-align: center; padding: 4rem; grid-column: 1 / -1;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                    <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 0.5rem;">No shops found</h3>
+                    <p style="color: var(--mid); font-size: 13px;">Try adjusting your search or location filters</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
     </div>
 </section>
 
 <!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="" crossorigin=""></script>
 
 <script>
 // Initialize map
 let map;
 let markers = [];
 let userMarker = null;
-const defaultCenter = [20.5937, 78.9629]; // India center
+const defaultCenter = [20.5937, 78.9629];
 const defaultZoom = 5;
 
 function initMap() {
     map = L.map('map').setView(defaultCenter, defaultZoom);
-    
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
-    
-    // Load shop markers
     loadShopMarkers();
 }
 
 function loadShopMarkers() {
-    // Get markers from shop data
     const shopData = [
         {% for item in shop_data %}
         {
@@ -253,56 +236,48 @@ function loadShopMarkers() {
         },
         {% endfor %}
     ];
-    
-    // Clear existing markers
+
     markers.forEach(m => map.removeLayer(m));
     markers = [];
-    
+
     shopData.forEach(shop => {
         if (shop.lat && shop.lon) {
             const marker = L.marker([shop.lat, shop.lon]).addTo(map);
-            
-            const distanceText = shop.distance ? 
-                (shop.distance < 1 ? 
-                    `${(shop.distance * 1000).toFixed(0)} m` : 
-                    `${shop.distance} km`) : '';
-            
+            const distanceText = shop.distance ?
+                (shop.distance < 1 ? `${(shop.distance * 1000).toFixed(0)} m` : `${shop.distance} km`) : '';
+
             marker.bindPopup(`
                 <div class="shop-popup">
                     <h4>${shop.name}</h4>
                     <p>📍 ${shop.location}</p>
                     <p>⭐ ${shop.rating} • 💰 ₹${shop.price}/page</p>
                     ${distanceText ? `<p>🚶 ${distanceText} away</p>` : ''}
-                    <a href="/shop/${shop.id}/" class="btn btn-primary" style="display: block; text-align: center; margin-top: 0.5rem; padding: 0.5rem; background: #00B140; color: white; text-decoration: none; border-radius: 4px;">
+                    <a href="/shop/${shop.id}/" style="display: block; text-align: center; margin-top: 0.5rem; padding: 0.5rem; background: #101010; color: #EFEDE8; text-decoration: none; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;">
                         Upload & Print
                     </a>
                 </div>
             `);
-            
             markers.push(marker);
         }
     });
-    
-    // Fit bounds if we have markers
+
     if (markers.length > 0) {
         const group = L.featureGroup(markers);
         map.fitBounds(group.getBounds().pad(0.1));
     }
 }
 
-// View switching
 function switchView(view) {
     const listView = document.getElementById('listView');
     const mapView = document.getElementById('mapView');
     const listBtn = document.getElementById('listViewBtn');
     const mapBtn = document.getElementById('mapViewBtn');
-    
+
     if (view === 'map') {
         listView.style.display = 'none';
         mapView.style.display = 'block';
         listBtn.classList.remove('active');
         mapBtn.classList.add('active');
-        // Invalidate map size after display change
         setTimeout(() => map.invalidateSize(), 100);
     } else {
         listView.style.display = 'block';
@@ -312,68 +287,49 @@ function switchView(view) {
     }
 }
 
-// Geolocation
 function getMyLocation() {
     const statusEl = document.getElementById('locationStatus');
     const textEl = document.getElementById('locationText');
     const btn = document.getElementById('locationBtn');
-    
+
     if (!navigator.geolocation) {
         textEl.textContent = 'Geolocation is not supported by your browser';
         statusEl.style.display = 'block';
-        statusEl.querySelector('div').style.color = 'var(--error)';
         return;
     }
-    
+
     btn.disabled = true;
-    btn.textContent = '📍 Detecting...';
+    btn.innerHTML = '<span>Detecting...</span>';
     textEl.textContent = 'Detecting your location...';
     statusEl.style.display = 'block';
-    statusEl.querySelector('div').style.color = 'var(--text-secondary)';
-    
+
     navigator.geolocation.getCurrentPosition(
         function(position) {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
-            
             document.getElementById('userLat').value = lat;
             document.getElementById('userLon').value = lon;
-            
             textEl.textContent = `Location detected! Searching within ${document.querySelector('select[name="distance"]').value || 5} km...`;
-            statusEl.querySelector('div').style.color = 'var(--success)';
-            
             btn.disabled = false;
-            btn.textContent = '📍 Use My Location';
-            
-            // Auto-submit form
+            btn.innerHTML = '<span>Use My Location</span>';
             document.getElementById('searchForm').submit();
         },
         function(error) {
             btn.disabled = false;
-            btn.textContent = '📍 Use My Location';
-            
+            btn.innerHTML = '<span>Use My Location</span>';
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    textEl.textContent = 'Location permission denied. Please enable location access.';
-                    break;
+                    textEl.textContent = 'Location permission denied. Please enable location access.'; break;
                 case error.POSITION_UNAVAILABLE:
-                    textEl.textContent = 'Location information unavailable.';
-                    break;
+                    textEl.textContent = 'Location information unavailable.'; break;
                 case error.TIMEOUT:
-                    textEl.textContent = 'Location request timed out.';
-                    break;
+                    textEl.textContent = 'Location request timed out.'; break;
                 default:
-                    textEl.textContent = 'An unknown error occurred.';
-                    break;
+                    textEl.textContent = 'An unknown error occurred.'; break;
             }
             statusEl.style.display = 'block';
-            statusEl.querySelector('div').style.color = 'var(--error)';
         },
-        {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 300000
-        }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
     );
 }
 
@@ -384,7 +340,7 @@ function clearLocation() {
     document.getElementById('searchForm').submit();
 }
 
-// Autocomplete for search
+// Autocomplete
 const searchInput = document.getElementById('searchInput');
 const dropdown = document.getElementById('autocompleteDropdown');
 let searchTimeout;
@@ -392,12 +348,7 @@ let searchTimeout;
 searchInput.addEventListener('input', function() {
     clearTimeout(searchTimeout);
     const query = this.value.trim();
-    
-    if (query.length < 2) {
-        dropdown.style.display = 'none';
-        return;
-    }
-    
+    if (query.length < 2) { dropdown.style.display = 'none'; return; }
     searchTimeout = setTimeout(() => {
         fetch(`/shop/api/search/?q=${encodeURIComponent(query)}`)
             .then(res => res.json())
@@ -424,17 +375,12 @@ function selectLocation(lat, lon, name) {
     document.getElementById('searchForm').submit();
 }
 
-// Auto-submit on distance change
 document.querySelector('select[name="distance"]').addEventListener('change', function() {
     document.getElementById('searchForm').submit();
 });
 
-// Initialize map when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    initMap();
-});
+document.addEventListener('DOMContentLoaded', function() { initMap(); });
 
-// Close dropdown when clicking outside
 document.addEventListener('click', function(e) {
     if (!e.target.closest('#searchInput') && !e.target.closest('#autocompleteDropdown')) {
         dropdown.style.display = 'none';

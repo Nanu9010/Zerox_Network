@@ -5,22 +5,22 @@
 {% block content %}
 <div class="container text-center" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh;">
     
-    <p style="color: var(--text-secondary); font-size: 1.25rem; margin-bottom: 2rem;">Your Pickup PIN</p>
+    <p style="color: var(--mid); font-family: var(--font-body); font-size: 1.25rem; margin-bottom: 2rem;">Your Pickup PIN</p>
     
     <!-- Huge PIN -->
-    <div style="font-size: 6rem; font-weight: 800; letter-spacing: 0.5rem; color: var(--primary); margin-bottom: 3rem; line-height: 1;">
+    <div style="font-size: 6rem; font-family: var(--font-heading); font-weight: 800; letter-spacing: 0.5rem; color: var(--ink); background: var(--bone); border: 2px solid var(--ink); padding: 1rem 2rem; margin-bottom: 3rem; line-height: 1;">
         {{ order.pin_code|default:"4729" }}
     </div>
     
-    <!-- QR Code Placeholder -->
+    <!-- QR Code -->
     <div style="margin-bottom: 2rem;">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ order.id }}-{{ order.pin_code }}" alt="Order QR" style="width: 250px; height: 250px; border-radius: var(--radius-lg); padding: 1rem; background: white; box-shadow: var(--shadow-md);">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ order.id }}-{{ order.pin_code }}" alt="Order QR" style="width: 250px; height: 250px; border-radius: 0; padding: 1rem; background: white; border: 1px solid var(--line);">
     </div>
     
-    <p style="font-weight: 600; font-size: 1.125rem;">Show this to shop owner</p>
+    <p style="font-family: var(--font-heading); font-weight: 800; font-size: 1.125rem; color: var(--ink);">Show this to shop owner</p>
     
     <div style="margin-top: 3rem;">
-        <a href="{% url 'orders:my_orders' %}" class="btn btn-ghost">← Back to Orders</a>
+        <a href="{% url 'orders:my_orders' %}" class="btn btn-ghost" style="border-radius: 0; padding: 0.75rem 1.5rem; border: 1px solid var(--line); background: var(--bone); color: var(--ink); text-decoration: none; font-family: var(--font-body); transition: all 0.2s ease; display: inline-block;" onmouseover="this.style.transform='translateY(-1px)'; this.style.borderColor='var(--ink)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--line)';">&larr; Back to Orders</a>
     </div>
 
 </div>

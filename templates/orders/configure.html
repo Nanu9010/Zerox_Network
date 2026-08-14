@@ -7,106 +7,106 @@
 <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
 
 <style>
-    /* Custom Pill Styles */
+    :root {
+        --bone: #EFEDE8; --ink: #101010; --mid: #8A8781;
+        --bg: #EFEDE8; --bg-surface: #F4F3EF; --bg-subtle: #E9E8E3;
+        --line: #E2E0DA; --error: #C43D3D;
+        --font-heading: 'Archivo', sans-serif; --font-body: 'Archivo', sans-serif;
+    }
     .pill-group {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
         margin-bottom: 1.5rem;
     }
-    
     .pill-option {
         flex: 1;
         min-width: 80px;
         position: relative;
     }
-    
     .pill-option input {
         position: absolute;
         opacity: 0;
         cursor: pointer;
     }
-    
     .pill-label {
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 0.75rem 1rem;
-        background: white;
-        border: 2px solid #e5e7eb;
-        border-radius: var(--radius-lg);
+        background: var(--bone);
+        border: 1px solid var(--line);
+        border-radius: 0;
         font-weight: 600;
-        color: var(--text-secondary);
+        font-family: var(--font-body);
+        color: var(--ink);
         transition: all 0.2s;
         height: 100%;
         text-align: center;
         font-size: 0.9rem;
     }
-    
     .pill-option input:checked + .pill-label {
-        border-color: var(--primary);
-        background: #f0fdf4; /* Light green tint */
-        color: var(--primary);
-        box-shadow: 0 4px 6px -1px rgba(15, 157, 88, 0.1);
+        border-color: var(--ink);
+        background: var(--ink);
+        color: var(--bone);
+        box-shadow: none;
     }
-    
-    /* File Strip Styles */
+    .pill-label:hover {
+        border-color: var(--mid);
+    }
     .file-strip {
         display: flex;
         gap: 1rem;
         overflow-x: auto;
         padding: 1rem;
         padding-bottom: 1.5rem;
-        scrollbar-width: none; /* Hide scrollbar Firefox */
-        -ms-overflow-style: none; /* Hide scrollbar IE */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
     .file-strip::-webkit-scrollbar {
-        display: none; /* Hide scrollbar Chrome/Safari */
+        display: none;
     }
-    
     .file-thumb {
         min-width: 140px;
-        background: white;
-        border: 2px solid #e5e7eb;
-        border-radius: var(--radius-lg);
+        background: var(--bg-surface);
+        border: 1px solid var(--line);
+        border-radius: 0;
         padding: 0.5rem;
         opacity: 0.6;
         transition: all 0.2s;
         text-align: center;
         position: relative;
     }
-    
     .file-thumb.active {
         opacity: 1;
-        border-color: var(--primary);
+        border-color: var(--ink);
         transform: scale(1.05);
-        box-shadow: var(--shadow-md);
+        box-shadow: none;
     }
-    
     .file-controls-top {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 0.25rem;
     }
-    
     .copies-control {
         display: flex;
         align-items: center;
         gap: 0.25rem;
-        background: var(--bg-light);
-        border-radius: 999px;
+        background: var(--bone);
+        border-radius: 0;
         padding: 0.15rem 0.3rem;
+        border: 1px solid var(--line);
     }
-    
     .copies-btn {
         width: 24px;
         height: 24px;
-        border-radius: 50%;
+        border-radius: 0;
         border: none;
-        background: var(--primary);
-        color: white;
+        background: var(--ink);
+        color: var(--bone);
         font-weight: 700;
+        font-family: var(--font-body);
         font-size: 1rem;
         cursor: pointer;
         display: flex;
@@ -116,31 +116,29 @@
         line-height: 1;
         transition: all 0.15s;
     }
-    
     .copies-btn:hover {
-        transform: scale(1.1);
+        transform: translateY(-1px);
     }
-    
     .copies-btn:active {
         transform: scale(0.95);
     }
-    
     .copies-count {
         min-width: 20px;
         text-align: center;
         font-weight: 700;
+        font-family: var(--font-body);
         font-size: 0.85rem;
-        color: var(--text-primary);
+        color: var(--ink);
     }
-    
     .remove-file-btn {
         width: 24px;
         height: 24px;
-        border-radius: 50%;
+        border-radius: 0;
         border: none;
-        background: var(--error, #ef4444);
-        color: white;
+        background: var(--error);
+        color: var(--bone);
         font-weight: 700;
+        font-family: var(--font-body);
         font-size: 0.9rem;
         cursor: pointer;
         display: flex;
@@ -149,48 +147,111 @@
         padding: 0;
         line-height: 1;
         transition: all 0.15s;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        box-shadow: none;
     }
-    
     .remove-file-btn:hover {
-        transform: scale(1.15);
-        background: #dc2626;
+        transform: translateY(-1px);
+        background: #a33232;
     }
-    
-    /* Sticky Footer */
     .sticky-footer {
         position: fixed;
         bottom: 0;
         left: 0;
         right: 0;
-        background: white;
+        background: var(--bone);
         padding: 1rem;
         padding-bottom: calc(1rem + env(safe-area-inset-bottom));
-        box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+        box-shadow: 0 -1px 0 var(--line);
         z-index: 100;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
+        border-top: 1px solid var(--line);
     }
-    
     .section-title {
+        font-family: var(--font-heading);
         font-size: 0.875rem;
         text-transform: uppercase;
-        color: var(--text-muted);
-        font-weight: 700;
+        color: var(--mid);
+        font-weight: 800;
         letter-spacing: 1px;
         margin-bottom: 0.75rem;
     }
+    .btn {
+        font-family: var(--font-body);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+        text-align: center;
+    }
+    .btn-primary {
+        background: var(--ink);
+        color: var(--bone);
+        border: 1px solid var(--ink);
+    }
+    .btn-primary:hover {
+        transform: translateY(-1px);
+    }
+    .btn-secondary {
+        background: var(--bone);
+        color: var(--ink);
+        border: 1px solid var(--line);
+    }
+    .btn-secondary:hover {
+        transform: translateY(-1px);
+        border-color: var(--ink);
+    }
+    .form-input {
+        font-family: var(--font-body);
+        background: var(--bone);
+        border: 1px solid var(--line);
+        border-radius: 0;
+        padding: 0.75rem 1rem;
+        color: var(--ink);
+        width: 100%;
+        transition: border-color 0.2s;
+    }
+    .form-input:focus {
+        outline: none;
+        border-color: var(--ink);
+    }
+    .form-input::placeholder {
+        color: var(--mid);
+    }
+    .form-label {
+        font-family: var(--font-body);
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    textarea.form-input {
+        resize: vertical;
+        min-height: 60px;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+    h3 {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        color: var(--ink);
+        margin: 0;
+        padding: 1rem 0;
+    }
 </style>
 
-<div style="padding-bottom: 120px; background: var(--bg-gray); min-height: 100vh;">
+<div style="padding-bottom: 120px; background: var(--bg); min-height: 100vh;">
     
     <form method="POST" id="configForm">
         {% csrf_token %}
         
         <!-- STEP A: File Selector -->
-        <div style="background: white; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb;">
+        <div style="background: var(--bg-surface); padding-bottom: 0.5rem; border-bottom: 1px solid var(--line);">
             <div class="container">
                 <h3 style="padding-top: 1rem; margin-bottom: 0;">Documents</h3>
             </div>
@@ -208,16 +269,16 @@
                         <button type="button" class="remove-file-btn" onclick="event.stopPropagation(); removeFile({{ file.id }});" title="Remove file">&times;</button>
                     </div>
                     <!-- Canvas for thumb -->
-                    <canvas id="thumb_{{ file.id }}" style="width: 100%; height: 100px; object-fit: contain; margin-bottom: 0.5rem; background: #fafafa;"></canvas>
-                    <div style="font-weight: 600; font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ file.file_name }}</div>
-                    <div style="font-size: 0.7rem; color: var(--text-muted);">{{ file.pages_count }} pgs</div>
+                    <canvas id="thumb_{{ file.id }}" style="width: 100%; height: 100px; object-fit: contain; margin-bottom: 0.5rem; background: var(--bone);"></canvas>
+                    <div style="font-weight: 600; font-family: var(--font-body); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ file.file_name }}</div>
+                    <div style="font-size: 0.7rem; color: var(--mid);">{{ file.pages_count }} pgs</div>
                 </div>
                 {% endfor %}
                 
                 <!-- Add Button -->
                 <div class="file-thumb" onclick="document.getElementById('addFileInput').click()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; border-style: dashed; opacity: 1;">
-                    <span style="font-size: 2rem; color: var(--primary);">+</span>
-                    <span style="font-size: 0.8rem; font-weight: 600; color: var(--primary);">Add File</span>
+                    <span style="font-size: 2rem; color: var(--ink);">+</span>
+                    <span style="font-size: 0.8rem; font-weight: 600; font-family: var(--font-body); color: var(--ink);">Add File</span>
                 </div>
             </div>
         </div>
@@ -241,7 +302,7 @@
             </div>
 
             <!-- Configuration Sections -->
-            <div class="card" style="border: none; box-shadow: none; padding: 0; background: transparent;">
+            <div class="card" style="border: 1px solid var(--line); box-shadow: none; padding: 1.5rem; background: var(--bg-surface); border-radius: 0;">
                 
                 <!-- Pages Per Sheet -->
                 <p class="section-title">Pages per Sheet</p>
@@ -275,7 +336,7 @@
                 <div class="grid grid-2" style="gap: 1rem; margin-bottom: 0;">
                     <div>
                         <p class="section-title">Color</p>
-                        <div class="pill-group" style="margin-bottom: 0;"> <!-- Reset margin for grid context -->
+                        <div class="pill-group" style="margin-bottom: 0;">
                             <label class="pill-option">
                                 <input type="radio" name="color_type" value="BW" checked onchange="updateSettings()">
                                 <span class="pill-label">B/W</span>
@@ -320,9 +381,9 @@
                 <div style="margin-top: 1.5rem;">
                     <p class="section-title">Copies</p>
                     <div style="display: flex; align-items: center; gap: 1rem;">
-                        <button type="button" class="btn btn-secondary" style="width: 48px; border-radius: 50%; padding: 0;" onclick="adjustCopies(-1)">-</button>
+                        <button type="button" class="btn btn-secondary" style="width: 48px; border-radius: 0; padding: 0;" onclick="adjustCopies(-1)">-</button>
                         <input type="number" name="copies" value="1" min="1" class="form-input" style="text-align: center; width: 80px;" onchange="updateSettings()" readonly>
-                        <button type="button" class="btn btn-secondary" style="width: 48px; border-radius: 50%; padding: 0;" onclick="adjustCopies(1)">+</button>
+                        <button type="button" class="btn btn-secondary" style="width: 48px; border-radius: 0; padding: 0;" onclick="adjustCopies(1)">+</button>
                     </div>
                 </div>
                 
@@ -337,13 +398,13 @@
         <!-- Sticky Footer -->
         <div class="sticky-footer">
             <div>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0;">Estimated Total</p>
+                <p style="font-size: 0.75rem; color: var(--mid); margin-bottom: 0; font-family: var(--font-body);">Estimated Total</p>
                 <div style="display: flex; align-items: baseline; gap: 0.5rem;">
-                    <h2 id="totalPriceDisplay" style="margin: 0; color: var(--text-primary);">₹0</h2>
-                    <span id="totalSheetsDisplay" style="font-size: 0.8rem; color: var(--text-secondary);">0 sheets</span>
+                    <h2 id="totalPriceDisplay" style="margin: 0; color: var(--ink); font-family: var(--font-heading); font-weight: 800;">₹0</h2>
+                    <span id="totalSheetsDisplay" style="font-size: 0.8rem; color: var(--ink); font-family: var(--font-body);">0 sheets</span>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary" style="padding: 0 2rem; min-width: 150px;">
+            <button type="submit" class="btn btn-primary" style="padding: 0 2rem; min-width: 150px; height: 48px;">
                 PAY NOW
             </button>
         </div>

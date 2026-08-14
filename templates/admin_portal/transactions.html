@@ -3,65 +3,212 @@
 {% block title %}Transactions - Admin Portal{% endblock %}
 
 {% block content %}
+<style>
+:root {
+  --bone: #EFEDE8;
+  --ink: #101010;
+  --mid: #8A8781;
+  --bg-surface: #F4F3EF;
+  --line: #E2E0DA;
+  --error: #C43D3D;
+  --font-heading: 'Archivo', sans-serif;
+  --font-body: 'Archivo', sans-serif;
+}
+.tx-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+@media (min-width: 768px) {
+  .tx-header { flex-direction: row; align-items: center; }
+}
+.tx-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.tx-title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1;
+}
+.tx-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--line);
+  border-radius: 0px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  transition: border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tx-card:hover {
+  border-color: var(--ink);
+}
+.tx-card-value {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+.tx-card-label {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--mid);
+  margin: 0;
+}
+.tx-table-wrap {
+  background: var(--bone);
+  border: 1px solid var(--line);
+  border-radius: 0px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+.tx-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+.tx-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.tx-table th {
+  padding: 1rem;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mid);
+  background: var(--bg-surface);
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.tx-table td {
+  padding: 1rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+.tx-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.tx-table tbody tr:hover {
+  background: var(--bg-surface);
+}
+.tx-id {
+  font-weight: 600;
+}
+.tx-amount {
+  font-weight: 600;
+}
+.tx-commission {
+  font-weight: 600;
+  color: var(--ink);
+}
+.tx-empty {
+  padding: 3rem;
+  text-align: center;
+  color: var(--mid);
+}
+.tx-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1rem;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--mid);
+  border: none;
+  border-radius: 0px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  min-height: 44px;
+  width: auto;
+  min-width: auto;
+}
+.tx-back:hover {
+  background: rgba(16, 16, 16, 0.05);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+.tx-date {
+  color: var(--mid);
+  white-space: nowrap;
+}
+</style>
+
 <div class="container mt-4 mb-4">
-    <div style="display: flex; flex-direction: column; md-flex-direction: row; align-items: flex-start; md-align-items: center; justify-content: space-between; margin-bottom: 2rem; gap: 1rem;">
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <a href="{% url 'admin_portal:dashboard' %}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
-            <h1 class="mb-0" style="font-size: 1.5rem;">Transactions</h1>
+    <div class="tx-header">
+        <div class="tx-header-left">
+            <a href="{% url 'admin_portal:dashboard' %}" class="tx-back" style="width: auto; min-width: auto;">&larr;</a>
+            <h1 class="tx-title mb-0">Transactions</h1>
         </div>
     </div>
 
-    <!-- Summary Cards -->
     <div class="grid grid-2 mb-4">
-        <div class="card bg-surface">
-            <h3 class="mb-1 text-primary">₹{{ total_volume|floatformat:2 }}</h3>
-            <p class="text-secondary text-sm mb-0">Total Gross Volume</p>
+        <div class="tx-card">
+            <div class="tx-card-value">₹{{ total_volume|floatformat:2 }}</div>
+            <p class="tx-card-label mb-0">Total Gross Volume</p>
         </div>
-        <div class="card bg-surface">
-            <h3 class="mb-1 text-success">₹{{ total_commission|floatformat:2 }}</h3>
-            <p class="text-secondary text-sm mb-0">Platform Revenue (15%)</p>
+        <div class="tx-card">
+            <div class="tx-card-value">₹{{ total_commission|floatformat:2 }}</div>
+            <p class="tx-card-label mb-0">Platform Revenue (15%)</p>
         </div>
     </div>
 
-    <!-- Transactions Table -->
-    <div class="card p-0" style="overflow: hidden;">
-        <div class="table-responsive" style="margin-bottom: 0;">
-            <table style="width: 100%; border-collapse: collapse;">
+    <div class="tx-table-wrap">
+        <div class="tx-table-scroll">
+            <table class="tx-table">
                 <thead>
-                    <tr style="background: var(--bg-subtle); text-align: left;">
-                        <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Date</th>
-                        <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Order ID</th>
-                        <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Shop</th>
-                        <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Customer</th>
-                        <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Amount</th>
-                        <th style="padding: 1rem; font-weight: 600; color: var(--text-secondary);">Commission</th>
+                    <tr>
+                        <th>Date</th>
+                        <th>Order ID</th>
+                        <th>Shop</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>Commission</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for order in orders %}
-                    <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
-                        <td style="padding: 1rem; color: var(--text-secondary);">
+                    <tr>
+                        <td class="tx-date">
                             {{ order.completed_at|date:"M d, Y H:i" }}
                         </td>
-                        <td style="padding: 1rem; font-weight: 600;">
+                        <td class="tx-id">
                             #{{ order.id|stringformat:".4s" }}
                         </td>
-                        <td style="padding: 1rem;">
+                        <td>
                             {{ order.shop.name }}
                         </td>
-                        <td style="padding: 1rem;">
+                        <td>
                             {{ order.customer.username|default:order.customer_name }}
                         </td>
-                        <td style="padding: 1rem; font-weight: 600;">
+                        <td class="tx-amount">
                             ₹{{ order.total_price }}
                         </td>
-                        <td style="padding: 1rem; color: var(--success); font-weight: 600;">
+                        <td class="tx-commission">
                             ₹{{ order.commission_amount }}
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                        <td colspan="6" class="tx-empty">
                             No transactions found.
                         </td>
                     </tr>

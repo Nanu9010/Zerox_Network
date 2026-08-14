@@ -2,14 +2,223 @@
 
 {% block title %}Add User - Admin{% endblock %}
 
+{% block extra_css %}
+<style>
+    :root {
+        --bone: #EFEDE8;
+        --ink: #101010;
+        --mid: #8A8781;
+        --bg-surface: #F4F3EF;
+        --line: #E2E0DA;
+        --error: #C43D3D;
+        --font-heading: 'Archivo', sans-serif;
+        --font-body: 'Archivo', sans-serif;
+    }
+    .sable-section {
+        background: var(--bg-surface);
+        padding: 2rem 0;
+    }
+    .sable-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .sable-card {
+        background: var(--bone);
+        border: 1px solid var(--line);
+        border-radius: 0;
+        padding: 2rem;
+    }
+    .sable-heading {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        color: var(--ink);
+        font-size: 1.75rem;
+        margin: 0;
+    }
+    .sable-subheading {
+        font-family: var(--font-body);
+        color: var(--mid);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    .sable-btn {
+        font-family: var(--font-body);
+        font-weight: 600;
+        border-radius: 0;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: var(--bone);
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        transition: transform 0.15s ease;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .sable-btn:hover {
+        transform: translateY(-1px);
+    }
+    .sable-btn-secondary {
+        background: transparent;
+        color: var(--ink);
+    }
+    .sable-btn-ghost {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--ink);
+    }
+    .sable-form-label {
+        font-family: var(--font-body);
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--ink);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    .sable-form-input {
+        font-family: var(--font-body);
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--line);
+        border-radius: 0;
+        background: var(--bone);
+        color: var(--ink);
+        font-size: 0.9rem;
+        box-sizing: border-box;
+    }
+    .sable-form-input::placeholder {
+        color: var(--mid);
+    }
+    .sable-form-group {
+        margin-bottom: 1.25rem;
+    }
+    .sable-role-card {
+        cursor: pointer;
+        padding: 1.25rem;
+        border: 2px solid var(--line);
+        border-radius: 0;
+        background: var(--bone);
+        text-align: center;
+        transition: all 0.2s;
+        font-family: var(--font-body);
+    }
+    .sable-role-card.active {
+        border-color: var(--ink);
+        background: var(--bg-surface);
+    }
+    .sable-role-card:hover {
+        border-color: var(--mid);
+    }
+    .sable-role-card input {
+        display: none;
+    }
+    .sable-role-label {
+        font-weight: 700;
+        font-size: 0.875rem;
+        color: var(--ink);
+    }
+    .sable-dual-toggle {
+        margin-top: 1rem;
+        padding: 0.75rem 1rem;
+        background: var(--bg-surface);
+        border: 1px dashed var(--line);
+        border-radius: 0;
+    }
+    .sable-dual-toggle label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+    }
+    .sable-dual-toggle-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--ink);
+    }
+    .sable-dual-toggle-desc {
+        font-size: 0.8rem;
+        color: var(--mid);
+    }
+    .sable-divider {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px dashed var(--line);
+    }
+    .sable-shop-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .sable-shop-header h3 {
+        margin: 0;
+        font-size: 1.125rem;
+        font-family: var(--font-heading);
+        font-weight: 800;
+        color: var(--ink);
+    }
+    .sable-badge {
+        font-size: 0.75rem;
+        padding: 0.15rem 0.5rem;
+        border-radius: 0;
+        font-family: var(--font-body);
+        font-weight: 600;
+    }
+    .sable-badge-required {
+        background: #FDE8E8;
+        color: var(--error);
+        display: none;
+    }
+    .sable-badge-optional {
+        background: var(--bg-surface);
+        color: var(--mid);
+    }
+    .sable-message {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border-radius: 0;
+        border: 1px solid var(--line);
+        font-family: var(--font-body);
+    }
+    .sable-message-success {
+        border-color: #2D7D46;
+        background: #E8F5ED;
+        color: #1A4D2B;
+    }
+    .sable-message-error {
+        border-color: var(--error);
+        background: #FDE8E8;
+        color: #7A1F1F;
+    }
+    .sable-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+    .sable-btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+    .sable-text-muted {
+        color: var(--mid);
+        font-family: var(--font-body);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<section style="background: var(--secondary); padding: 2rem 0;">
+<section class="sable-section">
     <div class="container">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
-            <a href="{% url 'admin_portal:users' %}?role={{ role_filter }}" class="btn btn-ghost" style="width: auto; min-width: auto;">←</a>
-            <h1 style="font-size: 1.75rem; margin: 0;">➕ Add User</h1>
+            <a href="{% url 'admin_portal:users' %}?role={{ role_filter }}" class="sable-btn sable-btn-ghost" style="width: auto; min-width: auto;">←</a>
+            <h1 class="sable-heading">Add User</h1>
         </div>
-        <p style="color: var(--text-secondary);">
+        <p class="sable-subheading">
             {% if role_filter == 'CUSTOMER' %}Create a new customer account
             {% elif role_filter == 'SHOP' %}Create a new shop owner account
             {% elif role_filter == 'STAFF' %}Create a staff account with limited admin access
@@ -20,12 +229,12 @@
 </section>
 
 <section class="container" style="padding: 3rem 0;">
-    <div style="max-width: 600px; margin: 0 auto;">
-        <div class="card card-elevated">
+    <div class="sable-container">
+        <div class="sable-card">
             
             {% if messages %}
                 {% for message in messages %}
-                <div class="card {% if message.tags == 'success' %}badge-success{% elif message.tags == 'error' %}badge-error{% endif %}" style="margin-bottom: 1.5rem; padding: 1rem;">
+                <div class="sable-message {% if message.tags == 'success' %}sable-message-success{% elif message.tags == 'error' %}sable-message-error{% endif %}">
                     {{ message }}
                 </div>
                 {% endfor %}
@@ -34,140 +243,138 @@
             <form method="POST" id="addUserForm">
                 {% csrf_token %}
                 
-                <!-- Role Selection -->
-                <div class="form-group">
-                    <label class="form-label">Role</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                <div class="sable-form-group">
+                    <label class="sable-form-label">Role</label>
+                    <div class="sable-grid">
                         {% if role_filter == 'all' or role_filter == 'CUSTOMER' %}
-                        <label class="role-option" style="cursor: pointer; padding: 1.25rem; border: 2px solid {% if role_filter == 'CUSTOMER' %}var(--primary); background: hsl(145, 60%, 97%){% else %}var(--border-color); background: white{% endif %}; border-radius: var(--radius-md); text-align: center; transition: all 0.2s;">
-                            <input type="radio" name="role" value="CUSTOMER" {% if role_filter == 'CUSTOMER' %}checked{% endif %} style="display: none;">
+                        <label class="sable-role-card {% if role_filter == 'CUSTOMER' %}active{% endif %}">
+                            <input type="radio" name="role" value="CUSTOMER" {% if role_filter == 'CUSTOMER' %}checked{% endif %}>
                             <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">👤</div>
-                            <div style="font-weight: 700; font-size: 0.875rem;">Customer</div>
+                            <div class="sable-role-label">Customer</div>
                         </label>
                         {% endif %}
                         
                         {% if role_filter == 'all' or role_filter == 'SHOP' %}
-                        <label class="role-option" style="cursor: pointer; padding: 1.25rem; border: 2px solid {% if role_filter == 'SHOP' %}var(--primary); background: hsl(145, 60%, 97%){% else %}var(--border-color); background: white{% endif %}; border-radius: var(--radius-md); text-align: center; transition: all 0.2s;">
-                            <input type="radio" name="role" value="SHOP" {% if role_filter == 'SHOP' %}checked{% endif %} style="display: none;">
+                        <label class="sable-role-card {% if role_filter == 'SHOP' %}active{% endif %}">
+                            <input type="radio" name="role" value="SHOP" {% if role_filter == 'SHOP' %}checked{% endif %}>
                             <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🏪</div>
-                            <div style="font-weight: 700; font-size: 0.875rem;">Shop Owner</div>
+                            <div class="sable-role-label">Shop Owner</div>
                         </label>
                         {% endif %}
                         
                         {% if role_filter == 'all' or role_filter == 'STAFF' %}
-                        <label class="role-option" style="cursor: pointer; padding: 1.25rem; border: 2px solid {% if role_filter == 'STAFF' %}var(--primary); background: hsl(145, 60%, 97%){% else %}var(--border-color); background: white{% endif %}; border-radius: var(--radius-md); text-align: center; transition: all 0.2s;">
-                            <input type="radio" name="role" value="STAFF" {% if role_filter == 'STAFF' %}checked{% endif %} style="display: none;">
+                        <label class="sable-role-card {% if role_filter == 'STAFF' %}active{% endif %}">
+                            <input type="radio" name="role" value="STAFF" {% if role_filter == 'STAFF' %}checked{% endif %}>
                             <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">📋</div>
-                            <div style="font-weight: 700; font-size: 0.875rem;">Staff</div>
+                            <div class="sable-role-label">Staff</div>
                         </label>
                         {% endif %}
                         
                         {% if role_filter == 'all' or role_filter == 'ADMIN' %}
-                        <label class="role-option" style="cursor: pointer; padding: 1.25rem; border: 2px solid {% if role_filter == 'ADMIN' %}var(--primary); background: hsl(145, 60%, 97%){% else %}var(--border-color); background: white{% endif %}; border-radius: var(--radius-md); text-align: center; transition: all 0.2s;">
-                            <input type="radio" name="role" value="ADMIN" {% if role_filter == 'ADMIN' %}checked{% endif %} style="display: none;">
+                        <label class="sable-role-card {% if role_filter == 'ADMIN' %}active{% endif %}">
+                            <input type="radio" name="role" value="ADMIN" {% if role_filter == 'ADMIN' %}checked{% endif %}>
                             <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">👑</div>
-                            <div style="font-weight: 700; font-size: 0.875rem;">Admin</div>
+                            <div class="sable-role-label">Admin</div>
                         </label>
                         {% endif %}
                     </div>
                 </div>
                 
-                <!-- Dual Role Toggle -->
-                <div style="margin-top: 1rem; padding: 0.75rem 1rem; background: var(--bg-light); border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
-                    <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
-                        <input type="checkbox" name="is_shop_owner" id="isShopOwner" style="width: 18px; height: 18px; accent-color: var(--primary);">
+                <div class="sable-dual-toggle">
+                    <label>
+                        <input type="checkbox" name="is_shop_owner" id="isShopOwner" style="width: 18px; height: 18px;">
                         <div>
-                            <div style="font-weight: 600; font-size: 0.9rem;">Also a Shop Owner</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">Allow this user to also manage shops (dual role)</div>
+                            <div class="sable-dual-toggle-title">Also a Shop Owner</div>
+                            <div class="sable-dual-toggle-desc">Allow this user to also manage shops (dual role)</div>
                         </div>
                     </label>
                 </div>
                 
-                <!-- User Info -->
                 <div style="margin-top: 1.5rem;">
-                    <div class="form-group">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" name="full_name" class="form-input" placeholder="e.g., John Doe" value="{{ form_data.full_name|default:'' }}" required>
+                    <div class="sable-form-group">
+                        <label class="sable-form-label">Full Name</label>
+                        <input type="text" name="full_name" class="sable-form-input" placeholder="e.g., John Doe" value="{{ form_data.full_name|default:'' }}" required>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">Username</label>
-                        <input type="text" name="username" class="form-input" placeholder="Choose a username" value="{{ form_data.username|default:'' }}" required>
+                    <div class="sable-form-group">
+                        <label class="sable-form-label">Username</label>
+                        <input type="text" name="username" class="sable-form-input" placeholder="Choose a username" value="{{ form_data.username|default:'' }}" required>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" name="email" class="form-input" placeholder="user@example.com" value="{{ form_data.email|default:'' }}">
+                    <div class="sable-form-group">
+                        <label class="sable-form-label">Email</label>
+                        <input type="email" name="email" class="sable-form-input" placeholder="user@example.com" value="{{ form_data.email|default:'' }}">
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">Phone</label>
-                        <input type="tel" name="phone" class="form-input" placeholder="+91 1234567890" value="{{ form_data.phone|default:'' }}" required>
+                    <div class="sable-form-group">
+                        <label class="sable-form-label">Phone</label>
+                        <input type="tel" name="phone" class="sable-form-input" placeholder="+91 1234567890" value="{{ form_data.phone|default:'' }}" required>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-input" placeholder="Create a strong password" required>
+                    <div class="sable-form-group">
+                        <label class="sable-form-label">Password</label>
+                        <input type="password" name="password" class="sable-form-input" placeholder="Create a strong password" required>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">Confirm Password</label>
-                        <input type="password" name="password2" class="form-input" placeholder="Confirm password" required>
+                    <div class="sable-form-group">
+                        <label class="sable-form-label">Confirm Password</label>
+                        <input type="password" name="password2" class="sable-form-input" placeholder="Confirm password" required>
                     </div>
                 </div>
                 
-                <!-- Shop Section (shown for SHOP and is_shop_owner) -->
-                <div id="shopSection" style="display: none; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px dashed var(--border-color);">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-                        <span style="font-size: 1.25rem;">🏪</span>
-                        <h3 style="margin: 0; font-size: 1.125rem;">Shop Details</h3>
-                        <span id="shopRequired" style="display: none; font-size: 0.75rem; background: hsl(0, 80%, 95%); color: hsl(0, 80%, 50%); padding: 0.15rem 0.5rem; border-radius: 999px;">Required</span>
-                        <span id="shopOptional" style="font-size: 0.75rem; background: hsl(145, 60%, 95%); color: var(--primary); padding: 0.15rem 0.5rem; border-radius: 999px;">Optional</span>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Shop Name</label>
-                        <input type="text" name="shop_name" class="form-input" placeholder="e.g., Quick Print Hub" value="{{ form_data.shop_name|default:'' }}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Location / Address</label>
-                        <input type="text" name="shop_location" class="form-input" placeholder="e.g., MG Road, Bangalore" value="{{ form_data.shop_location|default:'' }}">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Shop Phone</label>
-                        <input type="tel" name="shop_phone" class="form-input" placeholder="e.g., 9876543210" value="{{ form_data.shop_phone|default:'' }}">
-                    </div>
-                    
-                    <input type="hidden" name="shop_lat" id="shopLat">
-                    <input type="hidden" name="shop_lon" id="shopLon">
-                    
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                        <div class="form-group">
-                            <label class="form-label">A4 B&W (₹)</label>
-                            <input type="number" step="0.01" name="a4_bw_price" class="form-input" value="1.00">
+                <div id="shopSection" style="display: none;">
+                    <div class="sable-divider">
+                        <div class="sable-shop-header">
+                            <span style="font-size: 1.25rem;">🏪</span>
+                            <h3>Shop Details</h3>
+                            <span id="shopRequired" class="sable-badge sable-badge-required">Required</span>
+                            <span id="shopOptional" class="sable-badge sable-badge-optional">Optional</span>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">A4 Color (₹)</label>
-                            <input type="number" step="0.01" name="a4_color_price" class="form-input" value="5.00">
+                        
+                        <div class="sable-form-group">
+                            <label class="sable-form-label">Shop Name</label>
+                            <input type="text" name="shop_name" class="sable-form-input" placeholder="e.g., Quick Print Hub" value="{{ form_data.shop_name|default:'' }}">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">A3 B&W (₹)</label>
-                            <input type="number" step="0.01" name="a3_bw_price" class="form-input" value="2.00">
+                        
+                        <div class="sable-form-group">
+                            <label class="sable-form-label">Location / Address</label>
+                            <input type="text" name="shop_location" class="sable-form-input" placeholder="e.g., MG Road, Bangalore" value="{{ form_data.shop_location|default:'' }}">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">A3 Color (₹)</label>
-                            <input type="number" step="0.01" name="a3_color_price" class="form-input" value="10.00">
+                        
+                        <div class="sable-form-group">
+                            <label class="sable-form-label">Shop Phone</label>
+                            <input type="tel" name="shop_phone" class="sable-form-input" placeholder="e.g., 9876543210" value="{{ form_data.shop_phone|default:'' }}">
+                        </div>
+                        
+                        <input type="hidden" name="shop_lat" id="shopLat">
+                        <input type="hidden" name="shop_lon" id="shopLon">
+                        
+                        <div class="sable-grid">
+                            <div class="sable-form-group">
+                                <label class="sable-form-label">A4 B&W (₹)</label>
+                                <input type="number" step="0.01" name="a4_bw_price" class="sable-form-input" value="1.00">
+                            </div>
+                            <div class="sable-form-group">
+                                <label class="sable-form-label">A4 Color (₹)</label>
+                                <input type="number" step="0.01" name="a4_color_price" class="sable-form-input" value="5.00">
+                            </div>
+                            <div class="sable-form-group">
+                                <label class="sable-form-label">A3 B&W (₹)</label>
+                                <input type="number" step="0.01" name="a3_bw_price" class="sable-form-input" value="2.00">
+                            </div>
+                            <div class="sable-form-group">
+                                <label class="sable-form-label">A3 Color (₹)</label>
+                                <input type="number" step="0.01" name="a3_color_price" class="sable-form-input" value="10.00">
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem;">
-                    <button type="submit" class="btn btn-primary" style="width: 100%; height: 48px; justify-content: center;">
-                        ✅ Create User
+                <div class="sable-btn-group">
+                    <button type="submit" class="sable-btn" style="width: 100%;">
+                        Create User
                     </button>
-                    <a href="{% url 'admin_portal:users' %}?role={{ role_filter }}" class="btn btn-secondary" style="width: 100%; height: 48px; justify-content: center; display: flex; align-items: center;">
+                    <a href="{% url 'admin_portal:users' %}?role={{ role_filter }}" class="sable-btn sable-btn-secondary" style="width: 100%;">
                         Cancel
                     </a>
                 </div>
@@ -215,15 +422,12 @@ function setShopFieldsRequired(required) {
     });
 }
 
-// Role card selection
-document.querySelectorAll('.role-option').forEach(card => {
+document.querySelectorAll('.sable-role-card').forEach(card => {
     card.addEventListener('click', function() {
-        document.querySelectorAll('.role-option').forEach(c => {
-            c.style.borderColor = 'var(--border-color)';
-            c.style.background = 'white';
+        document.querySelectorAll('.sable-role-card').forEach(c => {
+            c.classList.remove('active');
         });
-        this.style.borderColor = 'var(--primary)';
-        this.style.background = 'hsl(145, 60%, 97%)';
+        this.classList.add('active');
         this.querySelector('input[type="radio"]').checked = true;
         toggleShopSection();
     });
@@ -231,7 +435,6 @@ document.querySelectorAll('.role-option').forEach(card => {
 
 isShopOwnerCheckbox.addEventListener('change', toggleShopSection);
 
-// Init on load
 toggleShopSection();
 </script>
 {% endblock %}
