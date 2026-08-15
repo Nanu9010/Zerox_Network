@@ -240,7 +240,7 @@
         if (e.target === this) {
             closeMenu();
         }
-    });
+    }, {once: true});
 
     // ============================================
     // CURSOR GLOW
@@ -254,10 +254,10 @@
             mouseX = e.clientX;
             mouseY = e.clientY;
             glow.style.opacity = '1';
-        });
+        }, {once: true});
         document.addEventListener('mouseleave', function() {
             glow.style.opacity = '0';
-        });
+        }, {once: true});
 
         function animateGlow() {
             glowX += (mouseX - glowX) * 0.08;
@@ -278,10 +278,10 @@
                     var x = e.clientX - rect.left - rect.width / 2;
                     var y = e.clientY - rect.top - rect.height / 2;
                     el.style.transform = 'translate(' + (x * 0.15) + 'px, ' + (y * 0.15) + 'px)';
-                });
+                }, {once: true});
                 el.addEventListener('mouseleave', function() {
                     el.style.transform = 'translate(0, 0)';
-                });
+                }, {once: true});
             });
         }
 
@@ -376,7 +376,7 @@
                         }
                     }
                 });
-            });
+            }, {once: true});
 
             dockBar.addEventListener('mouseleave', function() {
                 dockItems.forEach(function(item) {
@@ -391,7 +391,7 @@
                         }
                     }
                 });
-            });
+            }, {once: true});
         }
     })();
 

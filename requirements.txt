@@ -5,3 +5,4 @@ qrcode>=7.4.2
 reportlab>=4.0.0
 razorpay>=1.4.0
 requests>=2.31.0
+whitenoise>=6.6.0
